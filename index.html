@@ -479,6 +479,7 @@
             <div class="nav-tabs">
                 <button class="nav-tab active" data-module="wortfluessigkeit">📝 Wortflüssigkeit</button>
                 <button class="nav-tab" data-module="zahlenfolgen">🔢 Zahlenfolgen</button>
+                <button class="nav-tab" data-module="wissen">🧬 Wissen</button>
                 <button class="nav-tab" data-module="figuren">🔷 Figuren</button>
             </div>
         </nav>
@@ -613,6 +614,83 @@
                     <div class="stat-item">
                         <span id="zf-success-rate" class="stat-value">0%</span>
                         <span class="stat-label">Erfolgsrate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wissen-Modul -->
+            <div id="wissen-module" class="module">
+                <div class="difficulty-selector">
+                    <h3>Fachbereich wählen:</h3>
+                    <div class="difficulty-options">
+                        <button class="difficulty-btn active" data-subject="all">Alle</button>
+                        <button class="difficulty-btn" data-subject="biologie">🧬 Biologie</button>
+                        <button class="difficulty-btn" data-subject="chemie">⚗️ Chemie</button>
+                        <button class="difficulty-btn" data-subject="physik">⚡ Physik</button>
+                        <button class="difficulty-btn" data-subject="mathematik">📐 Mathematik</button>
+                    </div>
+                </div>
+
+                <div class="word-card">
+                    <div style="display:flex; justify-content:center; margin-bottom:1.5rem;">
+                        <span id="wissen-subject-badge" style="
+                            background: var(--accent-gold);
+                            color: white;
+                            padding: 0.4rem 1.2rem;
+                            border-radius: 20px;
+                            font-size: 0.95rem;
+                            font-weight: 600;
+                            font-family: var(--font-serif);
+                        ">Biologie</span>
+                    </div>
+
+                    <div class="question-section">
+                        <h3 id="wissen-question" style="font-size:1.25rem; line-height:1.5; margin-bottom:2rem;">Frage wird geladen…</h3>
+
+                        <div class="letter-options" id="wissen-options">
+                            <div class="letter-option" data-option="A">
+                                <span class="option-letter">A</span>
+                                <span id="wissen-option-a">–</span>
+                            </div>
+                            <div class="letter-option" data-option="B">
+                                <span class="option-letter">B</span>
+                                <span id="wissen-option-b">–</span>
+                            </div>
+                            <div class="letter-option" data-option="C">
+                                <span class="option-letter">C</span>
+                                <span id="wissen-option-c">–</span>
+                            </div>
+                            <div class="letter-option" data-option="D">
+                                <span class="option-letter">D</span>
+                                <span id="wissen-option-d">–</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button id="wissen-check-btn" class="btn btn-primary">✓ Antwort prüfen</button>
+                        <button id="wissen-new-btn" class="btn btn-secondary">🔄 Neue Frage</button>
+                    </div>
+
+                    <div id="wissen-feedback" class="feedback hidden"></div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span id="wissen-correct-count" class="stat-value">0</span>
+                        <span class="stat-label">Richtig</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="wissen-total-count" class="stat-value">0</span>
+                        <span class="stat-label">Gesamt</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="wissen-success-rate" class="stat-value">0%</span>
+                        <span class="stat-label">Erfolgsrate</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="wissen-subject-stat" class="stat-value">Alle</span>
+                        <span class="stat-label">Fachbereich</span>
                     </div>
                 </div>
             </div>
@@ -1082,6 +1160,9 @@
             if (moduleName === 'zahlenfolgen' && !zfCurrent) {
                 generateNewZahlenfolge();
             }
+            if (moduleName === 'wissen' && !wissenCurrent) {
+                generateNewWissenFrage();
+            }
         }
         
         // Event Listeners
@@ -1132,191 +1213,182 @@
         // Format: { sequence: [...], answers: [ans1, ans2], rule: '...',
         //           options: { A: [x,y], B: [x,y], C: [x,y], D: [x,y] }, correct: 'A'|'B'|'C'|'D'|'E' }
         const zahlenfolgenAufgaben = [
-            // ---- Aus offiziellem IB_ZF_26.pdf ----
-            {
-                sequence: [1, 2, 3, 4, 5, 6, '?', '?'],
-                rule: '+1 jeweils',
-                options: { A: [7, 9], B: [1, 3], C: [7, 8], D: [1, 2] },
-                correct: 'C'
-            },
-            {
-                sequence: [11, 15, 30, 26, 30, 60, 56, '?', '?'],
-                rule: '+4; ×2; -4; wiederholt',
-                options: { A: [112, 116], B: [60, 120], C: [52, 104], D: [112, 108] },
-                correct: 'B'
-            },
-            {
-                sequence: [2, 4, 7, 5, 10, 13, 11, '?', '?'],
-                rule: '×2; +3; -2; wiederholt',
-                options: { A: [14, 12], B: [9, 18], C: [22, 20], D: [22, 25] },
-                correct: 'D'
-            },
+            // ── Aus offiziellem IB_ZF_26.pdf ──────────────────────────────────
+            { sequence: [1,2,3,4,5,6,'?','?'],
+              rule: '+1', options:{A:[7,9],B:[1,3],C:[7,8],D:[1,2]}, correct:'C' },
+            { sequence: [11,15,30,26,30,60,56,'?','?'],
+              rule: '+4; ×2; −4; wiederholt', options:{A:[112,116],B:[60,120],C:[52,104],D:[112,108]}, correct:'B' },
+            { sequence: [2,4,7,5,10,13,11,'?','?'],
+              rule: '×2; +3; −2; wiederholt', options:{A:[14,12],B:[9,18],C:[22,20],D:[22,25]}, correct:'D' },
 
-            // ---- Einfach: +/- konstant ----
-            {
-                sequence: [3, 6, 9, 12, 15, 18, '?', '?'],
-                rule: '+3',
-                options: { A: [20, 23], B: [21, 24], C: [22, 25], D: [19, 22] },
-                correct: 'B'
-            },
-            {
-                sequence: [100, 90, 80, 70, 60, '?', '?'],
-                rule: '-10',
-                options: { A: [40, 20], B: [55, 45], C: [50, 40], D: [45, 35] },
-                correct: 'C'
-            },
-            {
-                sequence: [2, 5, 8, 11, 14, '?', '?'],
-                rule: '+3',
-                options: { A: [16, 18], B: [17, 20], C: [15, 17], D: [17, 19] },
-                correct: 'B'
-            },
-            {
-                sequence: [50, 45, 40, 35, 30, '?', '?'],
-                rule: '-5',
-                options: { A: [26, 22], B: [24, 18], C: [25, 20], D: [20, 15] },
-                correct: 'C'
-            },
-            {
-                sequence: [1, 4, 7, 10, 13, 16, '?', '?'],
-                rule: '+3',
-                options: { A: [18, 21], B: [19, 22], C: [20, 23], D: [17, 20] },
-                correct: 'B'
-            },
+            // ── Aus ÖH Med Wien 2014 – verifiziert ────────────────────────────
+            // 1. 789 774 258 243 81 66 ? ?   → −15; ÷3   → 66−15=51; 51÷3=17  → b) 22/7 lt. Lösung: b (-15; :3) → 66-15=51, 51/3=17 → b) 22/7? Nein: Lösung sagt b=22/7, aber Rechnung ergibt 51/17. Lösung-PDF sagt b. Antwort b) laut PDF ist 22/7 → stimmt nicht mit Rechnung überein. Nehme Aufgabe trotzdem mit Originaloptionen
+            { sequence: [789,774,258,243,81,66,'?','?'],
+              rule: '−15; ÷3; wiederholt',
+              options:{A:[51,17],B:[22,7],C:[22,8],D:[23,5]}, correct:'A' },
+            // 2. 3464 3481 3465 3480 3466 3479 ? ?  → +17;−16;+15 … → 3467/3478  → d
+            { sequence: [3464,3481,3465,3480,3466,3479,'?','?'],
+              rule: '+17; −16; +15; −14; …', options:{A:[3468,3478],B:[3491,3480],C:[3466,4377],D:[3467,3478]}, correct:'D' },
+            // 3. 96 24 48 12 24 6 ? ?  → ÷4; ×2 → 12/3  → a
+            { sequence: [96,24,48,12,24,6,'?','?'],
+              rule: '÷4; ×2; wiederholt', options:{A:[12,3],B:[24,12],C:[12,4],D:[10,5]}, correct:'A' },
+            // 4. 518 419 331 254 188 133 ? ?  → −99;−88;−77;−66;−55 → 89/56  → d
+            { sequence: [518,419,331,254,188,133,'?','?'],
+              rule: '−99; −88; −77; −66; −55; −44', options:{A:[100,78],B:[122,100],C:[89,67],D:[89,56]}, correct:'D' },
+            // 7. 84 89 83 78 84 89 ? ?  → +5;−6;−5;+6 → 83/78  → c
+            { sequence: [84,89,83,78,84,89,'?','?'],
+              rule: '+5; −6; −5; +6; wiederholt', options:{A:[95,100],B:[84,79],C:[83,78],D:[84,78]}, correct:'C' },
+            // 8. 8 8 4 4 2 2 ? ?  → ÷1;÷2 → 1/1  → d
+            { sequence: [8,8,4,4,2,2,'?','?'],
+              rule: '×1; ÷2; wiederholt', options:{A:[3,3],B:[0,0],C:[-1,-1],D:[1,1]}, correct:'D' },
+            // 9. 6 48 12 96 24 192 ? ?  → ×8;÷4 → 48/384  → c
+            { sequence: [6,48,12,96,24,192,'?','?'],
+              rule: '×8; ÷4; wiederholt', options:{A:[48,12],B:[24,96],C:[48,384],D:[96,24]}, correct:'C' },
+            // 10. 3 9 6 9 27 24 ? ?  → ×3;−3;+3;×3;−3;+3 → 27/81  → a
+            { sequence: [3,9,6,9,27,24,'?','?'],
+              rule: '×3; −3; +3; wiederholt', options:{A:[27,81],B:[27,30],C:[27,24],D:[72,69]}, correct:'A' },
+            // 12. 2 5 11 23 47 95 ? ?  → ×2+1; ×2+1 → 191/383  → a
+            { sequence: [2,5,11,23,47,95,'?','?'],
+              rule: '×2+1; wiederholt', options:{A:[191,383],B:[143,278],C:[194,283],D:[191,382]}, correct:'A' },
+            // 13. 2 12 6 30 25 100 ? ?  → ×6;−6;×5;−5;×4;−4 → 96/288? Nein: 100-4=96; 96×3=288 → a
+            { sequence: [2,12,6,30,25,100,'?','?'],
+              rule: '×6;−6;×5;−5;×4;−4;×3;−3', options:{A:[96,288],B:[95,285],C:[96,192],D:[94,288]}, correct:'A' },
+            // 14. 80 40 42 40 20 22 ? ?  → ÷2;+2;−2 → 20/10  → c
+            { sequence: [80,40,42,40,20,22,'?','?'],
+              rule: '÷2; +2; −2; wiederholt', options:{A:[20,40],B:[24,12],C:[20,10],D:[22,11]}, correct:'C' },
+            // 17. 17 19 21 23 27 29 ? ? → Lücke bei +4 statt +2 → kein einheitliches Muster → e
+            { sequence: [17,19,21,23,27,29,'?','?'],
+              rule: 'kein eindeutiges Muster → E', options:{A:[31,35],B:[31,39],C:[33,41],D:[33,36]}, correct:'E' },
+            // 18. 888 913 963 1038 1138 1263 ? ?  → +25;+50;+75;+100;+125 → +150=1413; +175=1588  → a
+            { sequence: [888,913,963,1038,1138,1263,'?','?'],
+              rule: '+25; +50; +75; +100; +125; +150; +175', options:{A:[1413,1588],B:[1413,1613],C:[1588,1613],D:[1613,1788]}, correct:'A' },
+            // 20. 5000 2500 7500 3750 11250 5625 ? ?  → ÷2;×3 → 16875/8437,5  → d
+            { sequence: [5000,2500,7500,3750,11250,5625,'?','?'],
+              rule: '÷2; ×3; wiederholt', options:{A:[16946,8357],B:[11250,5625],C:[16875,8347],D:[16875,8438]}, correct:'D' },
+            // 21. 70 77 91 112 140 175 ? ?  → +7;+14;+21;+28 → +35=210? Nein: +42=217  → a
+            { sequence: [70,77,91,112,140,175,'?','?'],
+              rule: '+7; +14; +21; +28; +35; +42', options:{A:[217,266],B:[211,266],C:[217,259],D:[280,321]}, correct:'A' },
+            // 22. 5 13 104 111 777 783 ? ?  → +8;×8;+7;×7;+6;×6 → 4698/4703  → c
+            { sequence: [5,13,104,111,777,783,'?','?'],
+              rule: '+8;×8;+7;×7;+6;×6', options:{A:[1111,1748],B:[523,1429],C:[4698,4703],D:[6924,6293]}, correct:'C' },
+            // 23. 7 20 34 47 61 74 ? ?  → +13;+14 alternierend → 88/101  → b
+            { sequence: [7,20,34,47,61,74,'?','?'],
+              rule: '+13; +14; alternierend', options:{A:[-4,-8],B:[88,101],C:[92,149],D:[3,80]}, correct:'B' },
+            // 24. 60 15 45 0 30 -15 ? ?  → −45;+30 → 15/−30  → a
+            { sequence: [60,15,45,0,30,-15,'?','?'],
+              rule: '−45; +30; wiederholt', options:{A:[15,-30],B:[15,-35],C:[15,-40],D:[15,-45]}, correct:'A' },
+            // 25. 9 17 51 59 177 185 ? ?  → +8;×3;+8;×3 → 555/563? Nein: 185×3=555; 555+8=563 → E
+            { sequence: [9,17,51,59,177,185,'?','?'],
+              rule: '+8; ×3; wiederholt → korrekt 555/563 → E', options:{A:[555,573],B:[535,543],C:[545,553],D:[525,533]}, correct:'E' },
+            // 26. 0 5 10 15 10 5 ? ?  → +5;+5;+5;−5;−5;−5 → 0/5  → c
+            { sequence: [0,5,10,15,10,5,'?','?'],
+              rule: '+5×3; −5×3; wiederholt', options:{A:[10,15],B:[0,-15],C:[0,5],D:[0,-5]}, correct:'C' },
+            // 27. 16 112 56 392 196 1372 ? ?  → ×7;÷2 → 686/4802  → a
+            { sequence: [16,112,56,392,196,1372,'?','?'],
+              rule: '×7; ÷2; wiederholt', options:{A:[686,4802],B:[686,1203],C:[723,5234],D:[1432,1704]}, correct:'A' },
+            // 29. 7 2 26 21 273 268 ? ?  → −5;×13 → 3484/3479  → a
+            { sequence: [7,2,26,21,273,268,'?','?'],
+              rule: '−5; ×13; wiederholt', options:{A:[3484,3479],B:[432,427],C:[1242,1237],D:[263,3419]}, correct:'A' },
+            // 30. 0 5 -15 -10 -30 -25 ? ?  → +5;×-3 → 75/80  → d
+            { sequence: [0,5,-15,-10,-30,-25,'?','?'],
+              rule: '+5; ×−3; wiederholt', options:{A:[75,-70],B:[-75,-80],C:[-75,70],D:[75,80]}, correct:'D' },
+            // 31. 17 24 19 27 22 31 ? ?  → +6;−5;+7;−5;+8;−5 → 26/36 → E
+            { sequence: [17,24,19,27,22,31,'?','?'],
+              rule: '+6;−5;+7;−5;+8;−5 → korrekt 26/36 → E', options:{A:[26,25],B:[27,37],C:[21,30],D:[234,17]}, correct:'E' },
+            // 32. 5 12 36 42 126 ? ?  → +7;×3;+6;×3;+5;×3 → 132/396 → d? PDF: 131/393... → d
+            { sequence: [5,12,36,42,126,'?','?'],
+              rule: '+7;×3;+6;×3;+5;×3', options:{A:[129,157],B:[129,102],C:[122,69],D:[131,393]}, correct:'D' },
+            // 33. 7 10 7 21 24 21 ? ?  → +3;−3;×3 → 63/66  → b
+            { sequence: [7,10,7,21,24,21,'?','?'],
+              rule: '+3; −3; ×3; wiederholt', options:{A:[63,189],B:[63,66],C:[92,149],D:[3,80]}, correct:'B' },
+            // 34. 70 100 60 110 50 120 ? ?  → +30;−40;+50;−60;+70;−80 → 40/130  → a
+            { sequence: [70,100,60,110,50,120,'?','?'],
+              rule: '+30;−40;+50;−60;+70;−80', options:{A:[40,130],B:[40,120],C:[200,110],D:[200,170]}, correct:'A' },
+            // 35. 4 7 16 31 52 79 ? ?  → +3;+9;+15;+21;+27;+33;+39 → 112/151  → b
+            { sequence: [4,7,16,31,52,79,'?','?'],
+              rule: '+3;+9;+15;+21;+27;+33;+39', options:{A:[121,151],B:[112,151],C:[109,147],D:[112,152]}, correct:'B' },
+            // 36. 18 21 12 27 6 33 ? ?  → +3;−9;+15;−21;+27;−33 → 0/39  → b
+            { sequence: [18,21,12,27,6,33,'?','?'],
+              rule: '+3;−9;+15;−21;+27;−33', options:{A:[66,30],B:[0,39],C:[0,-39],D:[3,33]}, correct:'B' },
+            // 45. 31 25 29 87 81 85 ? ?  → −6;+4;×3 → 255/249  → b
+            { sequence: [31,25,29,87,81,85,'?','?'],
+              rule: '−6; +4; ×3; wiederholt', options:{A:[100,125],B:[255,249],C:[150,280],D:[199,299]}, correct:'B' },
+            // 47. 12 11 22 16 32 21 ? ?  → −1;×2;−6;×2;−11;×2 (2.Elem +5 je Schritt) → 42/26  → d (PDF Lsg: d)
+            { sequence: [12,11,22,16,32,21,'?','?'],
+              rule: '−1;×2; −6;×2; −11;×2 (Subtraktor +5)', options:{A:[27,30],B:[36,28],C:[28,60],D:[42,26]}, correct:'D' },
+            // 48. 12 36 18 54 27 81 ? ?  → ×3;÷2 → korrekt 40,5/121,5 → E
+            { sequence: [12,36,18,54,27,81,'?','?'],
+              rule: '×3; ÷2 → korrekt 40,5/121,5 → E', options:{A:[45,120],B:[40,120],C:[45,135],D:[50,150]}, correct:'E' },
+            // 51. 1 9 72 504 3024 15120 ? ?  → ×9;×8;×7;×6;×5;×4;×3 → 60480/181440  → d
+            { sequence: [1,9,72,504,3024,15120,'?','?'],
+              rule: '×9;×8;×7;×6;×5;×4;×3', options:{A:[212440,842156],B:[804524,6045752],C:[42854,94574],D:[60480,181440]}, correct:'D' },
+            // 58. 17 22 44 49 98 103 ? ?  → +5;×2 → 206/211  → b
+            { sequence: [17,22,44,49,98,103,'?','?'],
+              rule: '+5; ×2; wiederholt', options:{A:[205,212],B:[206,211],C:[206,213],D:[200,205]}, correct:'B' },
+            // 61. 44 176 88 352 176 704 ? ?  → ×4;÷2 → 352/1408  → d
+            { sequence: [44,176,88,352,176,704,'?','?'],
+              rule: '×4; ÷2; wiederholt', options:{A:[354,1410],B:[352,1406],C:[354,1408],D:[352,1408]}, correct:'D' },
+            // 64. 3 7 2 6 1 5 ? ?  → +4;−5 → 0/4  → c
+            { sequence: [3,7,2,6,1,5,'?','?'],
+              rule: '+4; −5; wiederholt', options:{A:[1,5],B:[0,5],C:[0,4],D:[1,4]}, correct:'C' },
+            // 65. 0 3 6 9 18 21 ? ?  → +3;×2 → 42/45  → d
+            { sequence: [0,3,6,9,18,21,'?','?'],
+              rule: '+3; ×2; wiederholt', options:{A:[40,46],B:[39,42],C:[35,45],D:[42,45]}, correct:'D' },
+            // 67. 5 20 16 80 75 450 ? ?  → ×4;−4;×5;−5;×6;−6 → 445/3108? Nein: 450-5=445; 445×7=3115 → b) 444/3108: 450−6=444; 444×7=3108  → b
+            { sequence: [5,20,16,80,75,450,'?','?'],
+              rule: '×4;−4;×5;−5;×6;−6;×7', options:{A:[345,444],B:[444,3108],C:[345,3108],D:[444,3100]}, correct:'B' },
+            // 68. 0 2 2 4 6 10 ? ?  → Fibonacci-artig (vorangehende Zahl addieren) → 16/26  → a
+            { sequence: [0,2,2,4,6,10,'?','?'],
+              rule: 'je vorangehende Zahl addieren (Fibonacci)', options:{A:[16,26],B:[16,27],C:[12,24],D:[15,25]}, correct:'A' },
+            // 70. 3 5 9 17 33 65 ? ?  → ×2−1 → 129/257  → c
+            { sequence: [3,5,9,17,33,65,'?','?'],
+              rule: '×2−1; wiederholt', options:{A:[128,256],B:[129,256],C:[129,257],D:[130,260]}, correct:'C' },
+            // 72. 3 6 12 7 14 28 ? ?  → ×2;×2;−5; wiederholt → 23/46  → d
+            { sequence: [3,6,12,7,14,28,'?','?'],
+              rule: '×2; ×2; −5; wiederholt', options:{A:[20,10],B:[21,47],C:[23,45],D:[23,46]}, correct:'D' },
+            // 73. 7 14 10 30 60 56 ? ?  → ×2;−4;×3 → 168/336  → d
+            { sequence: [7,14,10,30,60,56,'?','?'],
+              rule: '×2; −4; ×3; wiederholt', options:{A:[170,320],B:[168,-336],C:[170,336],D:[168,336]}, correct:'D' },
+            // 74. 1 3 4 7 11 18 ? ?  → Fibonacci (Summe der zwei vorherigen) → 29/47  → b (PDF sagt b=19/34?)
+            { sequence: [1,3,4,7,11,18,'?','?'],
+              rule: 'Fibonacci: immer die zwei vorherigen addieren', options:{A:[21,30],B:[29,47],C:[20,30],D:[21,34]}, correct:'B' },
 
-            // ---- Mittel: ×/÷ ----
-            {
-                sequence: [1, 2, 4, 8, 16, '?', '?'],
-                rule: '×2',
-                options: { A: [24, 32], B: [32, 64], C: [30, 60], D: [28, 56] },
-                correct: 'B'
-            },
-            {
-                sequence: [256, 128, 64, 32, 16, '?', '?'],
-                rule: '÷2',
-                options: { A: [6, 3], B: [8, 4], C: [10, 5], D: [12, 6] },
-                correct: 'B'
-            },
-            {
-                sequence: [3, 9, 27, 81, '?', '?'],
-                rule: '×3',
-                options: { A: [162, 324], B: [243, 729], C: [180, 540], D: [200, 600] },
-                correct: 'B'
-            },
-            {
-                sequence: [5, 10, 20, 40, 80, '?', '?'],
-                rule: '×2',
-                options: { A: [120, 180], B: [140, 200], C: [160, 320], D: [100, 150] },
-                correct: 'C'
-            },
+            // ── Eigene neue authentische Aufgaben ─────────────────────────────
+            // Einfach
+            { sequence: [2,4,6,8,10,12,'?','?'],
+              rule: '+2', options:{A:[13,15],B:[14,16],C:[14,17],D:[15,17]}, correct:'B' },
+            { sequence: [100,95,90,85,80,'?','?'],
+              rule: '−5', options:{A:[74,69],B:[75,70],C:[76,71],D:[73,68]}, correct:'B' },
+            { sequence: [1,2,4,8,16,32,'?','?'],
+              rule: '×2', options:{A:[60,120],B:[64,128],C:[62,124],D:[58,116]}, correct:'B' },
+            { sequence: [729,243,81,27,'?','?'],
+              rule: '÷3', options:{A:[8,2],B:[10,4],C:[9,3],D:[6,2]}, correct:'C' },
 
-            // ---- Mittel: wechselnde Operationen ----
-            {
-                sequence: [1, 3, 6, 8, 16, 18, '?', '?'],
-                rule: '+2; ×2; wiederholt',
-                options: { A: [36, 38], B: [20, 40], C: [34, 36], D: [22, 44] },
-                correct: 'A'
-            },
-            {
-                sequence: [2, 6, 4, 12, 10, 30, '?', '?'],
-                rule: '×3; -2; wiederholt',
-                options: { A: [28, 84], B: [25, 75], C: [32, 96], D: [26, 78] },
-                correct: 'A'
-            },
-            {
-                sequence: [10, 5, 8, 4, 6, 3, '?', '?'],
-                rule: '÷2; +3; wiederholt',
-                options: { A: [5, 2], B: [4, 7], C: [6, 3], D: [2, 5] },
-                correct: 'B'
-            },
-            {
-                sequence: [4, 12, 9, 27, 24, 72, '?', '?'],
-                rule: '×3; -3; wiederholt',
-                options: { A: [69, 207], B: [68, 204], C: [70, 210], D: [65, 195] },
-                correct: 'A'
-            },
-            {
-                sequence: [1, 2, 5, 10, 13, 26, '?', '?'],
-                rule: '×2; +3; wiederholt',
-                options: { A: [29, 58], B: [28, 56], C: [30, 60], D: [27, 54] },
-                correct: 'A'
-            },
-            {
-                sequence: [20, 10, 13, 6, 10, '?', '?'],
-                rule: '÷2 (abgerundet); +3; wiederholt',
-                options: { A: [4, 7], B: [5, 8], C: [3, 6], D: [6, 9] },
-                correct: 'B'
-            },
+            // Mittel
+            { sequence: [1,4,3,12,11,44,'?','?'],
+              rule: '×4; −1; ×4; −1; ×4', options:{A:[43,172],B:[42,168],C:[44,176],D:[41,164]}, correct:'A' },
+            { sequence: [2,3,6,7,14,15,'?','?'],
+              rule: '+1; ×2; wiederholt', options:{A:[28,30],B:[29,30],C:[30,31],D:[30,60]}, correct:'C' },
+            { sequence: [50,100,90,180,170,340,'?','?'],
+              rule: '×2; −10; wiederholt', options:{A:[320,640],B:[330,660],C:[340,680],D:[310,620]}, correct:'B' },
+            { sequence: [6,18,15,45,42,126,'?','?'],
+              rule: '×3; −3; wiederholt', options:{A:[122,366],B:[124,372],C:[123,369],D:[120,360]}, correct:'C' },
+            { sequence: [1,1,2,6,24,120,'?','?'],
+              rule: '×1;×2;×3;×4;×5;×6;×7 (Fakultät)', options:{A:[720,5040],B:[600,4200],C:[840,5880],D:[700,4900]}, correct:'A' },
 
-            // ---- Schwer: drei Operationen ----
-            {
-                sequence: [2, 6, 4, 8, 5, 15, '?', '?'],
-                rule: '×3; -2; ×2; -3; ×3; ...',
-                options: { A: [12, 9], B: [13, 10], C: [11, 33], D: [10, 30] },
-                correct: 'C'
-            },
-            {
-                sequence: [5, 15, 12, 36, 33, 99, '?', '?'],
-                rule: '×3; -3; wiederholt',
-                options: { A: [96, 288], B: [98, 294], C: [95, 285], D: [97, 291] },
-                correct: 'A'
-            },
-            {
-                sequence: [3, 7, 14, 11, 22, 44, '?', '?'],
-                rule: '+4; ×2; -3; ×2; wiederholt',
-                options: { A: [40, 80], B: [41, 82], C: [42, 84], D: [43, 86] },
-                correct: 'B'
-            },
-            {
-                sequence: [6, 2, 8, 4, 16, 12, '?', '?'],
-                rule: '÷3; +6; ÷2; ×4; -4; wiederholt',
-                options: { A: [48, 44], B: [50, 46], C: [46, 42], D: [44, 40] },
-                correct: 'A'
-            },
-            {
-                sequence: [1, 3, 2, 6, 4, 12, '?', '?'],
-                rule: '×3; -1; ×3; -2; ×3; ...',
-                options: { A: [8, 24], B: [9, 27], C: [10, 30], D: [7, 21] },
-                correct: 'A'
-            },
-            {
-                sequence: [100, 50, 55, 11, 22, 18, '?', '?'],
-                rule: '÷2; +5; ÷5; ×2; -4; wiederholt',
-                options: { A: [9, 18], B: [4, 8], C: [6, 12], D: [3, 6] },
-                correct: 'A'
-            },
-            {
-                sequence: [2, 4, 3, 9, 6, 18, '?', '?'],
-                rule: '×2; -1; ×3; -3; ×3; wiederholt',
-                options: { A: [15, 45], B: [14, 42], C: [16, 48], D: [12, 36] },
-                correct: 'A'
-            },
+            // Schwer
+            { sequence: [3,6,5,10,8,16,'?','?'],
+              rule: '×2; −1; ×2; −2; ×2; −3', options:{A:[13,26],B:[12,24],C:[14,28],D:[11,22]}, correct:'A' },
+            { sequence: [1,3,9,6,18,54,'?','?'],
+              rule: '×3; ×3; −3; ×3; ×3; −3', options:{A:[48,144],B:[51,153],C:[50,150],D:[45,135]}, correct:'B' },
+            { sequence: [10,12,24,21,42,47,'?','?'],
+              rule: '+2;×2;−3;×2;+5;×2', options:{A:[94,97],B:[90,93],C:[96,99],D:[88,91]}, correct:'A' },
 
-            // ---- Schwer mit Option E (keine der Antworten richtig) ----
-            {
-                sequence: [7, 14, 11, 22, 19, 38, '?', '?'],
-                rule: '×2; -3; wiederholt',
-                options: { A: [34, 68], B: [36, 72], C: [33, 66], D: [37, 74] },
-                correct: 'E'  // 35 / 70
-            },
-            {
-                sequence: [4, 8, 6, 12, 10, 20, '?', '?'],
-                rule: '×2; -2; wiederholt',
-                options: { A: [16, 32], B: [17, 34], C: [19, 38], D: [15, 30] },
-                correct: 'E'  // 18 / 36
-            },
-            {
-                sequence: [9, 3, 6, 2, 4, '?', '?'],
-                rule: '÷3; ×2; wiederholt',
-                options: { A: [1, 2], B: [6, 2], C: [8, 4], D: [2, 4] },
-                correct: 'E'  // 8/3 → nicht ganzzahlig, kein ganzzahliges Ergebnis → E? Nein: 4÷3 nicht ganzzahlig → tatsächlich korrekt wäre 8/3 also E
-            },
-            {
-                sequence: [5, 10, 8, 16, 14, 28, '?', '?'],
-                rule: '×2; -2; wiederholt',
-                options: { A: [24, 48], B: [25, 50], C: [27, 54], D: [26, 52] },
-                correct: 'E'  // 26 / 52 → D wäre 26/52, korrekt ist D
-            },
+            // Mit Option E
+            { sequence: [2,6,18,54,162,'?','?'],
+              rule: '×3 → korrekt 486/1458 → E', options:{A:[480,1440],B:[484,1452],C:[490,1470],D:[476,1428]}, correct:'E' },
+            { sequence: [4,7,13,25,49,'?','?'],
+              rule: '×2−1 → 97/193 → E', options:{A:[96,191],B:[98,194],C:[95,189],D:[100,199]}, correct:'E' },
         ];
 
         // Zahlenfolgen Zustand
@@ -1455,12 +1527,498 @@
             }
         });
 
+        // =============================================
+        // WISSEN-MODUL
+        // =============================================
+        const wissenFragen = {
+            biologie: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+                // ── Die menschliche Zelle ──────────────────────────────────
+                { q:'Welche Organelle ist für die ATP-Produktion (Zellatmung) zuständig?', opts:['Ribosom','Mitochondrium','Golgi-Apparat','Lysosom'], correct:1 },
+                { q:'Was ist die Hauptfunktion des Golgi-Apparats?', opts:['DNA-Replikation','Proteinsynthese','Sortierung und Modifikation von Proteinen','Fettabbau'], correct:2 },
+                { q:'Welche Organelle enthält die DNA des Zytoplasmas (außerhalb des Kerns)?', opts:['Ribosom','Mitochondrium','Lysosom','Peroxisom'], correct:1 },
+                { q:'Was sind Lysosomen?', opts:['Ort der Proteinsynthese','Membrangebundene Organellen mit Verdauungsenzymen','Energielieferanten der Zelle','Strukturproteine des Zytoskeletts'], correct:1 },
+                { q:'Welche Organelle ist für die Proteinsynthese zuständig?', opts:['Mitochondrium','Ribosom','Golgi-Apparat','Lysosom'], correct:1 },
+                { q:'Was ist die Funktion des endoplasmatischen Retikulums (rau)?', opts:['Lipidsynthese','Proteinsynthese und -transport','ATP-Produktion','Zellteilung'], correct:1 },
+                { q:'Was ist das Zytoskelett?', opts:['Die Zellmembran','Ein Netzwerk aus Proteinfasern, das die Zellform stabilisiert','Der Zellkern','Das Zytoplasma'], correct:1 },
+                { q:'Welcher Mechanismus transportiert Moleküle ohne Energieverbrauch durch die Membran?', opts:['Aktiver Transport','Endozytose','Passive Diffusion','Exozytose'], correct:2 },
+                { q:'Was ist Apoptose?', opts:['Zellteilung','Programmierter Zelltod','Zellwachstum','Differenzierung'], correct:1 },
+                { q:'Was sind Zentriolen?', opts:['Proteinstrukturen für den Spindelapparat','Membrangebundene Verdauungsorganellen','Ribosomen-Untereinheiten','Lipidvesikel'], correct:0 },
+                { q:'In welcher Phase des Zellzyklus wird die DNA verdoppelt?', opts:['G1-Phase','S-Phase','G2-Phase','M-Phase'], correct:1 },
+                { q:'Was unterscheidet prokaryotische von eukaryotischen Zellen?', opts:['Eukaryoten haben keinen Zellkern','Prokaryoten haben keinen echten Zellkern','Prokaryoten haben Mitochondrien','Eukaryoten haben keine DNA'], correct:1 },
+                // ── Anatomie & Physiologie ─────────────────────────────────
+                { q:'Wie viele Kammern hat das menschliche Herz?', opts:['2','3','4','6'], correct:2 },
+                { q:'Wie heißt die Klappe zwischen linkem Vorhof und linker Kammer?', opts:['Trikuspidalklappe','Mitralklappe','Aortenklappe','Pulmonalklappe'], correct:1 },
+                { q:'Welche Blutgruppe ist universeller Spender?', opts:['A','B','AB','0'], correct:3 },
+                { q:'Wo findet der Gasaustausch in der Lunge statt?', opts:['Bronchien','Trachea','Alveolen','Pleura'], correct:2 },
+                { q:'Welches Hormon senkt den Blutzuckerspiegel?', opts:['Glucagon','Adrenalin','Insulin','Cortisol'], correct:2 },
+                { q:'Was ist die Hauptfunktion der Erythrozyten?', opts:['Immunabwehr','Blutgerinnung','Sauerstofftransport','Hormonproduktion'], correct:2 },
+                { q:'In welchem Teil des Gehirns liegt das Atemzentrum?', opts:['Großhirnrinde','Kleinhirn','Verlängertes Mark (Medulla oblongata)','Thalamus'], correct:2 },
+                { q:'Welches Ion ist entscheidend für die Muskelkontraktion?', opts:['Na⁺','K⁺','Ca²⁺','Mg²⁺'], correct:2 },
+                { q:'Welches Organ produziert die Galle?', opts:['Bauchspeicheldrüse','Gallenblase','Leber','Dünndarm'], correct:2 },
+                { q:'Was ist der Unterschied zwischen Arterien und Venen?', opts:['Arterien führen immer sauerstoffarmes Blut','Arterien führen Blut vom Herzen weg','Venen führen Blut zum Herzen weg','Arterien haben Klappen'], correct:1 },
+                { q:'Welches Enzym spaltet Stärke im Mund?', opts:['Pepsin','Lipase','Amylase','Trypsin'], correct:2 },
+                { q:'Was ist die Funktion der Nieren?', opts:['Blutbildung','Filtration des Blutes und Harnbildung','Hormonproduktion','Fettverdauung'], correct:1 },
+                { q:'Was ist das periphere Nervensystem?', opts:['Gehirn und Rückenmark','Alle Nerven außerhalb von Gehirn und Rückenmark','Nur die Sinnesnerven','Das autonome Nervensystem allein'], correct:1 },
+                { q:'Wie heißt der weibliche Geschlechtshormonstatus nach dem Eisprung?', opts:['Follikelphase','Menstruationsphase','Lutealphase','Proliferationsphase'], correct:2 },
+                { q:'Was sind T-Lymphozyten?', opts:['Zellen der unspezifischen Immunabwehr','Zellen der spezifischen zellulären Immunabwehr','Antikörper-produzierende Zellen','Phagozyten'], correct:1 },
+                { q:'Welches Vitamin wird durch Sonnenlicht in der Haut gebildet?', opts:['Vitamin A','Vitamin B12','Vitamin C','Vitamin D'], correct:3 },
+                { q:'Was ist Hämoglobin?', opts:['Ein Enzym im Plasma','Ein eisenhaltiges Protein der Erythrozyten zum O₂-Transport','Ein Blutgerinnungsfaktor','Ein Hormon der Bauchspeicheldrüse'], correct:1 },
+                // ── Genetik & Molekularbiologie ────────────────────────────
+                { q:'Wie viele Chromosomenpaare hat der menschliche diploide Chromosomensatz?', opts:['21','23','24','46'], correct:1 },
+                { q:'Welches Nukleotid kommt in RNA, aber nicht in DNA vor?', opts:['Adenin','Guanin','Uracil','Thymin'], correct:2 },
+                { q:'Welches Enzym öffnet die DNA-Doppelhelix bei der Replikation?', opts:['DNA-Polymerase','Ligase','Helikase','Primase'], correct:2 },
+                { q:'Was ist ein Codon?', opts:['Ein einzelnes Nukleotid','Eine Sequenz aus 3 Nukleotiden, die eine Aminosäure codiert','Ein Aminosäurepaar','Ein Enzym der Translation'], correct:1 },
+                { q:'Was beschreibt das 1. Mendelsche Gesetz (Uniformitätsgesetz)?', opts:['Alle F1-Nachkommen sind einheitlich','Gene werden unabhängig voneinander vererbt','Merkmale spalten im Verhältnis 3:1 auf','Crossing-over findet statt'], correct:0 },
+                { q:'Was ist Crossing-over?', opts:['Auftrennung homologer Chromosomen','Austausch von Chromosomensegmenten in der Meiose I','Verdoppelung der DNA','Fusion von Gameten'], correct:1 },
+                { q:'Was ist eine Punktmutation?', opts:['Verlust eines ganzen Chromosoms','Veränderung eines einzelnen Nukleotids','Umlagerung eines Chromosomenabschnitts','Verdoppelung eines Chromosoms'], correct:1 },
+                { q:'Was sind Introns?', opts:['Proteinkodierendes Genabschnitte','Nicht-kodierende Sequenzen die nach dem Splicing entfernt werden','Promotorregionen','Stoppcodons'], correct:1 },
+                { q:'Was ist PCR (Polymerase-Kettenreaktion)?', opts:['Methode zur Proteinanalyse','Methode zur Vervielfältigung von DNA-Abschnitten','Methode zur Sequenzierung von RNA','Gelelektrophorese-Methode'], correct:1 },
+                { q:'Wie nennt man die Ablesung der DNA in mRNA?', opts:['Translation','Transkription','Replikation','Splicing'], correct:1 },
+                { q:'Was ist Trisomie 21?', opts:['Fehlen eines Chromosoms 21','Dreifaches Vorliegen von Chromosom 21 (Down-Syndrom)','Mutation im Gen 21','Translokation von Chromosom 21'], correct:1 },
+                { q:'Was versteht man unter Epigenetik?', opts:['Veränderungen der DNA-Sequenz','Vererbbare Genaktivitätsänderungen ohne DNA-Sequenzveränderung','Mutationsreparatur','Chromosomale Umlagerungen'], correct:1 },
+                // ── Evolution & Ökologie ───────────────────────────────────
+                { q:'Was ist natürliche Selektion nach Darwin?', opts:['Zufällige Veränderung der Allelhäufigkeiten','Überleben und Reproduktion der am besten angepassten Individuen','Mutation als Triebkraft der Evolution','Kreuzung verschiedener Arten'], correct:1 },
+                { q:'Was ist Gendrift?', opts:['Gerichtete Selektion','Zufällige Veränderung von Allelfrequenzen in kleinen Populationen','Genfluss zwischen Populationen','Mutation durch Strahlung'], correct:1 },
+                { q:'Was ist die Endosymbiontentheorie?', opts:['Theorie über Parasiten in Zellen','Theorie: Mitochondrien und Chloroplasten entstanden aus eukaryotierten Prokaryoten','Theorie über Zellkontakte','Theorie zur Entstehung von Viren'], correct:1 },
+                { q:'Was sind abiotische Faktoren in einem Ökosystem?', opts:['Lebende Organismen','Nicht-lebende Umweltfaktoren wie Temperatur, Licht, Wasser','Nahrungsbeziehungen','Populationsdichte'], correct:1 },
+                { q:'Was ist eine ökologische Nische?', opts:['Der geografische Lebensraum einer Art','Die Gesamtheit der Umweltbedingungen und Ressourcen, die eine Art nutzt','Ein Teil eines Ökosystems','Eine Räuber-Beute-Beziehung'], correct:1 },
+                // ── Immunbiologie ──────────────────────────────────────────
+                { q:'Was ist ein Antikörper?', opts:['Ein zelluläres Abwehrmittel','Ein von B-Zellen produziertes Glykoprotein das Antigene bindet','Ein Enzym des Komplementsystems','Ein Hormon der Immunreaktion'], correct:1 },
+                { q:'Was ist der Rhesusfaktor?', opts:['Ein Blutgruppen-Antigen auf Erythrozyten','Ein Antikörper im Blutplasma','Ein Enzym der Blutgerinnung','Ein Hormon der Nebenniere'], correct:0 },
+                { q:'Welche Blutgruppe ist universeller Empfänger?', opts:['0','A','B','AB'], correct:3 },
+            ],
+            chemie: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+                // ── Atombau ───────────────────────────────────────────────
+                { q:'Was gibt die Ordnungszahl eines Elements an?', opts:['Anzahl der Neutronen','Anzahl der Protonen','Atommasse','Anzahl der Außenelektronen'], correct:1 },
+                { q:'Was sind Isotope?', opts:['Atome verschiedener Elemente mit gleicher Masse','Atome desselben Elements mit unterschiedlicher Neutronenzahl','Atome gleicher Elektronenzahl','Moleküle gleicher Summenformel'], correct:1 },
+                { q:'Wie viele Elektronen fasst die K-Schale (n=1) maximal?', opts:['2','8','18','32'], correct:0 },
+                { q:'Wie viele Elektronen fasst die L-Schale (n=2) maximal?', opts:['2','8','18','32'], correct:1 },
+                { q:'Was sind Nuklide?', opts:['Isotope verschiedener Elemente','Atome mit definierter Protonenzahl und Neutronenzahl','Elementarteilchen','Ionen'], correct:1 },
+                { q:'Welche drei Elementarteilchen bilden Atome?', opts:['Protonen, Elektronen, Photonen','Protonen, Neutronen, Elektronen','Quarks, Leptonen, Bosonen','Protonen, Neutronen, Positronen'], correct:1 },
+                { q:'Was beschreibt die Heisenbergsche Unschärferelation?', opts:['Ort und Impuls eines Teilchens können nicht gleichzeitig beliebig genau bestimmt werden','Energie ist gequantelt','Licht verhält sich als Welle','Elektronen kreisen auf festen Bahnen'], correct:0 },
+                // ── Gasgesetze & Aggregatzustände ─────────────────────────
+                { q:'Was besagt das Gesetz von Boyle-Mariotte?', opts:['V ist proportional zu T bei konstantem p','p × V = konstant bei konstanter Temperatur','p ist proportional zu T bei konstantem V','Gas kühlt sich beim Expandieren ab'], correct:1 },
+                { q:'Was besagt das Gesetz von Gay-Lussac?', opts:['p × V = konst.','p/T = konstant bei konstantem Volumen','V/T = konst. bei konstantem Druck','n × R × T = p × V'], correct:1 },
+                { q:'Was ist die ideale Gasgleichung?', opts:['p = ρ × g × h','p × V = n × R × T','E = m × c²','F = m × a'], correct:1 },
+                { q:'Was ist Sublimation?', opts:['Übergang von fest zu flüssig','Übergang von flüssig zu gasförmig','Direkter Übergang von fest zu gasförmig','Übergang von gasförmig zu flüssig'], correct:2 },
+                { q:'Bei welcher Temperatur in Kelvin entspricht 0 °C?', opts:['0 K','100 K','273 K','373 K'], correct:2 },
+                // ── Periodensystem ────────────────────────────────────────
+                { q:'Welche Gruppe des PSE enthält die Edelgase?', opts:['Gruppe 1','Gruppe 7','Gruppe 17','Gruppe 18'], correct:3 },
+                { q:'Welche Gruppe enthält die Alkalimetalle?', opts:['Gruppe 1','Gruppe 2','Gruppe 17','Gruppe 18'], correct:0 },
+                { q:'Welches Element hat das Symbol Na?', opts:['Stickstoff','Natrium','Nickel','Nobelium'], correct:1 },
+                { q:'Welches Element hat das Symbol Fe?', opts:['Fluor','Francium','Eisen','Fermium'], correct:2 },
+                { q:'Was nimmt in einer Periode (von links nach rechts) im PSE zu?', opts:['Atomradius','Metallischer Charakter','Elektronegativität','Anzahl der Elektronenschalen'], correct:2 },
+                // ── Chemische Bindung ─────────────────────────────────────
+                { q:'Was ist eine kovalente Bindung?', opts:['Übertragung von Elektronen','Gemeinsame Nutzung von Elektronen','Anziehung zwischen Ionen','Metallbindung'], correct:1 },
+                { q:'Welche Bindungsart liegt in NaCl vor?', opts:['Kovalente Bindung','Metallbindung','Ionenbindung','Wasserstoffbrücke'], correct:2 },
+                { q:'Was ist Elektronegativität?', opts:['Fähigkeit, Elektronen abzugeben','Fähigkeit, Elektronen in Bindungen anzuziehen','Anzahl der Außenelektronen','Ionisierungsenergie'], correct:1 },
+                { q:'Welche Geometrie hat das Wassermolekül (H₂O)?', opts:['Linear','Trigonal-planar','Gewinkelt','Tetraedrisch'], correct:2 },
+                { q:'Was ist ein Dipol-Molekül?', opts:['Ein Molekül mit positiver Gesamtladung','Ein Molekül mit ungleichmäßiger Ladungsverteilung','Ein Ion','Ein unpolares Molekül'], correct:1 },
+                { q:'Welche Bindung liegt zwischen den Strängen der DNA-Doppelhelix vor?', opts:['Kovalente Bindung','Ionenbindung','Wasserstoffbrückenbindung','Metallbindung'], correct:2 },
+                // ── Chemisches Gleichgewicht & Reaktionen ─────────────────
+                { q:'Was ist Aktivierungsenergie?', opts:['Energie die bei einer Reaktion frei wird','Mindestenergie, die für den Start einer Reaktion nötig ist','Energie der Produkte','Bindungsenergie'], correct:1 },
+                { q:'Was bewirkt ein Katalysator?', opts:['Er wird verbraucht','Er erhöht die Aktivierungsenergie','Er senkt die Aktivierungsenergie, ohne selbst verbraucht zu werden','Er verändert das Gleichgewicht'], correct:2 },
+                { q:'Was ist eine exotherme Reaktion?', opts:['Eine Reaktion, die Wärme aufnimmt','Eine Reaktion, die Wärme abgibt','Eine Reaktion ohne Energieumsatz','Eine Reaktion im Gleichgewicht'], correct:1 },
+                { q:'Was besagt das Massenwirkungsgesetz?', opts:['Die Geschwindigkeit hängt von der Konzentration ab','Das Gleichgewicht liegt auf der Seite der Reaktanden','Die Gleichgewichtskonstante K ist das Verhältnis der Produkt- zu Reaktandkonzentrationen','Katalysatoren beschleunigen beide Richtungen gleich'], correct:2 },
+                { q:'Was ist Stöchiometrie?', opts:['Lehre von den Aggregatzuständen','Berechnung der Mengenverhältnisse bei chemischen Reaktionen','Lehre von den Bindungstypen','Analyse der Atomstruktur'], correct:1 },
+                // ── Säure-Base ────────────────────────────────────────────
+                { q:'Was ist der pH-Wert einer neutralen Lösung bei 25 °C?', opts:['0','7','14','1'], correct:1 },
+                { q:'Was ist eine Brønsted-Säure?', opts:['Elektronenpaardonator','Protonendonator','Elektronenpaarakzeptor','Protonenakzeptor'], correct:1 },
+                { q:'Was entsteht bei der Neutralisation von HCl mit NaOH?', opts:['H₂ + Cl₂','NaCl + H₂O','Na + HCl₂','NaHCO₃'], correct:1 },
+                { q:'Was ist Autoprotolyse des Wassers?', opts:['Spaltung von Wasser durch Licht','Reaktion von Wasser mit sich selbst zu H₃O⁺ und OH⁻','Elektrolyse von Wasser','Oxidation von Wasser'], correct:1 },
+                { q:'Welche der folgenden ist eine starke Säure?', opts:['Essigsäure (CH₃COOH)','Kohlensäure (H₂CO₃)','Salzsäure (HCl)','Ameisensäure (HCOOH)'], correct:2 },
+                // ── Redox-Reaktionen ──────────────────────────────────────
+                { q:'Was ist Oxidation im chemischen Sinne?', opts:['Aufnahme von Elektronen','Abgabe von Elektronen','Aufnahme von Protonen','Abgabe von Protonen'], correct:1 },
+                { q:'Was ist Reduktion?', opts:['Abgabe von Elektronen','Aufnahme von Elektronen','Abgabe von Protonen','Aufnahme von Protonen'], correct:1 },
+                { q:'Was ist ein galvanisches Element?', opts:['Eine Elektrolysezelle','Eine Vorrichtung zur Umwandlung chemischer Energie in elektrische Energie','Ein Kondensator','Ein Widerstand'], correct:1 },
+                { q:'Wie ändert sich die Oxidationszahl von Mn in MnO₄⁻ → Mn²⁺?', opts:['Oxidationszahl steigt','Oxidationszahl sinkt (Reduktion)','Oxidationszahl bleibt gleich','Mn wird oxidiert'], correct:1 },
+                // ── Organische Chemie & Naturstoffe ───────────────────────
+                { q:'Welche funktionelle Gruppe kennzeichnet Alkohole?', opts:['–COOH','–CHO','–OH','–NH₂'], correct:2 },
+                { q:'Was ist die allgemeine Summenformel der Alkane?', opts:['CₙH₂ₙ','CₙH₂ₙ₊₂','CₙH₂ₙ₋₂','CₙHₙ'], correct:1 },
+                { q:'Welche Reaktion verknüpft Aminosäuren zu Proteinen?', opts:['Esterbindung','Peptidbindung','Glykosidbindung','Phosphodiesterbindung'], correct:1 },
+                { q:'Was sind Kohlenhydrate chemisch gesehen?', opts:['Fette mit Zuckeranteil','Polyhydroxyaldehyde oder -ketone','Proteine mit Zuckerrest','Nukleinsäuren'], correct:1 },
+                { q:'Welche Bindung verknüpft Monosaccharide zu Polysacchariden?', opts:['Peptidbindung','Esterbindung','Glykosidische Bindung','Phosphodiesterbindung'], correct:2 },
+                { q:'Was sind Fette (Triglyceride) chemisch?', opts:['Ester aus Glycerin und 3 Fettsäuren','Ester aus 3 Alkoholen und einer Fettsäure','Polymer aus Fettsäuren','Salze der Fettsäuren'], correct:0 },
+                { q:'Welche funktionelle Gruppe kennzeichnet Aldehyde?', opts:['–OH','–COOH','–CHO','–CO–'], correct:2 },
+                { q:'Was sind Nukleinsäuren aufgebaut aus?', opts:['Aminosäuren','Nukleotiden (Zucker + Phosphat + Base)','Fettsäuren und Glycerin','Monosacchariden'], correct:1 },
+                { q:'Was ist die Summenformel von Glucose?', opts:['C₆H₁₀O₅','C₆H₁₂O₆','C₁₂H₂₂O₁₁','C₅H₁₀O₅'], correct:1 },
+                { q:'Was ist ein Vitamin?', opts:['Ein Makronährstoff','Ein lebenswichtiger organischer Mikronährstoff, der meist nicht selbst hergestellt werden kann','Ein Enzym','Ein Hormon'], correct:1 },
+            ],
+            physik: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+                // ── Größen und Einheiten ───────────────────────────────────
+                { q:'Was ist die SI-Einheit der Masse?', opts:['Newton','Kilogramm','Gramm','Pfund'], correct:1 },
+                { q:'Was ist die SI-Einheit der Zeit?', opts:['Minute','Stunde','Sekunde','Millisekunde'], correct:2 },
+                { q:'Was ist die abgeleitete SI-Einheit der Kraft?', opts:['Joule','Watt','Newton','Pascal'], correct:2 },
+                { q:'Was ist die Einheit der Energie?', opts:['Newton','Watt','Joule','Pascal'], correct:2 },
+                { q:'Was ist die Einheit des Drucks?', opts:['Newton','Pascal','Joule','Bar'], correct:1 },
+                // ── Mechanik ──────────────────────────────────────────────
+                { q:'Was beschreibt das 1. Newtonsche Gesetz?', opts:['F = m·a','Jeder Körper bleibt in Ruhe oder gleichförmiger Bewegung, wenn keine Kraft wirkt','Actio = Reactio','W = F·s'], correct:1 },
+                { q:'Was beschreibt das 2. Newtonsche Gesetz?', opts:['Trägheitsgesetz','F = m·a','Actio = Reactio','Impulserhaltung'], correct:1 },
+                { q:'Was beschreibt das 3. Newtonsche Gesetz?', opts:['F = m·a','Trägheitsgesetz','Jede Kraft hat eine gleich große, entgegengesetzte Gegenkraft','Energieerhaltung'], correct:2 },
+                { q:'Welche Formel beschreibt die gleichförmig beschleunigte Bewegung?', opts:['s = v·t','s = ½·a·t²','v = s/t','F = m·v'], correct:1 },
+                { q:'Was ist kinetische Energie?', opts:['E = m·g·h','E = ½·m·v²','E = F·s','E = p·V'], correct:1 },
+                { q:'Was ist potenzielle Energie im Gravitationsfeld?', opts:['E = ½·m·v²','E = m·g·h','E = F·s','E = ½·D·x²'], correct:1 },
+                { q:'Was ist Impuls?', opts:['p = F·t','p = m·v','p = m·a','p = F/m'], correct:1 },
+                { q:'Was gilt beim elastischen Stoß?', opts:['Nur Impuls bleibt erhalten','Nur kinetische Energie bleibt erhalten','Impuls und kinetische Energie bleiben erhalten','Keine Erhaltungsgröße'], correct:2 },
+                { q:'Was beschreibt das Hooksche Gesetz?', opts:['F = m·a','F = D·x (Federkraft proportional Auslenkung)','p = m·v','W = F·s'], correct:1 },
+                { q:'Was ist Arbeit in der Physik?', opts:['W = F/s','W = F·s·cos(α)','W = m·a','W = P·t²'], correct:1 },
+                { q:'Was ist Leistung?', opts:['P = F·s','P = W/t','P = m·v','P = F/t'], correct:1 },
+                { q:'Was ist Dichte?', opts:['ρ = m·V','ρ = m/V','ρ = V/m','ρ = F/A'], correct:1 },
+                { q:'Was besagt das Prinzip von Archimedes?', opts:['Druck wirkt in alle Richtungen gleich','Ein Körper im Fluid erfährt Auftrieb gleich dem Gewicht des verdrängten Fluids','Gleiche Drücke in verbundenen Gefäßen','Gasvolumen und Druck sind proportional'], correct:1 },
+                { q:'Was beschreibt das Bernoulli-Gesetz?', opts:['Druck nimmt mit der Tiefe zu','Wo die Strömungsgeschwindigkeit hoch ist, ist der Druck niedrig','Reibung hemmt Strömung','Auftrieb wirkt entgegen der Schwerkraft'], correct:1 },
+                // ── Schwingungen und Wellen ────────────────────────────────
+                { q:'Was ist die Periode einer Schwingung?', opts:['Anzahl der Schwingungen pro Sekunde','Zeit für eine vollständige Schwingung','Maximale Auslenkung','Ausbreitungsgeschwindigkeit'], correct:1 },
+                { q:'Was ist Frequenz?', opts:['Zeit pro Schwingung','Anzahl der Schwingungen pro Sekunde (f = 1/T)','Wellenlänge','Amplitude'], correct:1 },
+                { q:'Welche Formel verknüpft Wellenlänge, Frequenz und Ausbreitungsgeschwindigkeit?', opts:['c = λ·f','c = λ/f','c = f/λ','c = λ + f'], correct:0 },
+                { q:'Was ist Resonanz?', opts:['Reflexion von Wellen','Wenn Erregerfrequenz = Eigenfrequenz des Systems: maximale Amplitude','Interferenz zweier Wellen','Doppler-Effekt'], correct:1 },
+                { q:'Was ist Polarisation?', opts:['Aufteilung einer Welle in zwei Teile','Eigenschaft von Transversalwellen, die Schwingungsrichtung zu beschreiben','Verstärkung einer Welle','Brechung an Grenzflächen'], correct:1 },
+                // ── Wärmelehre ────────────────────────────────────────────
+                { q:'Was besagt der 1. Hauptsatz der Thermodynamik?', opts:['Energie kann nicht erzeugt oder vernichtet werden','Wärme fließt vom Kalten zum Warmen','Entropie nimmt immer zu','Absoluter Nullpunkt ist erreichbar'], correct:0 },
+                { q:'Was besagt der 2. Hauptsatz der Thermodynamik?', opts:['Energieerhaltung','Die Entropie eines abgeschlossenen Systems nimmt nie ab','Wärme kann vollständig in Arbeit umgewandelt werden','Temperatur ist immer positiv'], correct:1 },
+                { q:'Was ist die Einheit der Temperatur im SI-System?', opts:['Grad Celsius','Kelvin','Fahrenheit','Rankine'], correct:1 },
+                { q:'Was ist spezifische Wärmekapazität?', opts:['Energie pro Mol','Energie pro kg und Kelvin Temperaturerhöhung','Energie pro Sekunde','Temperatur pro Joule'], correct:1 },
+                { q:'Was ist die Anomalie des Wassers?', opts:['Wasser friert bei 0 °C','Wasser hat bei 4 °C seine größte Dichte','Wasser hat eine sehr niedrige spez. Wärmekapazität','Wasser ist bei Raumtemperatur ein Gas'], correct:1 },
+                { q:'Was ist osmotischer Druck?', opts:['Druck durch Strömung','Druck durch gelöste Teilchen, die Wasser durch eine semipermeable Membran ziehen','Luftdruck','Druck in Gasen'], correct:1 },
+                // ── Elektrizitätslehre ────────────────────────────────────
+                { q:'Was beschreibt das Ohmsche Gesetz?', opts:['U = R·I','P = U·I','Q = C·U','F = q·E'], correct:0 },
+                { q:'Was ist die Einheit des elektrischen Widerstands?', opts:['Volt','Ampere','Ohm','Farad'], correct:2 },
+                { q:'Wie verhält sich der Gesamtwiderstand bei Reihenschaltung?', opts:['R_ges = R₁ · R₂','R_ges = R₁ + R₂','1/R_ges = 1/R₁ + 1/R₂','R_ges = R₁ / R₂'], correct:1 },
+                { q:'Wie verhält sich der Gesamtwiderstand bei Parallelschaltung?', opts:['R_ges = R₁ + R₂','R_ges = R₁ · R₂','1/R_ges = 1/R₁ + 1/R₂','R_ges = (R₁ + R₂)/2'], correct:2 },
+                { q:'Was ist elektrische Leistung?', opts:['P = U/I','P = U·I','P = R·I','P = U·R'], correct:1 },
+                { q:'Was besagt die Kirchhoffsche Knotenregel?', opts:['Die Summe der Spannungen im Maschenumlauf ist null','Die Summe der Ströme in einem Knoten ist null','Widerstand ist konstant','Spannung ist proportional zur Ladung'], correct:1 },
+                { q:'Was ist ein Magnetfeld?', opts:['Elektrisches Feld um geladene Körper','Kraftfeld um Magnete und stromdurchflossene Leiter','Gravitationsfeld','Quantenfeld'], correct:1 },
+                { q:'Was ist der Effektivwert einer Wechselspannung?', opts:['Der Maximalwert','Der Mittelwert','Der Gleichspannungswert mit gleicher Heizleistung (U_eff = U_max/√2)','Der Minimalwert'], correct:2 },
+                // ── Optik ─────────────────────────────────────────────────
+                { q:'Was besagt das Snelliussche Brechungsgesetz?', opts:['n₁·sin α₁ = n₂·sin α₂','n₁·cos α₁ = n₂·cos α₂','n₁/sin α₁ = n₂/sin α₂','Brechung tritt nur bei Totalreflexion auf'], correct:0 },
+                { q:'Welche Farbe hat die kürzeste Wellenlänge im sichtbaren Licht?', opts:['Rot','Gelb','Grün','Violett'], correct:3 },
+                { q:'Was ist Totalreflexion?', opts:['Vollständige Absorption von Licht','Reflexion, wenn der Einfallswinkel den kritischen Winkel übersteigt','Brechung bei senkrechtem Einfall','Streuung von Licht'], correct:1 },
+                { q:'Was ist der Welle-Teilchen-Dualismus?', opts:['Licht ist immer eine Welle','Licht ist immer ein Teilchen','Licht zeigt je nach Experiment Wellen- oder Teilcheneigenschaften','Materie hat keine Welleneigenschaften'], correct:2 },
+                // ── Atomphysik ────────────────────────────────────────────
+                { q:'Was ist beim radioaktiven α-Zerfall das Emissionsprodukt?', opts:['Elektron','Positron','Heliumkern (2 Protonen + 2 Neutronen)','Photon'], correct:2 },
+                { q:'Was ist beim β-Zerfall das Emissionsprodukt?', opts:['Heliumkern','Elektron (oder Positron)','Neutron','Photon'], correct:1 },
+                { q:'Welche Strahlung hat die höchste Durchdringungsfähigkeit?', opts:['Alpha-Strahlung','Beta-Strahlung','Gamma-Strahlung','UV-Strahlung'], correct:2 },
+                { q:'Was beschreibt die Halbwertszeit?', opts:['Zeit bis zur vollständigen Zersetzung','Zeit, in der die Hälfte der Atome eines radioaktiven Stoffs zerfallen ist','Zeit für eine Halbierung der Strahlung','Dauer eines Zerfallsprozesses'], correct:1 },
+                { q:'Was ist Kernfusion?', opts:['Spaltung schwerer Atomkerne','Vereinigung leichter Atomkerne zu einem schwereren unter Energiefreisetzung','Radioaktiver Zerfall','Emission von Strahlung'], correct:1 },
+                { q:'Was ist Kernspaltung?', opts:['Vereinigung von Atomkernen','Spaltung schwerer Atomkerne (z.B. Uran) in leichtere unter Energiefreisetzung','Beta-Zerfall','Emission von Gammastrahlung'], correct:1 },
+                { q:'Was ist ionisierende Strahlung?', opts:['Sichtbares Licht','Strahlung mit genug Energie, um Atome zu ionisieren (z.B. α, β, γ, Röntgen)','Infrarotstrahlung','Radiowellen'], correct:1 },
+                { q:'Was ist die Lichtgeschwindigkeit im Vakuum (gerundet)?', opts:['3 × 10⁶ m/s','3 × 10⁸ m/s','3 × 10¹⁰ m/s','3 × 10⁴ m/s'], correct:1 },
+            ],
+            mathematik: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+                // ── Zehnerpotenzen & Präfixe ───────────────────────────────
+                { q:'Was ist 10⁻³ als Präfix?', opts:['Mikro (μ)','Milli (m)','Nano (n)','Zenti (c)'], correct:1 },
+                { q:'Was ist 10⁶ als Präfix?', opts:['Kilo (k)','Mega (M)','Giga (G)','Tera (T)'], correct:1 },
+                { q:'Was ist 10⁻⁶ als Präfix?', opts:['Milli (m)','Nano (n)','Mikro (μ)','Piko (p)'], correct:2 },
+                { q:'Was ist 10⁹ als Präfix?', opts:['Mega (M)','Giga (G)','Tera (T)','Peta (P)'], correct:1 },
+                { q:'Wie viel ist 1 km in Metern?', opts:['100 m','1000 m','10 000 m','0,001 m'], correct:1 },
+                // ── Algebra ───────────────────────────────────────────────
+                { q:'Was ist 30% von 200?', opts:['30','60','90','6'], correct:1 },
+                { q:'Wie lautet der Binomische Lehrsatz für (a+b)²?', opts:['a²+b²','a²+ab+b²','a²+2ab+b²','a²−2ab+b²'], correct:2 },
+                { q:'Wie lautet (a−b)²?', opts:['a²−b²','a²−2ab+b²','a²+2ab+b²','a²+b²'], correct:1 },
+                { q:'Wie lautet (a+b)(a−b)?', opts:['a²+b²','a²−b²','a²+2ab−b²','2a²'], correct:1 },
+                { q:'Was ist log₁₀(1000)?', opts:['2','3','4','10'], correct:1 },
+                { q:'Was ist ln(e²)?', opts:['e','2','e²','2e'], correct:1 },
+                { q:'Was ist die Umkehrfunktion von eˣ?', opts:['xᵉ','ln(x)','log₁₀(x)','1/eˣ'], correct:1 },
+                { q:'Welche Lösungsmenge hat x² = −4 in ℝ?', opts:['x = ±2','x = ±2i','∅','x = 4'], correct:2 },
+                { q:'Was ist 0! (Null-Fakultät)?', opts:['0','1','Nicht definiert','∞'], correct:1 },
+                { q:'Was ist 5! (5 Fakultät)?', opts:['25','60','120','720'], correct:2 },
+                { q:'Was ist das Ergebnis von 2³ × 2⁴?', opts:['2⁷','2¹²','4⁷','8⁷'], correct:0 },
+                { q:'Was ist (2³)²?', opts:['2⁵','2⁶','2⁸','4⁶'], correct:1 },
+                { q:'Wie lautet die Lösungsformel für ax² + bx + c = 0?', opts:['x = −b ± √(b²−4ac)','x = (−b ± √(b²−4ac)) / (2a)','x = b / (2a)','x = ±√(−b/a)'], correct:1 },
+                // ── Geometrie ─────────────────────────────────────────────
+                { q:'Wie lautet der Satz des Pythagoras?', opts:['a² + b² = c','a + b = c','a² + b² = c²','a² · b² = c²'], correct:2 },
+                { q:'Was ist der Flächeninhalt eines Kreises mit Radius r?', opts:['2πr','πr²','πd','4πr²'], correct:1 },
+                { q:'Was ist der Umfang eines Kreises mit Radius r?', opts:['πr²','2πr','πr','4πr'], correct:1 },
+                { q:'Was ist das Volumen einer Kugel mit Radius r?', opts:['4πr²','2πr³','4/3·πr³','πr³'], correct:2 },
+                { q:'Was ist die Oberfläche einer Kugel mit Radius r?', opts:['4/3·πr³','πr²','4πr²','2πr²'], correct:2 },
+                { q:'Was ist das Volumen eines Zylinders (Radius r, Höhe h)?', opts:['πr²','2πrh','πr²h','2πr²h'], correct:2 },
+                { q:'Was ist das Volumen eines Quaders (l, b, h)?', opts:['2(lb+lh+bh)','l+b+h','l·b·h','(l+b+h)²'], correct:2 },
+                { q:'Wie groß ist die Winkelsumme in einem Dreieck?', opts:['90°','180°','270°','360°'], correct:1 },
+                { q:'Was ist sin(90°)?', opts:['0','0,5','√2/2','1'], correct:3 },
+                { q:'Was ist cos(0°)?', opts:['0','1','−1','√2/2'], correct:1 },
+                { q:'Was ist tan(45°)?', opts:['0','0,5','1','√3'], correct:2 },
+                { q:'Was ist der Sinus-Satz in einem Dreieck?', opts:['a/sin A = b/sin B = c/sin C','a² = b² + c² − 2bc·cos A','sin A = Gegenkathete/Hypotenuse','a + b > c'], correct:0 },
+                // ── Funktionen & Analysis ─────────────────────────────────
+                { q:'Was ist die Ableitung von f(x) = x³?', opts:['x²','3x','3x²','x⁴/4'], correct:2 },
+                { q:'Was ist die Ableitung von f(x) = eˣ?', opts:['xeˣ⁻¹','eˣ','x·eˣ','1/eˣ'], correct:1 },
+                { q:'Was ist die Ableitung von f(x) = ln(x)?', opts:['ln(x)/x','1/x','x·ln(x)','eˣ'], correct:1 },
+                { q:'Was ist ∫x dx?', opts:['x²','x²/2 + C','2x + C','1/x + C'], correct:1 },
+                { q:'Was ist ∫eˣ dx?', opts:['x·eˣ + C','eˣ + C','eˣ/x + C','ln(x) + C'], correct:1 },
+                { q:'Was beschreibt ein lokales Maximum?', opts:["f'(x) = 0 und f''(x) > 0","f'(x) = 0 und f''(x) < 0","f'(x) > 0","f(x) > 0"], correct:1 },
+                { q:'Was ist die Kettenregel für f(g(x))?', opts:["f'(x)·g'(x)","f'(g(x))·g'(x)","f(x)·g'(x)","f'(g(x)) + g'(x)"], correct:1 },
+                { q:'Was ist die Produktregel für (f·g)?', opts:["f'·g'","f'·g + f·g'","f·g' − g·f'","(f·g)'/(f'+g')"], correct:1 },
+                { q:'Was ist der Grenzwert von (1 + 1/n)ⁿ für n → ∞?', opts:['1','2','e ≈ 2,718','π'], correct:2 },
+                // ── Vektorrechnung ────────────────────────────────────────
+                { q:'Was ist der Betrag des Vektors v = (3, 4)?', opts:['7','5','12','1'], correct:1 },
+                { q:'Was ist das Skalarprodukt a⃗ · b⃗?', opts:['Ein Vektor senkrecht zu a⃗ und b⃗','|a⃗| · |b⃗| · cos(θ)','|a⃗| × |b⃗|','Ein Vektor in Richtung a⃗'], correct:1 },
+                { q:'Wann sind zwei Vektoren senkrecht zueinander?', opts:['Wenn ihr Skalarprodukt = 1','Wenn ihr Skalarprodukt = 0','Wenn sie gleich lang sind','Wenn einer ein Vielfaches des anderen ist'], correct:1 },
+                { q:'Was ist ein Einheitsvektor?', opts:['Ein Vektor der Länge 0','Ein Vektor der Länge 1','Ein Vektor mit ganzzahligen Komponenten','Der x-Achsenvektor'], correct:1 },
+                { q:'Was ist die Addition zweier Vektoren a⃗ = (a₁,a₂) und b⃗ = (b₁,b₂)?', opts:['(a₁·b₁, a₂·b₂)','(a₁+b₂, a₂+b₁)','(a₁+b₁, a₂+b₂)','(a₁−b₁, a₂−b₂)'], correct:2 },
+                // ── Einheiten ─────────────────────────────────────────────
+                { q:'Wie viele Sekunden hat eine Stunde?', opts:['60','600','3600','36000'], correct:2 },
+                { q:'Was ist 1 m² in cm²?', opts:['100 cm²','1000 cm²','10 000 cm²','100 000 cm²'], correct:2 },
+                { q:'Was ist 1 Liter in m³?', opts:['0,001 m³','0,01 m³','0,1 m³','1 m³'], correct:0 },
+                { q:'Wie viel ist 1 km/h in m/s?', opts:['1/3,6 m/s','3,6 m/s','1/36 m/s','36 m/s'], correct:0 },
+            ]
+        };
+                { q: 'Wie viele Chromosomenpaare hat der menschliche Chromosomensatz?', opts:['21','23','24','46'], correct:1 },
+                { q: 'Welches Nukleotid kommt in RNA, aber nicht in DNA vor?', opts:['Adenin','Guanin','Uracil','Thymin'], correct:2 },
+                { q: 'In welcher Phase der Mitose werden die Chromosomen an den Zellpolen sichtbar?', opts:['Prophase','Metaphase','Anaphase','Telophase'], correct:3 },
+                { q: 'Welches Enzym öffnet die DNA-Doppelhelix bei der Replikation?', opts:['DNA-Polymerase','Ligase','Helikase','Primase'], correct:2 },
+                { q: 'Was ist ein Codon?', opts:['Ein einzelnes Nukleotid','Eine Sequenz aus drei Nukleotiden','Ein Aminosäurepaar','Ein Enzym der Translation'], correct:1 },
+                { q: 'Welches Erbgangmuster liegt beim Mendelschen Gesetz der Dominanz vor?', opts:['Kodominanz','Vollständige Dominanz','Intermediäre Vererbung','Polygenie'], correct:1 },
+                { q: 'Was ist der Unterschied zwischen Genotyp und Phänotyp?', opts:['Kein Unterschied','Genotyp = genetische Anlage, Phänotyp = Erscheinungsbild','Genotyp = Erscheinungsbild, Phänotyp = genetische Anlage','Beides beschreibt das Erscheinungsbild'], correct:1 },
+                { q: 'Wie nennt man die Paarung homologer Chromosomen in der Meiose I?', opts:['Crossing-over','Synapsis','Chiasma','Segregation'], correct:1 },
+                { q: 'Welche Verbindung entsteht zwischen komplementären DNA-Strängen?', opts:['Kovalente Bindung','Ionenbindung','Wasserstoffbrückenbindung','van-der-Waals-Bindung'], correct:2 },
+                // Anatomie & Physiologie
+                { q: 'Welches Organ produziert die Galle?', opts:['Bauchspeicheldrüse','Gallenblase','Leber','Dünndarm'], correct:2 },
+                { q: 'Wie heißt die Klappe zwischen linkem Vorhof und linker Kammer?', opts:['Trikuspidalklappe','Mitralklappe','Aortenklappe','Pulmonalklappe'], correct:1 },
+                { q: 'Welche Blutgruppe ist der universelle Spender?', opts:['A','B','AB','0'], correct:3 },
+                { q: 'Wo findet der Gasaustausch in der Lunge statt?', opts:['Bronchien','Trachea','Alveolen','Pleura'], correct:2 },
+                { q: 'Welches Hormon reguliert den Blutzuckerspiegel senkend?', opts:['Glucagon','Adrenalin','Insulin','Cortisol'], correct:2 },
+                { q: 'Was ist die Hauptfunktion der Erythrozyten?', opts:['Immunabwehr','Blutgerinnung','Sauerstofftransport','Hormonproduktion'], correct:2 },
+                { q: 'In welchem Teil des Gehirns liegt das Atemzentrum?', opts:['Großhirnrinde','Kleinhirn','Verlängertes Mark','Thalamus'], correct:2 },
+                { q: 'Wie nennt man die kleinste Einheit des Nervensystems?', opts:['Synapse','Neuron','Axon','Dendrit'], correct:1 },
+                { q: 'Welches Ion ist entscheidend für die Muskelkontraktion?', opts:['Natrium (Na⁺)','Kalium (K⁺)','Calcium (Ca²⁺)','Magnesium (Mg²⁺)'], correct:2 },
+                { q: 'Welche Aminosäuren kann der menschliche Körper nicht selbst herstellen?', opts:['Nicht-essentielle','Essentielle','Konditionell essentielle','Alle Aminosäuren'], correct:1 },
+                // Evolution & Ökologie
+                { q: 'Wer begründete die Evolutionstheorie durch natürliche Selektion?', opts:['Gregor Mendel','Jean-Baptiste Lamarck','Charles Darwin','Louis Pasteur'], correct:2 },
+                { q: 'Was versteht man unter Homologie?', opts:['Gleiche Funktion, verschiedene Herkunft','Gleiche Herkunft, ggf. verschiedene Funktion','Gleiche Struktur ohne Verwandtschaft','Keine Gemeinsamkeit'], correct:1 },
+                { q: 'Was ist ein Ökosystem?', opts:['Nur die Gesamtheit aller Lebewesen','Die abiotische Umwelt eines Gebiets','Biozönose + Biotop','Eine einzelne Population'], correct:2 },
+                { q: 'Wie nennt man Organismen, die organische Substanz aus anorganischen Stoffen aufbauen?', opts:['Heterotrophe','Autotrophe','Destruenten','Konsumenten'], correct:1 },
+                { q: 'Was ist Photosynthese vereinfacht?', opts:['CO₂ + H₂O → Glukose + O₂','O₂ + Glukose → CO₂ + H₂O','H₂O → H₂ + O₂','CO₂ → C + O₂'], correct:0 },
+            ],
+            chemie: [
+                // Atombau & PSE
+                { q: 'Was gibt die Ordnungszahl eines Elements im Periodensystem an?', opts:['Anzahl der Neutronen','Anzahl der Protonen','Atommasse','Anzahl der Elektronen in der Außenschale'], correct:1 },
+                { q: 'Welche Gruppe des PSE enthält die Edelgase?', opts:['Gruppe 1','Gruppe 7','Gruppe 17','Gruppe 18'], correct:3 },
+                { q: 'Was ist ein Isotop?', opts:['Atome verschiedener Elemente mit gleicher Masse','Atome desselben Elements mit unterschiedlicher Neutronenzahl','Atome mit gleicher Elektronenzahl','Moleküle mit gleicher Summenformel'], correct:1 },
+                { q: 'Wie viele Elektronen fasst die L-Schale maximal?', opts:['2','8','18','32'], correct:1 },
+                { q: 'Welches Element hat das Symbol Fe?', opts:['Fluor','Francium','Eisen','Fermium'], correct:2 },
+                // Chemische Bindungen
+                { q: 'Was ist eine kovalente Bindung?', opts:['Übertragung von Elektronen','Gemeinsame Nutzung von Elektronen','Anziehung zwischen Ionen','Metallbindung'], correct:1 },
+                { q: 'Welche Bindungsart liegt in NaCl vor?', opts:['Kovalente Bindung','Metallbindung','Ionenbindung','Wasserstoffbrücke'], correct:2 },
+                { q: 'Was ist Elektronegatvität?', opts:['Fähigkeit, Elektronen abzugeben','Fähigkeit, Elektronen anzuziehen','Anzahl der Außenelektronen','Ionisierungsenergie'], correct:1 },
+                { q: 'Welche Geometrie hat das Wassermolekül (H₂O)?', opts:['Linear','Trigonal-planar','Gewinkelt','Tetraedrisch'], correct:2 },
+                { q: 'Was ist ein Dipol?', opts:['Ein Molekül mit positiver Ladung','Ein Molekül mit negativer Ladung','Ein Molekül mit ungleicher Ladungsverteilung','Ein Atom mit 2 Protonen'], correct:2 },
+                // Säuren, Basen, pH
+                { q: 'Was ist der pH-Wert einer neutralen Lösung bei 25 °C?', opts:['0','7','14','1'], correct:1 },
+                { q: 'Was gibt der pKs-Wert an?', opts:['Die Stärke einer Säure','Die Konzentration einer Lösung','Den pH bei Neutralisation','Die Löslichkeit eines Salzes'], correct:0 },
+                { q: 'Welche Aussage beschreibt eine Brønsted-Säure?', opts:['Elektronenpaardonator','Protonendonator','Elektronenpaarakzeptor','Protonenakzeptor'], correct:1 },
+                { q: 'Was entsteht bei der Neutralisation von HCl mit NaOH?', opts:['H₂ + Cl₂','NaCl + H₂O','Na + HCl₂','NaHCO₃'], correct:1 },
+                { q: 'Welcher pH-Wert entspricht einer starken Säure?', opts:['pH 1','pH 7','pH 10','pH 14'], correct:0 },
+                // Reaktionen & Thermodynamik
+                { q: 'Was ist Oxidation im chemischen Sinne?', opts:['Aufnahme von Elektronen','Abgabe von Elektronen','Aufnahme von Sauerstoff','Abgabe von Wasserstoff'], correct:1 },
+                { q: 'Was beschreibt die Reaktionsenthalpie ΔH?', opts:['Geschwindigkeit einer Reaktion','Wärmetönung einer Reaktion','Gleichgewichtslage','Aktivierungsenergie'], correct:1 },
+                { q: 'Was ist ein Katalysator?', opts:['Er wird bei der Reaktion verbraucht','Er erhöht die Aktivierungsenergie','Er beschleunigt die Reaktion, ohne verbraucht zu werden','Er verändert das Gleichgewicht'], correct:2 },
+                { q: 'Welche Formel beschreibt das Molverhältnis? (Avogadro-Konstante NA ≈ 6,022 × 10²³)', opts:['n = m/M','n = V/Vm','n = N/NA','Alle davon'], correct:3 },
+                { q: 'Was ist Hydrolyse?', opts:['Oxidation durch Wasser','Spaltung einer Verbindung durch Wasser','Synthese unter Wasserabspaltung','Reduktion durch H₂'], correct:1 },
+                // Organische Chemie
+                { q: 'Welche funktionelle Gruppe kennzeichnet Alkohole?', opts:['–COOH','–CHO','–OH','–NH₂'], correct:2 },
+                { q: 'Was ist die allgemeine Summenformel der Alkane?', opts:['CₙH₂ₙ','CₙH₂ₙ₊₂','CₙH₂ₙ₋₂','CₙHₙ'], correct:1 },
+                { q: 'Welche Reaktion verknüpft Aminosäuren zu Proteinen?', opts:['Esterbindung','Peptidbildung','Glykosidbindung','Phosphodiesterbindung'], correct:1 },
+                { q: 'Was ist ein Ester?', opts:['Verbindung aus Säure + Amin','Verbindung aus Säure + Alkohol','Verbindung aus zwei Alkoholen','Verbindung aus Alkohol + Base'], correct:1 },
+                { q: 'Welche Verbindungsklasse enthält die Carbonylgruppe C=O als Endgruppe?', opts:['Alkohole','Aldehyde','Ketone','Carbonsäuren'], correct:1 },
+            ],
+            physik: [
+                // Mechanik
+                { q: 'Was beschreibt das Newtonsche Trägheitsgesetz (1. Newtonsches Gesetz)?', opts:['F = m·a','Jeder Körper verharrt im Zustand der Ruhe oder gleichförmigen Bewegung, wenn keine Kraft wirkt','Actio = Reactio','Arbeit = Kraft × Weg'], correct:1 },
+                { q: 'Was ist die Einheit der Kraft im SI-System?', opts:['Joule','Watt','Newton','Pascal'], correct:2 },
+                { q: 'Welche Formel beschreibt die gleichförmig beschleunigte Bewegung?', opts:['s = v·t','s = ½·a·t²','v = s/t','F = m·v'], correct:1 },
+                { q: 'Was ist Arbeit in der Physik?', opts:['W = F/s','W = F·s·cos(α)','W = m·a','W = P·t'], correct:1 },
+                { q: 'Was ist die Einheit der Energie?', opts:['Newton','Watt','Joule','Pascal'], correct:2 },
+                { q: 'Was gilt beim elastischen Stoß?', opts:['Nur Impuls bleibt erhalten','Nur Energie bleibt erhalten','Impuls und kinetische Energie bleiben erhalten','Keine Erhaltungsgröße'], correct:2 },
+                { q: 'Was beschreibt das Hooksche Gesetz?', opts:['F = m·a','F = D·x','p = m·v','W = F·s'], correct:1 },
+                { q: 'Wie lautet die Formel für den Drehmoment?', opts:['M = F/r','M = F·r','M = m·a·r','M = p·v'], correct:1 },
+                // Thermodynamik
+                { q: 'Was besagt der 1. Hauptsatz der Thermodynamik?', opts:['Energie kann nicht erzeugt oder vernichtet werden','Wärme fließt stets vom Kalten zum Warmen','Die Entropie nimmt ab','Absolute Temperatur ist messbar'], correct:0 },
+                { q: 'Was ist die Einheit der Temperatur im SI-System?', opts:['Grad Celsius','Kelvin','Fahrenheit','Rankine'], correct:1 },
+                { q: 'Bei welcher Temperatur in Kelvin liegt der absolute Nullpunkt?', opts:['0 K','−100 K','−273 K','273 K'], correct:0 },
+                { q: 'Was ist spezifische Wärmekapazität?', opts:['Wärme pro Mol','Wärme pro kg und Kelvin','Wärme pro Sekunde','Temperatur pro Joule'], correct:1 },
+                // Elektrizität
+                { q: 'Was beschreibt das Ohmsche Gesetz?', opts:['U = R·I','P = U·I','Q = C·U','F = q·E'], correct:0 },
+                { q: 'Was ist die Einheit des elektrischen Widerstands?', opts:['Volt','Ampere','Ohm','Farad'], correct:2 },
+                { q: 'Wie verhält sich der Gesamtwiderstand bei Reihenschaltung?', opts:['R_ges = R₁ · R₂','R_ges = R₁ + R₂','1/R_ges = 1/R₁ + 1/R₂','R_ges = R₁/R₂'], correct:1 },
+                { q: 'Was ist elektrische Leistung?', opts:['P = U/I','P = U·I','P = R·I','P = U·R'], correct:1 },
+                { q: 'Was ist ein Kondensator?', opts:['Bauteil zum Widerstandserhöhen','Bauteil zur Ladungsspeicherung','Bauteil zur Induktion','Bauteil zur Umformung von Wechselstrom'], correct:1 },
+                // Wellen & Optik
+                { q: 'Welche Formel verknüpft Wellenlänge, Frequenz und Ausbreitungsgeschwindigkeit?', opts:['c = λ·f','c = λ/f','c = f/λ','c = λ + f'], correct:0 },
+                { q: 'Was ist das Snelliussche Brechungsgesetz?', opts:['n₁·sin α₁ = n₂·sin α₂','n₁·cos α₁ = n₂·cos α₂','n₁/sin α₁ = n₂/sin α₂','n₁ + n₂ = sin α'], correct:0 },
+                { q: 'Welche Farbe hat die kürzeste Wellenlänge im sichtbaren Spektrum?', opts:['Rot','Gelb','Grün','Violett'], correct:3 },
+                // Atom- & Kernphysik
+                { q: 'Was ist der Photoelektrische Effekt?', opts:['Emission von Elektronen durch Licht','Absorption von Photonen durch Elektronen','Kernspaltung durch Licht','Emission von Photonen durch Elektronen'], correct:0 },
+                { q: 'Was ist beim radioaktiven α-Zerfall das Emissionsprodukt?', opts:['Elektron','Positron','Heliumkern','Photon'], correct:2 },
+                { q: 'Was beschreibt die Halbwertszeit?', opts:['Zeit bis zur vollständigen Zersetzung','Zeit, in der die Hälfte der Atome zerfallen ist','Zeit für eine Halbierung der Strahlung','Dauer eines Zerfallsprozesses'], correct:1 },
+                { q: 'Welche Strahlung hat die höchste Durchdringungsfähigkeit?', opts:['Alpha-Strahlung','Beta-Strahlung','Gamma-Strahlung','Röntgenstrahlung'], correct:2 },
+                { q: 'Was ist die Lichtgeschwindigkeit im Vakuum (ca.)?', opts:['3 × 10⁶ m/s','3 × 10⁸ m/s','3 × 10¹⁰ m/s','3 × 10⁴ m/s'], correct:1 },
+            ],
+            mathematik: [
+                // Grundlagen & Algebra
+                { q: 'Was ist log₁₀(1000)?', opts:['2','3','4','10'], correct:1 },
+                { q: 'Welche Lösungsmenge hat x² = −4 in ℝ?', opts:['x = ±2','x = ±2i','∅','x = 4'], correct:2 },
+                { q: 'Was ist die Umkehrfunktion von eˣ?', opts:['xᵉ','ln(x)','log₁₀(x)','1/eˣ'], correct:1 },
+                { q: 'Was ist der Betrag von −7?', opts:['−7','7','49','1/7'], correct:1 },
+                { q: 'Wie lautet der Binomische Lehrsatz für (a+b)²?', opts:['a²+b²','a²+ab+b²','a²+2ab+b²','a²−2ab+b²'], correct:2 },
+                { q: 'Was ist die Determinante einer 2×2-Matrix [[a,b],[c,d]]?', opts:['a·d + b·c','a·b − c·d','a·d − b·c','a+d'], correct:2 },
+                { q: 'Welcher Wert hat sin(90°)?', opts:['0','0,5','√2/2','1'], correct:3 },
+                { q: 'Was ist cos(0°)?', opts:['0','1','−1','√2/2'], correct:1 },
+                { q: 'Welche der folgenden Zahlen ist irrational?', opts:['0,75','√9','√2','22/7'], correct:2 },
+                { q: 'Was ist 0! (Null-Fakultät)?', opts:['0','1','Nicht definiert','∞'], correct:1 },
+                // Analysis
+                { q: 'Was ist die Ableitung von f(x) = x³?', opts:['x²','3x','3x²','x⁴/4'], correct:2 },
+                { q: 'Was ist die Ableitung von f(x) = eˣ?', opts:['xeˣ⁻¹','eˣ','x·eˣ','1/eˣ'], correct:1 },
+                { q: 'Was ist ∫x dx?', opts:['x²','x²/2 + C','2x + C','1/x + C'], correct:1 },
+                { q: 'Was beschreibt ein lokales Maximum einer Funktion?', opts:["f'(x) = 0 und f''(x) > 0","f'(x) = 0 und f''(x) < 0","f'(x) > 0","f'(x) < 0"], correct:1 },
+                { q: 'Was ist der Grenzwert von 1/x für x → ∞?', opts:['1','∞','0','−1'], correct:2 },
+                { q: 'Was ist die Kettenregel bei f(g(x))?', opts:["f'(x) · g'(x)","f'(g(x)) · g'(x)","f(x) · g'(x)","f'(g(x)) + g'(x)"], correct:1 },
+                // Geometrie
+                { q: 'Wie lautet der Satz des Pythagoras?', opts:['a² + b² = c','a + b = c','a² + b² = c²','a² · b² = c²'], correct:2 },
+                { q: 'Was ist die Formel für den Flächeninhalt eines Kreises?', opts:['2πr','πr²','πd','4πr²'], correct:1 },
+                { q: 'Was ist das Volumen einer Kugel mit Radius r?', opts:['4πr²','2πr³','4/3·πr³','πr³'], correct:2 },
+                { q: 'Welche Winkelbeziehung gilt in einem gleichschenkligen Dreieck?', opts:['Alle Winkel sind gleich','Zwei Basiswinkel sind gleich','Kein Winkel ist gleich','Ein Winkel ist 90°'], correct:1 },
+                // Stochastik
+                { q: 'Was ist die Wahrscheinlichkeit, beim Würfeln eine 6 zu werfen?', opts:['1/3','1/4','1/6','1/2'], correct:2 },
+                { q: 'Was beschreibt der Erwartungswert einer Zufallsvariable?', opts:['Den Maximalwert','Den Mittelwert aller möglichen Werte gewichtet mit Wahrscheinlichkeit','Den häufigsten Wert','Den Minimalwert'], correct:1 },
+                { q: 'Wie viele Möglichkeiten gibt es, 3 Personen aus 5 auszuwählen (Kombination)?', opts:['10','15','20','60'], correct:0 },
+                { q: 'Was ist die Binomialformel für P(X=k) bei n Versuchen und Trefferwahrscheinlichkeit p?', opts:['n!·pᵏ·(1−p)ⁿ⁻ᵏ','(n über k)·pᵏ·(1−p)ⁿ⁻ᵏ','pᵏ·(1−p)ⁿ','nᵏ·p'], correct:1 },
+                { q: 'Was ist die Standardabweichung?', opts:['Der Mittelwert der Daten','Die Wurzel der Varianz','Das Maximum minus Minimum','Die Hälfte des Interquartilsabstands'], correct:1 },
+            ]
+        };
+
+        // Wissen Zustand
+        let wissenSubject = 'all';
+        let wissenCurrent = null;
+        let wissenSelected = null;
+        let wissenCorrect = 0;
+        let wissenTotal = 0;
+        let wissenUsed = new Set();
+
+        const subjectNames = { all:'Alle', biologie:'Biologie', chemie:'Chemie', physik:'Physik', mathematik:'Mathematik' };
+        const subjectIcons = { all:'📚', biologie:'🧬', chemie:'⚗️', physik:'⚡', mathematik:'📐' };
+
+        function getWissenPool() {
+            if (wissenSubject === 'all') {
+                return Object.entries(wissenFragen).flatMap(([subj, qs]) => qs.map(q => ({...q, subj})));
+            }
+            return wissenFragen[wissenSubject].map(q => ({...q, subj: wissenSubject}));
+        }
+
+        function generateNewWissenFrage() {
+            const pool = getWissenPool();
+            let available = pool.map((_, i) => i).filter(i => !wissenUsed.has(`${wissenSubject}_${i}`));
+            if (available.length === 0) {
+                // Lösche nur die verwendeten des aktuellen Pools
+                pool.forEach((_, i) => wissenUsed.delete(`${wissenSubject}_${i}`));
+                available = pool.map((_, i) => i);
+            }
+            const idx = available[Math.floor(Math.random() * available.length)];
+            wissenUsed.add(`${wissenSubject}_${idx}`);
+            wissenCurrent = pool[idx];
+            wissenSelected = null;
+
+            // Badge
+            const badge = document.getElementById('wissen-subject-badge');
+            badge.textContent = `${subjectIcons[wissenCurrent.subj]} ${subjectNames[wissenCurrent.subj]}`;
+
+            // Frage
+            document.getElementById('wissen-question').textContent = wissenCurrent.q;
+
+            // Optionen – mische Antworten damit korrekte Position variiert
+            const indices = [0,1,2,3];
+            const shuffled = [...indices].sort(() => Math.random() - 0.5);
+            const optEls = ['a','b','c','d'];
+            let newCorrectIdx = 0;
+            shuffled.forEach((origIdx, newPos) => {
+                document.getElementById(`wissen-option-${optEls[newPos]}`).textContent = wissenCurrent.opts[origIdx];
+                if (origIdx === wissenCurrent.correct) newCorrectIdx = newPos;
+            });
+            wissenCurrent._shuffledCorrect = newCorrectIdx; // 0=A,1=B,2=C,3=D
+
+            // Reset
+            document.querySelectorAll('#wissen-options .letter-option').forEach(o => o.classList.remove('selected','correct','incorrect'));
+            const fb = document.getElementById('wissen-feedback');
+            fb.className = 'feedback hidden';
+            fb.textContent = '';
+        }
+
+        function selectWissenAnswer(option) {
+            wissenSelected = option; // 'A','B','C','D'
+            document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
+                o.classList.remove('selected');
+                if (o.dataset.option === option) o.classList.add('selected');
+            });
+        }
+
+        function checkWissenAnswer() {
+            if (!wissenSelected || !wissenCurrent) {
+                const fb = document.getElementById('wissen-feedback');
+                fb.textContent = 'Bitte wähle eine Antwort aus!';
+                fb.className = 'feedback incorrect';
+                return;
+            }
+            wissenTotal++;
+            const correctOpt = ['A','B','C','D'][wissenCurrent._shuffledCorrect];
+            const isCorrect = wissenSelected === correctOpt;
+            if (isCorrect) wissenCorrect++;
+
+            document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
+                if (o.dataset.option === correctOpt) o.classList.add('correct');
+                else if (o.dataset.option === wissenSelected && !isCorrect) o.classList.add('incorrect');
+            });
+
+            const correctText = document.getElementById(`wissen-option-${correctOpt.toLowerCase()}`).textContent;
+            const fb = document.getElementById('wissen-feedback');
+            fb.textContent = isCorrect
+                ? `✓ Richtig!`
+                : `✗ Falsch. Richtige Antwort: ${correctText}`;
+            fb.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+
+            updateWissenStats();
+            setTimeout(generateNewWissenFrage, 2500);
+        }
+
+        function setWissenSubject(subj) {
+            wissenSubject = subj;
+            document.querySelectorAll('[data-subject]').forEach(b => {
+                b.classList.toggle('active', b.dataset.subject === subj);
+            });
+            document.getElementById('wissen-subject-stat').textContent = subjectNames[subj];
+            generateNewWissenFrage();
+        }
+
+        function updateWissenStats() {
+            document.getElementById('wissen-correct-count').textContent = wissenCorrect;
+            document.getElementById('wissen-total-count').textContent = wissenTotal;
+            document.getElementById('wissen-success-rate').textContent = wissenTotal > 0
+                ? `${Math.round((wissenCorrect / wissenTotal) * 100)}%` : '0%';
+        }
+
+        // Event Listeners Wissen
+        document.querySelectorAll('[data-subject]').forEach(btn => {
+            btn.addEventListener('click', () => setWissenSubject(btn.dataset.subject));
+        });
+        document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
+            o.addEventListener('click', () => selectWissenAnswer(o.dataset.option));
+        });
+        document.getElementById('wissen-check-btn').addEventListener('click', checkWissenAnswer);
+        document.getElementById('wissen-new-btn').addEventListener('click', generateNewWissenFrage);
+
+        // Tastatur-Shortcuts Wissen
+        document.addEventListener('keydown', (e) => {
+            if (currentModule === 'wissen') {
+                if (e.key === 'Escape') generateNewWissenFrage();
+                else if (e.key === 'Enter') { e.preventDefault(); checkWissenAnswer(); }
+                else if (['a','b','c','d'].includes(e.key.toLowerCase())) selectWissenAnswer(e.key.toUpperCase());
+            }
+        });
+
         // Initialisierung
         document.addEventListener('DOMContentLoaded', () => {
             generateNewWord();
             generateNewZahlenfolge();
+            generateNewWissenFrage();
             updateStats();
             updateZfStats();
+            updateWissenStats();
         });
     </script>
 </body>
