@@ -87,6 +87,53 @@
             border-radius: 1px;
         }
         
+        .difficulty-selector {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .difficulty-selector h3 {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .difficulty-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .difficulty-btn {
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-light);
+            border-radius: 25px;
+            background: var(--warm-white);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+            letter-spacing: 0.02rem;
+        }
+        
+        .difficulty-btn:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+        
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, var(--accent-gold), #b8941f);
+            color: var(--warm-white);
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        
         h1 {
             font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 700;
@@ -430,6 +477,16 @@
                 padding: 2rem 1rem;
             }
             
+            .difficulty-options {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .difficulty-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            
             .word-card {
                 padding: 2rem 1.5rem;
             }
@@ -473,6 +530,17 @@
         <header class="header">
             <h1>Anagramm Trainer</h1>
             <p class="subtitle">Entwirre die Buchstaben und finde das ursprüngliche Wort</p>
+            
+            <!-- Schwierigkeitsgrad Auswahl -->
+            <div class="difficulty-selector">
+                <h3>Schwierigkeitsgrad wählen:</h3>
+                <div class="difficulty-options">
+                    <button class="difficulty-btn active" data-difficulty="all">Alle Wörter</button>
+                    <button class="difficulty-btn" data-difficulty="short">Kurz (3-4)</button>
+                    <button class="difficulty-btn" data-difficulty="medium">Mittel (5-6)</button>
+                    <button class="difficulty-btn" data-difficulty="long">Lang (7+)</button>
+                </div>
+            </div>
         </header>
         
         <main class="game-container">
@@ -495,6 +563,7 @@
                     
                     <div class="controls">
                         <button id="hint-btn" class="btn btn-secondary">💡 Tipp anzeigen</button>
+                        <button id="reveal-btn" class="btn btn-secondary">🔍 Auflösen</button>
                         <button id="skip-btn" class="btn btn-secondary">⏭ Überspringen</button>
                         <button id="new-word-btn" class="btn btn-primary">🔄 Neues Wort</button>
                     </div>
@@ -515,6 +584,10 @@
                 <div class="stat-item">
                     <span id="success-rate" class="stat-value">0%</span>
                     <span class="stat-label">Erfolgsrate</span>
+                </div>
+                <div class="stat-item">
+                    <span id="current-difficulty" class="stat-value">Alle</span>
+                    <span class="stat-label">Schwierigkeit</span>
                 </div>
             </div>
             
@@ -565,6 +638,7 @@
         let correctCount = 0;
         let totalCount = 0;
         let solvedWords = new Set();
+        let currentDifficulty = 'all';
         
         // DOM Elemente
         const scrambledWordElement = document.getElementById('scrambled-word');
@@ -572,12 +646,15 @@
         const hintDisplay = document.getElementById('hint-display');
         const feedbackElement = document.getElementById('feedback');
         const hintBtn = document.getElementById('hint-btn');
+        const revealBtn = document.getElementById('reveal-btn');
         const skipBtn = document.getElementById('skip-btn');
         const newWordBtn = document.getElementById('new-word-btn');
         const correctCountElement = document.getElementById('correct-count');
         const totalCountElement = document.getElementById('total-count');
         const successRateElement = document.getElementById('success-rate');
+        const currentDifficultyElement = document.getElementById('current-difficulty');
         const solvedWordsElement = document.getElementById('solved-words');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
         
         // Fisher-Yates Shuffle Algorithmus
         function shuffleWord(word) {
@@ -600,17 +677,54 @@
             return shuffled.join('');
         }
         
+        function getWordsByDifficulty() {
+            switch(currentDifficulty) {
+                case 'short':
+                    return allWords.filter(word => word.length >= 3 && word.length <= 4);
+                case 'medium':
+                    return allWords.filter(word => word.length >= 5 && word.length <= 6);
+                case 'long':
+                    return allWords.filter(word => word.length >= 7);
+                case 'all':
+                default:
+                    return allWords;
+            }
+        }
+        
         function getRandomWord() {
-            const availableWords = allWords.filter(word => !solvedWords.has(word));
+            const wordsForDifficulty = getWordsByDifficulty();
+            const availableWords = wordsForDifficulty.filter(word => !solvedWords.has(word));
             
             if (availableWords.length === 0) {
-                // Alle Wörter gelöst - Reset für neues Spiel
+                // Alle Wörter dieser Schwierigkeit gelöst - Reset für neues Spiel
                 solvedWords.clear();
                 updateSolvedWordsList();
-                return allWords[Math.floor(Math.random() * allWords.length)];
+                return wordsForDifficulty[Math.floor(Math.random() * wordsForDifficulty.length)];
             }
             
             return availableWords[Math.floor(Math.random() * availableWords.length)];
+        }
+        
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            
+            // UI Update
+            difficultyBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.difficulty === difficulty) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Stats reset für neue Schwierigkeit
+            correctCount = 0;
+            totalCount = 0;
+            solvedWords.clear();
+            updateStats();
+            updateSolvedWordsList();
+            
+            // Neues Wort generieren
+            newWord();
         }
         
         function displayScrambledWord() {
@@ -638,6 +752,7 @@
             // Reset button states
             hintBtn.disabled = false;
             hintBtn.textContent = '💡 Tipp anzeigen';
+            revealBtn.disabled = false;
             
             wordInput.focus();
         }
@@ -650,6 +765,28 @@
                 hintBtn.disabled = true;
                 hintUsed = true;
             }
+        }
+        
+        function revealWord() {
+            // Wort in Input-Feld anzeigen
+            wordInput.value = currentWord;
+            wordInput.className = 'word-input';
+            
+            // Feedback anzeigen
+            showFeedback(`Das Wort war: "${currentWord}"`, false);
+            
+            // Als übersprungen zählen
+            totalCount++;
+            updateStats();
+            
+            // Buttons temporär deaktivieren
+            revealBtn.disabled = true;
+            hintBtn.disabled = true;
+            
+            // Nach 2 Sekunden neues Wort
+            setTimeout(() => {
+                newWord();
+            }, 2500);
         }
         
         function clearHint() {
@@ -677,6 +814,15 @@
             
             const rate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
             successRateElement.textContent = `${rate}%`;
+            
+            // Schwierigkeitsgrad anzeigen
+            const difficultyNames = {
+                'all': 'Alle',
+                'short': 'Kurz',
+                'medium': 'Mittel', 
+                'long': 'Lang'
+            };
+            currentDifficultyElement.textContent = difficultyNames[currentDifficulty];
         }
         
         function updateSolvedWordsList() {
@@ -758,8 +904,16 @@
         });
         
         hintBtn.addEventListener('click', showHint);
+        revealBtn.addEventListener('click', revealWord);
         skipBtn.addEventListener('click', skipWord);
         newWordBtn.addEventListener('click', newWord);
+        
+        // Schwierigkeitsgrad Event Listeners
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setDifficulty(btn.dataset.difficulty);
+            });
+        });
         
         // Tastatur-Shortcuts
         document.addEventListener('keydown', (e) => {
@@ -768,6 +922,9 @@
             } else if (e.key === 'F1') {
                 e.preventDefault();
                 if (!hintUsed) showHint();
+            } else if (e.key === 'F2') {
+                e.preventDefault();
+                revealWord();
             } else if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
                 skipWord();
@@ -779,7 +936,7 @@
             newWord();
             updateStats();
             console.log('Anagramm Trainer geladen!');
-            console.log('Shortcuts: ESC = Neues Wort, F1 = Tipp, Ctrl+S = Überspringen');
+            console.log('Shortcuts: ESC = Neues Wort, F1 = Tipp, F2 = Auflösen, Ctrl+S = Überspringen');
         });
     </script>
 </body>
