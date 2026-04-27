@@ -708,7 +708,9 @@
     </div>
 
     <script>
-        // Echte medAT-Wortflüssigkeits-Aufgaben aus offiziellen Dokumenten
+        // ============================================================
+        // DATEN
+        // ============================================================
         const wordFluencyWords = {
             // Kurz: bis 5 Buchstaben
             short: [
@@ -874,344 +876,7 @@
                 { letters: ['F', 'T', 'W', 'K', 'R', 'A', 'K', 'E', 'R'], word: 'KRAFTWERK', startLetter: 'K' }
             ]
         };
-        
-        // Spielvariablen
-        let currentModule = 'wortfluessigkeit';
-        let currentDifficulty = 'all';
-        let currentWordData = null;
-        let selectedAnswer = null;
-        let correctCount = 0;
-        let totalCount = 0;
-        let currentAnswerOptions = [];
-        
-        // DOM Elemente
-        const navTabs = document.querySelectorAll('.nav-tab');
-        const modules = document.querySelectorAll('.module');
-        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
-        const lettersContainer = document.getElementById('letters-container');
-        const letterOptions = document.querySelectorAll('.letter-option');
-        const showWordBtn = document.getElementById('show-word-btn');
-        const checkAnswerBtn = document.getElementById('check-answer-btn');
-        const newWordBtn = document.getElementById('new-word-btn');
-        const feedbackElement = document.getElementById('feedback');
-        const correctCountElement = document.getElementById('correct-count');
-        const totalCountElement = document.getElementById('total-count');
-        const successRateElement = document.getElementById('success-rate');
-        const currentDifficultyElement = document.getElementById('current-difficulty');
-        
-        // Kombiniere alle Wörter für "Alle" Option
-        const allWordFluencyWords = [
-            ...wordFluencyWords.short,
-            ...wordFluencyWords.medium,
-            ...wordFluencyWords.long
-        ];
-        
-        function getWordsByDifficulty() {
-            switch(currentDifficulty) {
-                case 'short':
-                    return wordFluencyWords.short;
-                case 'medium':
-                    return wordFluencyWords.medium;
-                case 'long':
-                    return wordFluencyWords.long;
-                case 'all':
-                default:
-                    return allWordFluencyWords;
-            }
-        }
-        
-        function generateNewWord() {
-            const wordsForDifficulty = getWordsByDifficulty();
-            currentWordData = wordsForDifficulty[Math.floor(Math.random() * wordsForDifficulty.length)];
-            
-            // Mische die Buchstaben durcheinander
-            const shuffledLetters = shuffleArray([...currentWordData.letters]);
-            
-            // Zeige durchmischte Buchstaben an
-            displayLetters(shuffledLetters);
-            
-            // Generiere Antwortoptionen
-            generateAnswerOptions();
-            
-            // Reset UI
-            selectedAnswer = null;
-            letterOptions.forEach(option => {
-                option.classList.remove('selected', 'correct', 'incorrect');
-            });
-            clearFeedback();
-        }
-        
-        function shuffleArray(array) {
-            const shuffled = [...array];
-            let attempts = 0;
-            let isShuffled = false;
-            
-            // Stelle sicher, dass die Reihenfolge tatsächlich verändert wird
-            do {
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                }
-                
-                // Prüfe ob die Reihenfolge sich geändert hat
-                isShuffled = !shuffled.every((letter, index) => letter === array[index]);
-                attempts++;
-                
-                // Verhindere endlose Schleifen bei sehr kurzen Arrays
-                if (attempts > 50) break;
-                
-            } while (!isShuffled && array.length > 1);
-            
-            return shuffled;
-        }
-        
-        function displayLetters(letters) {
-            lettersContainer.innerHTML = '';
-            letters.forEach((letter, index) => {
-                const letterElement = document.createElement('div');
-                letterElement.className = 'single-letter';
-                letterElement.textContent = letter;
-                letterElement.style.animationDelay = `${index * 0.1}s`;
-                lettersContainer.appendChild(letterElement);
-            });
-        }
-        
-        function generateAnswerOptions() {
-            // Erstelle 4 zufällige Buchstaben-Optionen + die korrekte Antwort
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            const correctLetter = currentWordData.startLetter;
-            const options = [correctLetter];
-            
-            // Füge 3 zufällige falsche Optionen hinzu
-            while (options.length < 4) {
-                const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
-                if (!options.includes(randomLetter)) {
-                    options.push(randomLetter);
-                }
-            }
-            
-            // Mische die Optionen
-            for (let i = options.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [options[i], options[j]] = [options[j], options[i]];
-            }
-            
-            currentAnswerOptions = options;
-            
-            // Update UI
-            document.getElementById('option-a-letter').textContent = `Anfangsbuchstabe: ${options[0]}`;
-            document.getElementById('option-b-letter').textContent = `Anfangsbuchstabe: ${options[1]}`;
-            document.getElementById('option-c-letter').textContent = `Anfangsbuchstabe: ${options[2]}`;
-            document.getElementById('option-d-letter').textContent = `Anfangsbuchstabe: ${options[3]}`;
-        }
-        
-        function selectAnswer(option) {
-            selectedAnswer = option;
-            
-            letterOptions.forEach(opt => {
-                opt.classList.remove('selected');
-                if (opt.dataset.option === option) {
-                    opt.classList.add('selected');
-                }
-            });
-        }
-        
-        function checkAnswer() {
-            if (!selectedAnswer || !currentWordData) {
-                showFeedback('Bitte wähle eine Antwort aus!', false);
-                return;
-            }
-            
-            totalCount++;
-            let isCorrect = false;
-            
-            if (selectedAnswer === 'E') {
-                // Option E gewählt - prüfe ob keine der A-D Optionen korrekt ist
-                const correctLetter = currentWordData.startLetter;
-                const hasCorrectOption = currentAnswerOptions.includes(correctLetter);
-                
-                if (!hasCorrectOption) {
-                    correctCount++;
-                    isCorrect = true;
-                    showFeedback(`Richtig! Das Wort "${currentWordData.word}" beginnt mit "${correctLetter}", was nicht in den Optionen A-D war.`, true);
-                } else {
-                    showFeedback(`Falsch! Das Wort "${currentWordData.word}" beginnt mit "${correctLetter}", was eine der Optionen war.`, false);
-                }
-            } else {
-                // Option A-D gewählt
-                const selectedLetter = currentAnswerOptions[selectedAnswer.charCodeAt(0) - 65]; // A=0, B=1, C=2, D=3
-                const correctLetter = currentWordData.startLetter;
-                
-                if (selectedLetter === correctLetter) {
-                    correctCount++;
-                    isCorrect = true;
-                    showFeedback(`Richtig! Das Wort "${currentWordData.word}" beginnt tatsächlich mit "${correctLetter}".`, true);
-                } else {
-                    showFeedback(`Falsch! Das Wort "${currentWordData.word}" beginnt mit "${correctLetter}", nicht mit "${selectedLetter}".`, false);
-                }
-            }
-            
-            // Markiere korrekte/falsche Antworten
-            letterOptions.forEach(opt => {
-                const optionLetter = opt.dataset.option;
-                if (selectedAnswer === 'E' && optionLetter === 'E') {
-                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
-                } else if (optionLetter !== 'E') {
-                    const optionChar = currentAnswerOptions[optionLetter.charCodeAt(0) - 65];
-                    if (optionChar === currentWordData.startLetter) {
-                        opt.classList.add('correct');
-                    } else if (optionLetter === selectedAnswer) {
-                        opt.classList.add('incorrect');
-                    }
-                }
-            });
-            
-            updateStats();
-            
-            // Nach 3 Sekunden neue Aufgabe
-            setTimeout(() => {
-                generateNewWord();
-            }, 3000);
-        }
-        
-        function showWord() {
-            showFeedback(`Das gesuchte Wort ist: "${currentWordData.word}" (beginnt mit "${currentWordData.startLetter}")`, true);
-            
-            // Markiere korrekte Antwort
-            letterOptions.forEach(opt => {
-                const optionLetter = opt.dataset.option;
-                if (optionLetter !== 'E') {
-                    const optionChar = currentAnswerOptions[optionLetter.charCodeAt(0) - 65];
-                    if (optionChar === currentWordData.startLetter) {
-                        opt.classList.add('correct');
-                    }
-                } else if (!currentAnswerOptions.includes(currentWordData.startLetter)) {
-                    opt.classList.add('correct');
-                }
-            });
-            
-            totalCount++;
-            updateStats();
-            
-            setTimeout(() => {
-                generateNewWord();
-            }, 4000);
-        }
-        
-        function showFeedback(message, isCorrect) {
-            feedbackElement.textContent = message;
-            feedbackElement.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-        }
-        
-        function clearFeedback() {
-            feedbackElement.textContent = '';
-            feedbackElement.className = 'feedback hidden';
-        }
-        
-        function updateStats() {
-            correctCountElement.textContent = correctCount;
-            totalCountElement.textContent = totalCount;
-            
-            const rate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
-            successRateElement.textContent = `${rate}%`;
-        }
-        
-        function setDifficulty(difficulty) {
-            currentDifficulty = difficulty;
-            
-            difficultyBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.difficulty === difficulty) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            const difficultyNames = {
-                'all': 'Alle',
-                'short': 'Kurz',
-                'medium': 'Mittel', 
-                'long': 'Lang'
-            };
-            
-            currentDifficultyElement.textContent = difficultyNames[difficulty];
-            generateNewWord();
-        }
-        
-        function switchModule(moduleName) {
-            currentModule = moduleName;
-            
-            navTabs.forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.dataset.module === moduleName) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            modules.forEach(module => {
-                module.classList.remove('active');
-                if (module.id === moduleName + '-module') {
-                    module.classList.add('active');
-                }
-            });
-            
-            if (moduleName === 'wortfluessigkeit' && !currentWordData) {
-                generateNewWord();
-            }
-            if (moduleName === 'zahlenfolgen' && !zfCurrent) {
-                generateNewZahlenfolge();
-            }
-            if (moduleName === 'wissen' && !wissenCurrent) {
-                generateNewWissenFrage();
-            }
-        }
-        
-        // Event Listeners
-        navTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                switchModule(tab.dataset.module);
-            });
-        });
-        
-        difficultyBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                setDifficulty(btn.dataset.difficulty);
-            });
-        });
-        
-        letterOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                selectAnswer(option.dataset.option);
-            });
-        });
-        
-        showWordBtn.addEventListener('click', showWord);
-        checkAnswerBtn.addEventListener('click', checkAnswer);
-        newWordBtn.addEventListener('click', generateNewWord);
-        
-        // Tastatur-Shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (currentModule === 'wortfluessigkeit') {
-                if (e.key === 'Escape') {
-                    generateNewWord();
-                } else if (e.key === 'F1') {
-                    e.preventDefault();
-                    showWord();
-                } else if (e.key === 'Enter') {
-                    e.preventDefault();
-                    checkAnswer();
-                } else if (['a', 'b', 'c', 'd', 'e'].includes(e.key.toLowerCase())) {
-                    selectAnswer(e.key.toUpperCase());
-                }
-            }
-        });
-        
-        // =============================================
-        // ZAHLENFOLGEN-MODUL
-        // =============================================
 
-        // Aufgaben direkt aus dem offiziellen PDF + authentische Eigenkreationen
-        // Format: { sequence: [...], answers: [ans1, ans2], rule: '...',
-        //           options: { A: [x,y], B: [x,y], C: [x,y], D: [x,y] }, correct: 'A'|'B'|'C'|'D'|'E' }
         const zahlenfolgenAufgaben = [
             // ── Aus offiziellem IB_ZF_26.pdf ──────────────────────────────────
             { sequence: [1,2,3,4,5,6,'?','?'],
@@ -1391,147 +1056,8 @@
               rule: '×2−1 → 97/193 → E', options:{A:[96,191],B:[98,194],C:[95,189],D:[100,199]}, correct:'E' },
         ];
 
-        // Zahlenfolgen Zustand
-        let zfCurrent = null;
-        let zfSelected = null;
-        let zfCorrectCount = 0;
-        let zfTotalCount = 0;
-        let zfUsed = new Set();
-
-        // DOM Elemente Zahlenfolgen
-        const zfSequenceEl = document.getElementById('zf-sequence');
-        const zfOptions = document.querySelectorAll('#zf-options .letter-option');
-        const zfShowBtn = document.getElementById('zf-show-btn');
-        const zfCheckBtn = document.getElementById('zf-check-btn');
-        const zfNewBtn = document.getElementById('zf-new-btn');
-        const zfFeedback = document.getElementById('zf-feedback');
-        const zfCorrectEl = document.getElementById('zf-correct-count');
-        const zfTotalEl = document.getElementById('zf-total-count');
-        const zfRateEl = document.getElementById('zf-success-rate');
-
-        function generateNewZahlenfolge() {
-            // Wähle zufällige ungenutzte Aufgabe
-            let available = zahlenfolgenAufgaben
-                .map((_, i) => i)
-                .filter(i => !zfUsed.has(i));
-            if (available.length === 0) {
-                zfUsed.clear();
-                available = zahlenfolgenAufgaben.map((_, i) => i);
-            }
-            const idx = available[Math.floor(Math.random() * available.length)];
-            zfUsed.add(idx);
-            zfCurrent = zahlenfolgenAufgaben[idx];
-            zfSelected = null;
-
-            // Rendere Folge
-            zfSequenceEl.innerHTML = '';
-            zfCurrent.sequence.forEach((num, i) => {
-                const el = document.createElement('div');
-                el.className = 'zf-number' + (num === '?' ? ' unknown' : '');
-                el.textContent = num;
-                el.style.animationDelay = `${i * 0.08}s`;
-                zfSequenceEl.appendChild(el);
-            });
-
-            // Setze Antwortoptionen
-            const opts = zfCurrent.options;
-            document.getElementById('zf-option-a').textContent = `${opts.A[0]} / ${opts.A[1]}`;
-            document.getElementById('zf-option-b').textContent = `${opts.B[0]} / ${opts.B[1]}`;
-            document.getElementById('zf-option-c').textContent = `${opts.C[0]} / ${opts.C[1]}`;
-            document.getElementById('zf-option-d').textContent = `${opts.D[0]} / ${opts.D[1]}`;
-
-            // Reset
-            zfOptions.forEach(o => o.classList.remove('selected', 'correct', 'incorrect'));
-            zfFeedback.className = 'feedback hidden';
-            zfFeedback.textContent = '';
-        }
-
-        function selectZfAnswer(option) {
-            zfSelected = option;
-            zfOptions.forEach(o => {
-                o.classList.remove('selected');
-                if (o.dataset.option === option) o.classList.add('selected');
-            });
-        }
-
-        function checkZfAnswer() {
-            if (!zfSelected || !zfCurrent) {
-                zfFeedback.textContent = 'Bitte wähle eine Antwort aus!';
-                zfFeedback.className = 'feedback incorrect';
-                return;
-            }
-
-            zfTotalCount++;
-            const correct = zfCurrent.correct;
-            const isCorrect = zfSelected === correct;
-            if (isCorrect) zfCorrectCount++;
-
-            // Markiere Optionen
-            zfOptions.forEach(o => {
-                const opt = o.dataset.option;
-                if (opt === correct) o.classList.add('correct');
-                else if (opt === zfSelected && !isCorrect) o.classList.add('incorrect');
-            });
-
-            // Feedback-Text
-            let correctText = correct === 'E'
-                ? 'Keine der Antwortmöglichkeiten ist richtig'
-                : `${correct}: ${zfCurrent.options[correct][0]} / ${zfCurrent.options[correct][1]}`;
-            
-            zfFeedback.textContent = isCorrect
-                ? `✓ Richtig! Regel: ${zfCurrent.rule}`
-                : `✗ Falsch. Richtige Antwort: ${correctText}. Regel: ${zfCurrent.rule}`;
-            zfFeedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-
-            updateZfStats();
-            setTimeout(generateNewZahlenfolge, 3500);
-        }
-
-        function showZfSolution() {
-            const correct = zfCurrent.correct;
-            let correctText = correct === 'E'
-                ? 'Keine der Antwortmöglichkeiten ist richtig'
-                : `${correct}: ${zfCurrent.options[correct][0]} / ${zfCurrent.options[correct][1]}`;
-            zfFeedback.textContent = `Lösung: ${correctText}. Regel: ${zfCurrent.rule}`;
-            zfFeedback.className = 'feedback correct';
-
-            zfOptions.forEach(o => {
-                if (o.dataset.option === correct) o.classList.add('correct');
-            });
-
-            zfTotalCount++;
-            updateZfStats();
-            setTimeout(generateNewZahlenfolge, 4000);
-        }
-
-        function updateZfStats() {
-            zfCorrectEl.textContent = zfCorrectCount;
-            zfTotalEl.textContent = zfTotalCount;
-            zfRateEl.textContent = zfTotalCount > 0
-                ? `${Math.round((zfCorrectCount / zfTotalCount) * 100)}%`
-                : '0%';
-        }
-
-        // Event Listeners Zahlenfolgen
-        zfOptions.forEach(o => o.addEventListener('click', () => selectZfAnswer(o.dataset.option)));
-        zfCheckBtn.addEventListener('click', checkZfAnswer);
-        zfShowBtn.addEventListener('click', showZfSolution);
-        zfNewBtn.addEventListener('click', generateNewZahlenfolge);
-
-        // Tastatur-Shortcuts Zahlenfolgen
-        document.addEventListener('keydown', (e) => {
-            if (currentModule === 'zahlenfolgen') {
-                if (e.key === 'Escape') generateNewZahlenfolge();
-                else if (e.key === 'Enter') { e.preventDefault(); checkZfAnswer(); }
-                else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) selectZfAnswer(e.key.toUpperCase());
-            }
-        });
-
-        // =============================================
-        // WISSEN-MODUL
-        // =============================================
         const wissenFragen = {
-            biologie: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+            biologie: [
                 // ── Die menschliche Zelle ──────────────────────────────────
                 { q:'Welche Organelle ist für die ATP-Produktion (Zellatmung) zuständig?', opts:['Ribosom','Mitochondrium','Golgi-Apparat','Lysosom'], correct:1 },
                 { q:'Was ist die Hauptfunktion des Golgi-Apparats?', opts:['DNA-Replikation','Proteinsynthese','Sortierung und Modifikation von Proteinen','Fettabbau'], correct:2 },
@@ -1586,8 +1112,9 @@
                 { q:'Was ist ein Antikörper?', opts:['Ein zelluläres Abwehrmittel','Ein von B-Zellen produziertes Glykoprotein das Antigene bindet','Ein Enzym des Komplementsystems','Ein Hormon der Immunreaktion'], correct:1 },
                 { q:'Was ist der Rhesusfaktor?', opts:['Ein Blutgruppen-Antigen auf Erythrozyten','Ein Antikörper im Blutplasma','Ein Enzym der Blutgerinnung','Ein Hormon der Nebenniere'], correct:0 },
                 { q:'Welche Blutgruppe ist universeller Empfänger?', opts:['0','A','B','AB'], correct:3 },
+            
             ],
-            chemie: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+            chemie: [
                 // ── Atombau ───────────────────────────────────────────────
                 { q:'Was gibt die Ordnungszahl eines Elements an?', opts:['Anzahl der Neutronen','Anzahl der Protonen','Atommasse','Anzahl der Außenelektronen'], correct:1 },
                 { q:'Was sind Isotope?', opts:['Atome verschiedener Elemente mit gleicher Masse','Atome desselben Elements mit unterschiedlicher Neutronenzahl','Atome gleicher Elektronenzahl','Moleküle gleicher Summenformel'], correct:1 },
@@ -1643,8 +1170,9 @@
                 { q:'Was sind Nukleinsäuren aufgebaut aus?', opts:['Aminosäuren','Nukleotiden (Zucker + Phosphat + Base)','Fettsäuren und Glycerin','Monosacchariden'], correct:1 },
                 { q:'Was ist die Summenformel von Glucose?', opts:['C₆H₁₀O₅','C₆H₁₂O₆','C₁₂H₂₂O₁₁','C₅H₁₀O₅'], correct:1 },
                 { q:'Was ist ein Vitamin?', opts:['Ein Makronährstoff','Ein lebenswichtiger organischer Mikronährstoff, der meist nicht selbst hergestellt werden kann','Ein Enzym','Ein Hormon'], correct:1 },
+            
             ],
-            physik: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+            physik: [
                 // ── Größen und Einheiten ───────────────────────────────────
                 { q:'Was ist die SI-Einheit der Masse?', opts:['Newton','Kilogramm','Gramm','Pfund'], correct:1 },
                 { q:'Was ist die SI-Einheit der Zeit?', opts:['Minute','Stunde','Sekunde','Millisekunde'], correct:2 },
@@ -1670,7 +1198,7 @@
                 { q:'Was ist die Periode einer Schwingung?', opts:['Anzahl der Schwingungen pro Sekunde','Zeit für eine vollständige Schwingung','Maximale Auslenkung','Ausbreitungsgeschwindigkeit'], correct:1 },
                 { q:'Was ist Frequenz?', opts:['Zeit pro Schwingung','Anzahl der Schwingungen pro Sekunde (f = 1/T)','Wellenlänge','Amplitude'], correct:1 },
                 { q:'Welche Formel verknüpft Wellenlänge, Frequenz und Ausbreitungsgeschwindigkeit?', opts:['c = λ·f','c = λ/f','c = f/λ','c = λ + f'], correct:0 },
-                { q:'Was ist Resonanz?', opts:['Reflexion von Wellen','Wenn Erregerfrequenz = Eigenfrequenz des Systems: maximale Amplitude','Interferenz zweier Wellen','Doppler-Effekt'], correct:1 },
+                { q:'Was ist Resonanz?', opts:['Reflexion von Wellen','Wenn Erregerfrequenz = Eigenfrequenz: maximale Amplitude','Interferenz zweier Wellen','Doppler-Effekt'], correct:1 },
                 { q:'Was ist Polarisation?', opts:['Aufteilung einer Welle in zwei Teile','Eigenschaft von Transversalwellen, die Schwingungsrichtung zu beschreiben','Verstärkung einer Welle','Brechung an Grenzflächen'], correct:1 },
                 // ── Wärmelehre ────────────────────────────────────────────
                 { q:'Was besagt der 1. Hauptsatz der Thermodynamik?', opts:['Energie kann nicht erzeugt oder vernichtet werden','Wärme fließt vom Kalten zum Warmen','Entropie nimmt immer zu','Absoluter Nullpunkt ist erreichbar'], correct:0 },
@@ -1685,7 +1213,7 @@
                 { q:'Wie verhält sich der Gesamtwiderstand bei Reihenschaltung?', opts:['R_ges = R₁ · R₂','R_ges = R₁ + R₂','1/R_ges = 1/R₁ + 1/R₂','R_ges = R₁ / R₂'], correct:1 },
                 { q:'Wie verhält sich der Gesamtwiderstand bei Parallelschaltung?', opts:['R_ges = R₁ + R₂','R_ges = R₁ · R₂','1/R_ges = 1/R₁ + 1/R₂','R_ges = (R₁ + R₂)/2'], correct:2 },
                 { q:'Was ist elektrische Leistung?', opts:['P = U/I','P = U·I','P = R·I','P = U·R'], correct:1 },
-                { q:'Was besagt die Kirchhoffsche Knotenregel?', opts:['Die Summe der Spannungen im Maschenumlauf ist null','Die Summe der Ströme in einem Knoten ist null','Widerstand ist konstant','Spannung ist proportional zur Ladung'], correct:1 },
+                { q:'Was besagt die Kirchhoffsche Knotenregel?', opts:['Summe der Spannungen im Maschenumlauf ist null','Summe der Ströme in einem Knoten ist null','Widerstand ist konstant','Spannung ist proportional zur Ladung'], correct:1 },
                 { q:'Was ist ein Magnetfeld?', opts:['Elektrisches Feld um geladene Körper','Kraftfeld um Magnete und stromdurchflossene Leiter','Gravitationsfeld','Quantenfeld'], correct:1 },
                 { q:'Was ist der Effektivwert einer Wechselspannung?', opts:['Der Maximalwert','Der Mittelwert','Der Gleichspannungswert mit gleicher Heizleistung (U_eff = U_max/√2)','Der Minimalwert'], correct:2 },
                 // ── Optik ─────────────────────────────────────────────────
@@ -1703,7 +1231,7 @@
                 { q:'Was ist ionisierende Strahlung?', opts:['Sichtbares Licht','Strahlung mit genug Energie, um Atome zu ionisieren (z.B. α, β, γ, Röntgen)','Infrarotstrahlung','Radiowellen'], correct:1 },
                 { q:'Was ist die Lichtgeschwindigkeit im Vakuum (gerundet)?', opts:['3 × 10⁶ m/s','3 × 10⁸ m/s','3 × 10¹⁰ m/s','3 × 10⁴ m/s'], correct:1 },
             ],
-            mathematik: [ // ~80 Fragen, alle Stichwortlisten-Themen abgedeckt
+            mathematik: [
                 // ── Zehnerpotenzen & Präfixe ───────────────────────────────
                 { q:'Was ist 10⁻³ als Präfix?', opts:['Mikro (μ)','Milli (m)','Nano (n)','Zenti (c)'], correct:1 },
                 { q:'Was ist 10⁶ als Präfix?', opts:['Kilo (k)','Mega (M)','Giga (G)','Tera (T)'], correct:1 },
@@ -1760,191 +1288,342 @@
                 { q:'Wie viel ist 1 km/h in m/s?', opts:['1/3,6 m/s','3,6 m/s','1/36 m/s','36 m/s'], correct:0 },
             ]
         };
-                { q: 'Wie viele Chromosomenpaare hat der menschliche Chromosomensatz?', opts:['21','23','24','46'], correct:1 },
-                { q: 'Welches Nukleotid kommt in RNA, aber nicht in DNA vor?', opts:['Adenin','Guanin','Uracil','Thymin'], correct:2 },
-                { q: 'In welcher Phase der Mitose werden die Chromosomen an den Zellpolen sichtbar?', opts:['Prophase','Metaphase','Anaphase','Telophase'], correct:3 },
-                { q: 'Welches Enzym öffnet die DNA-Doppelhelix bei der Replikation?', opts:['DNA-Polymerase','Ligase','Helikase','Primase'], correct:2 },
-                { q: 'Was ist ein Codon?', opts:['Ein einzelnes Nukleotid','Eine Sequenz aus drei Nukleotiden','Ein Aminosäurepaar','Ein Enzym der Translation'], correct:1 },
-                { q: 'Welches Erbgangmuster liegt beim Mendelschen Gesetz der Dominanz vor?', opts:['Kodominanz','Vollständige Dominanz','Intermediäre Vererbung','Polygenie'], correct:1 },
-                { q: 'Was ist der Unterschied zwischen Genotyp und Phänotyp?', opts:['Kein Unterschied','Genotyp = genetische Anlage, Phänotyp = Erscheinungsbild','Genotyp = Erscheinungsbild, Phänotyp = genetische Anlage','Beides beschreibt das Erscheinungsbild'], correct:1 },
-                { q: 'Wie nennt man die Paarung homologer Chromosomen in der Meiose I?', opts:['Crossing-over','Synapsis','Chiasma','Segregation'], correct:1 },
-                { q: 'Welche Verbindung entsteht zwischen komplementären DNA-Strängen?', opts:['Kovalente Bindung','Ionenbindung','Wasserstoffbrückenbindung','van-der-Waals-Bindung'], correct:2 },
-                // Anatomie & Physiologie
-                { q: 'Welches Organ produziert die Galle?', opts:['Bauchspeicheldrüse','Gallenblase','Leber','Dünndarm'], correct:2 },
-                { q: 'Wie heißt die Klappe zwischen linkem Vorhof und linker Kammer?', opts:['Trikuspidalklappe','Mitralklappe','Aortenklappe','Pulmonalklappe'], correct:1 },
-                { q: 'Welche Blutgruppe ist der universelle Spender?', opts:['A','B','AB','0'], correct:3 },
-                { q: 'Wo findet der Gasaustausch in der Lunge statt?', opts:['Bronchien','Trachea','Alveolen','Pleura'], correct:2 },
-                { q: 'Welches Hormon reguliert den Blutzuckerspiegel senkend?', opts:['Glucagon','Adrenalin','Insulin','Cortisol'], correct:2 },
-                { q: 'Was ist die Hauptfunktion der Erythrozyten?', opts:['Immunabwehr','Blutgerinnung','Sauerstofftransport','Hormonproduktion'], correct:2 },
-                { q: 'In welchem Teil des Gehirns liegt das Atemzentrum?', opts:['Großhirnrinde','Kleinhirn','Verlängertes Mark','Thalamus'], correct:2 },
-                { q: 'Wie nennt man die kleinste Einheit des Nervensystems?', opts:['Synapse','Neuron','Axon','Dendrit'], correct:1 },
-                { q: 'Welches Ion ist entscheidend für die Muskelkontraktion?', opts:['Natrium (Na⁺)','Kalium (K⁺)','Calcium (Ca²⁺)','Magnesium (Mg²⁺)'], correct:2 },
-                { q: 'Welche Aminosäuren kann der menschliche Körper nicht selbst herstellen?', opts:['Nicht-essentielle','Essentielle','Konditionell essentielle','Alle Aminosäuren'], correct:1 },
-                // Evolution & Ökologie
-                { q: 'Wer begründete die Evolutionstheorie durch natürliche Selektion?', opts:['Gregor Mendel','Jean-Baptiste Lamarck','Charles Darwin','Louis Pasteur'], correct:2 },
-                { q: 'Was versteht man unter Homologie?', opts:['Gleiche Funktion, verschiedene Herkunft','Gleiche Herkunft, ggf. verschiedene Funktion','Gleiche Struktur ohne Verwandtschaft','Keine Gemeinsamkeit'], correct:1 },
-                { q: 'Was ist ein Ökosystem?', opts:['Nur die Gesamtheit aller Lebewesen','Die abiotische Umwelt eines Gebiets','Biozönose + Biotop','Eine einzelne Population'], correct:2 },
-                { q: 'Wie nennt man Organismen, die organische Substanz aus anorganischen Stoffen aufbauen?', opts:['Heterotrophe','Autotrophe','Destruenten','Konsumenten'], correct:1 },
-                { q: 'Was ist Photosynthese vereinfacht?', opts:['CO₂ + H₂O → Glukose + O₂','O₂ + Glukose → CO₂ + H₂O','H₂O → H₂ + O₂','CO₂ → C + O₂'], correct:0 },
-            ],
-            chemie: [
-                // Atombau & PSE
-                { q: 'Was gibt die Ordnungszahl eines Elements im Periodensystem an?', opts:['Anzahl der Neutronen','Anzahl der Protonen','Atommasse','Anzahl der Elektronen in der Außenschale'], correct:1 },
-                { q: 'Welche Gruppe des PSE enthält die Edelgase?', opts:['Gruppe 1','Gruppe 7','Gruppe 17','Gruppe 18'], correct:3 },
-                { q: 'Was ist ein Isotop?', opts:['Atome verschiedener Elemente mit gleicher Masse','Atome desselben Elements mit unterschiedlicher Neutronenzahl','Atome mit gleicher Elektronenzahl','Moleküle mit gleicher Summenformel'], correct:1 },
-                { q: 'Wie viele Elektronen fasst die L-Schale maximal?', opts:['2','8','18','32'], correct:1 },
-                { q: 'Welches Element hat das Symbol Fe?', opts:['Fluor','Francium','Eisen','Fermium'], correct:2 },
-                // Chemische Bindungen
-                { q: 'Was ist eine kovalente Bindung?', opts:['Übertragung von Elektronen','Gemeinsame Nutzung von Elektronen','Anziehung zwischen Ionen','Metallbindung'], correct:1 },
-                { q: 'Welche Bindungsart liegt in NaCl vor?', opts:['Kovalente Bindung','Metallbindung','Ionenbindung','Wasserstoffbrücke'], correct:2 },
-                { q: 'Was ist Elektronegatvität?', opts:['Fähigkeit, Elektronen abzugeben','Fähigkeit, Elektronen anzuziehen','Anzahl der Außenelektronen','Ionisierungsenergie'], correct:1 },
-                { q: 'Welche Geometrie hat das Wassermolekül (H₂O)?', opts:['Linear','Trigonal-planar','Gewinkelt','Tetraedrisch'], correct:2 },
-                { q: 'Was ist ein Dipol?', opts:['Ein Molekül mit positiver Ladung','Ein Molekül mit negativer Ladung','Ein Molekül mit ungleicher Ladungsverteilung','Ein Atom mit 2 Protonen'], correct:2 },
-                // Säuren, Basen, pH
-                { q: 'Was ist der pH-Wert einer neutralen Lösung bei 25 °C?', opts:['0','7','14','1'], correct:1 },
-                { q: 'Was gibt der pKs-Wert an?', opts:['Die Stärke einer Säure','Die Konzentration einer Lösung','Den pH bei Neutralisation','Die Löslichkeit eines Salzes'], correct:0 },
-                { q: 'Welche Aussage beschreibt eine Brønsted-Säure?', opts:['Elektronenpaardonator','Protonendonator','Elektronenpaarakzeptor','Protonenakzeptor'], correct:1 },
-                { q: 'Was entsteht bei der Neutralisation von HCl mit NaOH?', opts:['H₂ + Cl₂','NaCl + H₂O','Na + HCl₂','NaHCO₃'], correct:1 },
-                { q: 'Welcher pH-Wert entspricht einer starken Säure?', opts:['pH 1','pH 7','pH 10','pH 14'], correct:0 },
-                // Reaktionen & Thermodynamik
-                { q: 'Was ist Oxidation im chemischen Sinne?', opts:['Aufnahme von Elektronen','Abgabe von Elektronen','Aufnahme von Sauerstoff','Abgabe von Wasserstoff'], correct:1 },
-                { q: 'Was beschreibt die Reaktionsenthalpie ΔH?', opts:['Geschwindigkeit einer Reaktion','Wärmetönung einer Reaktion','Gleichgewichtslage','Aktivierungsenergie'], correct:1 },
-                { q: 'Was ist ein Katalysator?', opts:['Er wird bei der Reaktion verbraucht','Er erhöht die Aktivierungsenergie','Er beschleunigt die Reaktion, ohne verbraucht zu werden','Er verändert das Gleichgewicht'], correct:2 },
-                { q: 'Welche Formel beschreibt das Molverhältnis? (Avogadro-Konstante NA ≈ 6,022 × 10²³)', opts:['n = m/M','n = V/Vm','n = N/NA','Alle davon'], correct:3 },
-                { q: 'Was ist Hydrolyse?', opts:['Oxidation durch Wasser','Spaltung einer Verbindung durch Wasser','Synthese unter Wasserabspaltung','Reduktion durch H₂'], correct:1 },
-                // Organische Chemie
-                { q: 'Welche funktionelle Gruppe kennzeichnet Alkohole?', opts:['–COOH','–CHO','–OH','–NH₂'], correct:2 },
-                { q: 'Was ist die allgemeine Summenformel der Alkane?', opts:['CₙH₂ₙ','CₙH₂ₙ₊₂','CₙH₂ₙ₋₂','CₙHₙ'], correct:1 },
-                { q: 'Welche Reaktion verknüpft Aminosäuren zu Proteinen?', opts:['Esterbindung','Peptidbildung','Glykosidbindung','Phosphodiesterbindung'], correct:1 },
-                { q: 'Was ist ein Ester?', opts:['Verbindung aus Säure + Amin','Verbindung aus Säure + Alkohol','Verbindung aus zwei Alkoholen','Verbindung aus Alkohol + Base'], correct:1 },
-                { q: 'Welche Verbindungsklasse enthält die Carbonylgruppe C=O als Endgruppe?', opts:['Alkohole','Aldehyde','Ketone','Carbonsäuren'], correct:1 },
-            ],
-            physik: [
-                // Mechanik
-                { q: 'Was beschreibt das Newtonsche Trägheitsgesetz (1. Newtonsches Gesetz)?', opts:['F = m·a','Jeder Körper verharrt im Zustand der Ruhe oder gleichförmigen Bewegung, wenn keine Kraft wirkt','Actio = Reactio','Arbeit = Kraft × Weg'], correct:1 },
-                { q: 'Was ist die Einheit der Kraft im SI-System?', opts:['Joule','Watt','Newton','Pascal'], correct:2 },
-                { q: 'Welche Formel beschreibt die gleichförmig beschleunigte Bewegung?', opts:['s = v·t','s = ½·a·t²','v = s/t','F = m·v'], correct:1 },
-                { q: 'Was ist Arbeit in der Physik?', opts:['W = F/s','W = F·s·cos(α)','W = m·a','W = P·t'], correct:1 },
-                { q: 'Was ist die Einheit der Energie?', opts:['Newton','Watt','Joule','Pascal'], correct:2 },
-                { q: 'Was gilt beim elastischen Stoß?', opts:['Nur Impuls bleibt erhalten','Nur Energie bleibt erhalten','Impuls und kinetische Energie bleiben erhalten','Keine Erhaltungsgröße'], correct:2 },
-                { q: 'Was beschreibt das Hooksche Gesetz?', opts:['F = m·a','F = D·x','p = m·v','W = F·s'], correct:1 },
-                { q: 'Wie lautet die Formel für den Drehmoment?', opts:['M = F/r','M = F·r','M = m·a·r','M = p·v'], correct:1 },
-                // Thermodynamik
-                { q: 'Was besagt der 1. Hauptsatz der Thermodynamik?', opts:['Energie kann nicht erzeugt oder vernichtet werden','Wärme fließt stets vom Kalten zum Warmen','Die Entropie nimmt ab','Absolute Temperatur ist messbar'], correct:0 },
-                { q: 'Was ist die Einheit der Temperatur im SI-System?', opts:['Grad Celsius','Kelvin','Fahrenheit','Rankine'], correct:1 },
-                { q: 'Bei welcher Temperatur in Kelvin liegt der absolute Nullpunkt?', opts:['0 K','−100 K','−273 K','273 K'], correct:0 },
-                { q: 'Was ist spezifische Wärmekapazität?', opts:['Wärme pro Mol','Wärme pro kg und Kelvin','Wärme pro Sekunde','Temperatur pro Joule'], correct:1 },
-                // Elektrizität
-                { q: 'Was beschreibt das Ohmsche Gesetz?', opts:['U = R·I','P = U·I','Q = C·U','F = q·E'], correct:0 },
-                { q: 'Was ist die Einheit des elektrischen Widerstands?', opts:['Volt','Ampere','Ohm','Farad'], correct:2 },
-                { q: 'Wie verhält sich der Gesamtwiderstand bei Reihenschaltung?', opts:['R_ges = R₁ · R₂','R_ges = R₁ + R₂','1/R_ges = 1/R₁ + 1/R₂','R_ges = R₁/R₂'], correct:1 },
-                { q: 'Was ist elektrische Leistung?', opts:['P = U/I','P = U·I','P = R·I','P = U·R'], correct:1 },
-                { q: 'Was ist ein Kondensator?', opts:['Bauteil zum Widerstandserhöhen','Bauteil zur Ladungsspeicherung','Bauteil zur Induktion','Bauteil zur Umformung von Wechselstrom'], correct:1 },
-                // Wellen & Optik
-                { q: 'Welche Formel verknüpft Wellenlänge, Frequenz und Ausbreitungsgeschwindigkeit?', opts:['c = λ·f','c = λ/f','c = f/λ','c = λ + f'], correct:0 },
-                { q: 'Was ist das Snelliussche Brechungsgesetz?', opts:['n₁·sin α₁ = n₂·sin α₂','n₁·cos α₁ = n₂·cos α₂','n₁/sin α₁ = n₂/sin α₂','n₁ + n₂ = sin α'], correct:0 },
-                { q: 'Welche Farbe hat die kürzeste Wellenlänge im sichtbaren Spektrum?', opts:['Rot','Gelb','Grün','Violett'], correct:3 },
-                // Atom- & Kernphysik
-                { q: 'Was ist der Photoelektrische Effekt?', opts:['Emission von Elektronen durch Licht','Absorption von Photonen durch Elektronen','Kernspaltung durch Licht','Emission von Photonen durch Elektronen'], correct:0 },
-                { q: 'Was ist beim radioaktiven α-Zerfall das Emissionsprodukt?', opts:['Elektron','Positron','Heliumkern','Photon'], correct:2 },
-                { q: 'Was beschreibt die Halbwertszeit?', opts:['Zeit bis zur vollständigen Zersetzung','Zeit, in der die Hälfte der Atome zerfallen ist','Zeit für eine Halbierung der Strahlung','Dauer eines Zerfallsprozesses'], correct:1 },
-                { q: 'Welche Strahlung hat die höchste Durchdringungsfähigkeit?', opts:['Alpha-Strahlung','Beta-Strahlung','Gamma-Strahlung','Röntgenstrahlung'], correct:2 },
-                { q: 'Was ist die Lichtgeschwindigkeit im Vakuum (ca.)?', opts:['3 × 10⁶ m/s','3 × 10⁸ m/s','3 × 10¹⁰ m/s','3 × 10⁴ m/s'], correct:1 },
-            ],
-            mathematik: [
-                // Grundlagen & Algebra
-                { q: 'Was ist log₁₀(1000)?', opts:['2','3','4','10'], correct:1 },
-                { q: 'Welche Lösungsmenge hat x² = −4 in ℝ?', opts:['x = ±2','x = ±2i','∅','x = 4'], correct:2 },
-                { q: 'Was ist die Umkehrfunktion von eˣ?', opts:['xᵉ','ln(x)','log₁₀(x)','1/eˣ'], correct:1 },
-                { q: 'Was ist der Betrag von −7?', opts:['−7','7','49','1/7'], correct:1 },
-                { q: 'Wie lautet der Binomische Lehrsatz für (a+b)²?', opts:['a²+b²','a²+ab+b²','a²+2ab+b²','a²−2ab+b²'], correct:2 },
-                { q: 'Was ist die Determinante einer 2×2-Matrix [[a,b],[c,d]]?', opts:['a·d + b·c','a·b − c·d','a·d − b·c','a+d'], correct:2 },
-                { q: 'Welcher Wert hat sin(90°)?', opts:['0','0,5','√2/2','1'], correct:3 },
-                { q: 'Was ist cos(0°)?', opts:['0','1','−1','√2/2'], correct:1 },
-                { q: 'Welche der folgenden Zahlen ist irrational?', opts:['0,75','√9','√2','22/7'], correct:2 },
-                { q: 'Was ist 0! (Null-Fakultät)?', opts:['0','1','Nicht definiert','∞'], correct:1 },
-                // Analysis
-                { q: 'Was ist die Ableitung von f(x) = x³?', opts:['x²','3x','3x²','x⁴/4'], correct:2 },
-                { q: 'Was ist die Ableitung von f(x) = eˣ?', opts:['xeˣ⁻¹','eˣ','x·eˣ','1/eˣ'], correct:1 },
-                { q: 'Was ist ∫x dx?', opts:['x²','x²/2 + C','2x + C','1/x + C'], correct:1 },
-                { q: 'Was beschreibt ein lokales Maximum einer Funktion?', opts:["f'(x) = 0 und f''(x) > 0","f'(x) = 0 und f''(x) < 0","f'(x) > 0","f'(x) < 0"], correct:1 },
-                { q: 'Was ist der Grenzwert von 1/x für x → ∞?', opts:['1','∞','0','−1'], correct:2 },
-                { q: 'Was ist die Kettenregel bei f(g(x))?', opts:["f'(x) · g'(x)","f'(g(x)) · g'(x)","f(x) · g'(x)","f'(g(x)) + g'(x)"], correct:1 },
-                // Geometrie
-                { q: 'Wie lautet der Satz des Pythagoras?', opts:['a² + b² = c','a + b = c','a² + b² = c²','a² · b² = c²'], correct:2 },
-                { q: 'Was ist die Formel für den Flächeninhalt eines Kreises?', opts:['2πr','πr²','πd','4πr²'], correct:1 },
-                { q: 'Was ist das Volumen einer Kugel mit Radius r?', opts:['4πr²','2πr³','4/3·πr³','πr³'], correct:2 },
-                { q: 'Welche Winkelbeziehung gilt in einem gleichschenkligen Dreieck?', opts:['Alle Winkel sind gleich','Zwei Basiswinkel sind gleich','Kein Winkel ist gleich','Ein Winkel ist 90°'], correct:1 },
-                // Stochastik
-                { q: 'Was ist die Wahrscheinlichkeit, beim Würfeln eine 6 zu werfen?', opts:['1/3','1/4','1/6','1/2'], correct:2 },
-                { q: 'Was beschreibt der Erwartungswert einer Zufallsvariable?', opts:['Den Maximalwert','Den Mittelwert aller möglichen Werte gewichtet mit Wahrscheinlichkeit','Den häufigsten Wert','Den Minimalwert'], correct:1 },
-                { q: 'Wie viele Möglichkeiten gibt es, 3 Personen aus 5 auszuwählen (Kombination)?', opts:['10','15','20','60'], correct:0 },
-                { q: 'Was ist die Binomialformel für P(X=k) bei n Versuchen und Trefferwahrscheinlichkeit p?', opts:['n!·pᵏ·(1−p)ⁿ⁻ᵏ','(n über k)·pᵏ·(1−p)ⁿ⁻ᵏ','pᵏ·(1−p)ⁿ','nᵏ·p'], correct:1 },
-                { q: 'Was ist die Standardabweichung?', opts:['Der Mittelwert der Daten','Die Wurzel der Varianz','Das Maximum minus Minimum','Die Hälfte des Interquartilsabstands'], correct:1 },
-            ]
-        };
 
-        // Wissen Zustand
+        // ============================================================
+        // GLOBALER ZUSTAND
+        // ============================================================
+        let currentModule = 'wortfluessigkeit';
+
+        // Wortflüssigkeit
+        let currentDifficulty = 'all';
+        let currentWordData = null;
+        let selectedAnswer = null;
+        let correctCount = 0;
+        let totalCount = 0;
+        let currentAnswerOptions = [];
+        const allWordFluencyWords = [
+            ...wordFluencyWords.short,
+            ...wordFluencyWords.medium,
+            ...wordFluencyWords.long
+        ];
+
+        // Zahlenfolgen
+        let zfCurrent = null;
+        let zfSelected = null;
+        let zfCorrectCount = 0;
+        let zfTotalCount = 0;
+        let zfUsed = new Set();
+
+        // Wissen
         let wissenSubject = 'all';
         let wissenCurrent = null;
         let wissenSelected = null;
         let wissenCorrect = 0;
         let wissenTotal = 0;
         let wissenUsed = new Set();
-
         const subjectNames = { all:'Alle', biologie:'Biologie', chemie:'Chemie', physik:'Physik', mathematik:'Mathematik' };
         const subjectIcons = { all:'📚', biologie:'🧬', chemie:'⚗️', physik:'⚡', mathematik:'📐' };
 
+        // ============================================================
+        // WORTFLÜSSIGKEIT
+        // ============================================================
+        function getWordsByDifficulty() {
+            switch(currentDifficulty) {
+                case 'short': return wordFluencyWords.short;
+                case 'medium': return wordFluencyWords.medium;
+                case 'long': return wordFluencyWords.long;
+                default: return allWordFluencyWords;
+            }
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            let attempts = 0, isShuffled = false;
+            do {
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                isShuffled = !shuffled.every((l, i) => l === array[i]);
+                attempts++;
+                if (attempts > 50) break;
+            } while (!isShuffled && array.length > 1);
+            return shuffled;
+        }
+
+        function generateNewWord() {
+            const words = getWordsByDifficulty();
+            currentWordData = words[Math.floor(Math.random() * words.length)];
+            const shuffled = shuffleArray([...currentWordData.letters]);
+            const container = document.getElementById('letters-container');
+            container.innerHTML = '';
+            shuffled.forEach((letter, i) => {
+                const el = document.createElement('div');
+                el.className = 'single-letter';
+                el.textContent = letter;
+                el.style.animationDelay = (i * 0.1) + 's';
+                container.appendChild(el);
+            });
+            // Antwortoptionen generieren
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const correctLetter = currentWordData.startLetter;
+            const options = [correctLetter];
+            while (options.length < 4) {
+                const r = alphabet[Math.floor(Math.random() * alphabet.length)];
+                if (!options.includes(r)) options.push(r);
+            }
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            currentAnswerOptions = options;
+            document.getElementById('option-a-letter').textContent = 'Anfangsbuchstabe: ' + options[0];
+            document.getElementById('option-b-letter').textContent = 'Anfangsbuchstabe: ' + options[1];
+            document.getElementById('option-c-letter').textContent = 'Anfangsbuchstabe: ' + options[2];
+            document.getElementById('option-d-letter').textContent = 'Anfangsbuchstabe: ' + options[3];
+            // Reset
+            selectedAnswer = null;
+            document.querySelectorAll('#letter-options .letter-option').forEach(o => {
+                o.classList.remove('selected', 'correct', 'incorrect');
+            });
+            const fb = document.getElementById('feedback');
+            fb.className = 'feedback hidden';
+            fb.textContent = '';
+        }
+
+        function selectAnswer(option) {
+            selectedAnswer = option;
+            document.querySelectorAll('#letter-options .letter-option').forEach(o => {
+                o.classList.toggle('selected', o.dataset.option === option);
+            });
+        }
+
+        function checkAnswer() {
+            if (!selectedAnswer || !currentWordData) {
+                showFeedback('Bitte wähle eine Antwort aus!', false);
+                return;
+            }
+            totalCount++;
+            let isCorrect = false;
+            const correctLetter = currentWordData.startLetter;
+            if (selectedAnswer === 'E') {
+                if (!currentAnswerOptions.includes(correctLetter)) {
+                    correctCount++; isCorrect = true;
+                    showFeedback('Richtig! Das Wort "' + currentWordData.word + '" beginnt mit "' + correctLetter + '" – nicht in A-D.', true);
+                } else {
+                    showFeedback('Falsch! Das Wort "' + currentWordData.word + '" beginnt mit "' + correctLetter + '".', false);
+                }
+            } else {
+                const sel = currentAnswerOptions[selectedAnswer.charCodeAt(0) - 65];
+                if (sel === correctLetter) {
+                    correctCount++; isCorrect = true;
+                    showFeedback('Richtig! Das Wort "' + currentWordData.word + '" beginnt mit "' + correctLetter + '".', true);
+                } else {
+                    showFeedback('Falsch! Das Wort "' + currentWordData.word + '" beginnt mit "' + correctLetter + '", nicht "' + sel + '".', false);
+                }
+            }
+            // Markiere Optionen
+            document.querySelectorAll('#letter-options .letter-option').forEach(o => {
+                const ol = o.dataset.option;
+                if (selectedAnswer === 'E' && ol === 'E') {
+                    o.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (ol !== 'E') {
+                    const c = currentAnswerOptions[ol.charCodeAt(0) - 65];
+                    if (c === correctLetter) o.classList.add('correct');
+                    else if (ol === selectedAnswer) o.classList.add('incorrect');
+                }
+            });
+            updateStats();
+            setTimeout(generateNewWord, 3000);
+        }
+
+        function showWord() {
+            showFeedback('Das gesuchte Wort ist: "' + currentWordData.word + '" (beginnt mit "' + currentWordData.startLetter + '")', true);
+            const correctLetter = currentWordData.startLetter;
+            document.querySelectorAll('#letter-options .letter-option').forEach(o => {
+                const ol = o.dataset.option;
+                if (ol !== 'E') {
+                    const c = currentAnswerOptions[ol.charCodeAt(0) - 65];
+                    if (c === correctLetter) o.classList.add('correct');
+                } else if (!currentAnswerOptions.includes(correctLetter)) {
+                    o.classList.add('correct');
+                }
+            });
+            totalCount++;
+            updateStats();
+            setTimeout(generateNewWord, 4000);
+        }
+
+        function showFeedback(msg, isCorrect) {
+            const fb = document.getElementById('feedback');
+            fb.textContent = msg;
+            fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+        }
+
+        function updateStats() {
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('total-count').textContent = totalCount;
+            const rate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
+            document.getElementById('success-rate').textContent = rate + '%';
+        }
+
+        function setDifficulty(d) {
+            currentDifficulty = d;
+            document.querySelectorAll('.difficulty-btn[data-difficulty]').forEach(b => {
+                b.classList.toggle('active', b.dataset.difficulty === d);
+            });
+            const names = { all:'Alle', short:'Kurz', medium:'Mittel', long:'Lang' };
+            document.getElementById('current-difficulty').textContent = names[d];
+            generateNewWord();
+        }
+
+        // ============================================================
+        // ZAHLENFOLGEN
+        // ============================================================
+        function generateNewZahlenfolge() {
+            let avail = zahlenfolgenAufgaben.map((_, i) => i).filter(i => !zfUsed.has(i));
+            if (avail.length === 0) {
+                zfUsed.clear();
+                avail = zahlenfolgenAufgaben.map((_, i) => i);
+            }
+            const idx = avail[Math.floor(Math.random() * avail.length)];
+            zfUsed.add(idx);
+            zfCurrent = zahlenfolgenAufgaben[idx];
+            zfSelected = null;
+
+            const seqEl = document.getElementById('zf-sequence');
+            seqEl.innerHTML = '';
+            zfCurrent.sequence.forEach((num, i) => {
+                const el = document.createElement('div');
+                el.className = 'zf-number' + (num === '?' ? ' unknown' : '');
+                el.textContent = num;
+                el.style.animationDelay = (i * 0.08) + 's';
+                seqEl.appendChild(el);
+            });
+
+            const opts = zfCurrent.options;
+            document.getElementById('zf-option-a').textContent = opts.A[0] + ' / ' + opts.A[1];
+            document.getElementById('zf-option-b').textContent = opts.B[0] + ' / ' + opts.B[1];
+            document.getElementById('zf-option-c').textContent = opts.C[0] + ' / ' + opts.C[1];
+            document.getElementById('zf-option-d').textContent = opts.D[0] + ' / ' + opts.D[1];
+
+            document.querySelectorAll('#zf-options .letter-option').forEach(o => {
+                o.classList.remove('selected', 'correct', 'incorrect');
+            });
+            const fb = document.getElementById('zf-feedback');
+            fb.className = 'feedback hidden';
+            fb.textContent = '';
+        }
+
+        function selectZfAnswer(option) {
+            zfSelected = option;
+            document.querySelectorAll('#zf-options .letter-option').forEach(o => {
+                o.classList.toggle('selected', o.dataset.option === option);
+            });
+        }
+
+        function checkZfAnswer() {
+            if (!zfSelected || !zfCurrent) {
+                const fb = document.getElementById('zf-feedback');
+                fb.textContent = 'Bitte wähle eine Antwort aus!';
+                fb.className = 'feedback incorrect';
+                return;
+            }
+            zfTotalCount++;
+            const correct = zfCurrent.correct;
+            const isCorrect = zfSelected === correct;
+            if (isCorrect) zfCorrectCount++;
+
+            document.querySelectorAll('#zf-options .letter-option').forEach(o => {
+                if (o.dataset.option === correct) o.classList.add('correct');
+                else if (o.dataset.option === zfSelected && !isCorrect) o.classList.add('incorrect');
+            });
+
+            const correctText = correct === 'E'
+                ? 'Keine der Antwortmöglichkeiten ist richtig'
+                : correct + ': ' + zfCurrent.options[correct][0] + ' / ' + zfCurrent.options[correct][1];
+
+            const fb = document.getElementById('zf-feedback');
+            fb.textContent = isCorrect
+                ? '✓ Richtig! Regel: ' + zfCurrent.rule
+                : '✗ Falsch. Richtige Antwort: ' + correctText + '. Regel: ' + zfCurrent.rule;
+            fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+
+            updateZfStats();
+            setTimeout(generateNewZahlenfolge, 3500);
+        }
+
+        function showZfSolution() {
+            const correct = zfCurrent.correct;
+            const text = correct === 'E'
+                ? 'Keine der Antwortmöglichkeiten ist richtig'
+                : correct + ': ' + zfCurrent.options[correct][0] + ' / ' + zfCurrent.options[correct][1];
+            const fb = document.getElementById('zf-feedback');
+            fb.textContent = 'Lösung: ' + text + '. Regel: ' + zfCurrent.rule;
+            fb.className = 'feedback correct';
+            document.querySelectorAll('#zf-options .letter-option').forEach(o => {
+                if (o.dataset.option === correct) o.classList.add('correct');
+            });
+            zfTotalCount++;
+            updateZfStats();
+            setTimeout(generateNewZahlenfolge, 4000);
+        }
+
+        function updateZfStats() {
+            document.getElementById('zf-correct-count').textContent = zfCorrectCount;
+            document.getElementById('zf-total-count').textContent = zfTotalCount;
+            const rate = zfTotalCount > 0 ? Math.round((zfCorrectCount / zfTotalCount) * 100) : 0;
+            document.getElementById('zf-success-rate').textContent = rate + '%';
+        }
+
+        // ============================================================
+        // WISSEN
+        // ============================================================
         function getWissenPool() {
             if (wissenSubject === 'all') {
-                return Object.entries(wissenFragen).flatMap(([subj, qs]) => qs.map(q => ({...q, subj})));
+                return Object.entries(wissenFragen).flatMap(([s, qs]) => qs.map(q => ({...q, subj: s})));
             }
             return wissenFragen[wissenSubject].map(q => ({...q, subj: wissenSubject}));
         }
 
         function generateNewWissenFrage() {
             const pool = getWissenPool();
-            let available = pool.map((_, i) => i).filter(i => !wissenUsed.has(`${wissenSubject}_${i}`));
-            if (available.length === 0) {
-                // Lösche nur die verwendeten des aktuellen Pools
-                pool.forEach((_, i) => wissenUsed.delete(`${wissenSubject}_${i}`));
-                available = pool.map((_, i) => i);
+            let avail = pool.map((_, i) => i).filter(i => !wissenUsed.has(wissenSubject + '_' + i));
+            if (avail.length === 0) {
+                pool.forEach((_, i) => wissenUsed.delete(wissenSubject + '_' + i));
+                avail = pool.map((_, i) => i);
             }
-            const idx = available[Math.floor(Math.random() * available.length)];
-            wissenUsed.add(`${wissenSubject}_${idx}`);
+            const idx = avail[Math.floor(Math.random() * avail.length)];
+            wissenUsed.add(wissenSubject + '_' + idx);
             wissenCurrent = pool[idx];
             wissenSelected = null;
 
-            // Badge
-            const badge = document.getElementById('wissen-subject-badge');
-            badge.textContent = `${subjectIcons[wissenCurrent.subj]} ${subjectNames[wissenCurrent.subj]}`;
-
-            // Frage
+            document.getElementById('wissen-subject-badge').textContent =
+                subjectIcons[wissenCurrent.subj] + ' ' + subjectNames[wissenCurrent.subj];
             document.getElementById('wissen-question').textContent = wissenCurrent.q;
 
-            // Optionen – mische Antworten damit korrekte Position variiert
             const indices = [0,1,2,3];
             const shuffled = [...indices].sort(() => Math.random() - 0.5);
             const optEls = ['a','b','c','d'];
-            let newCorrectIdx = 0;
+            let newCorrect = 0;
             shuffled.forEach((origIdx, newPos) => {
-                document.getElementById(`wissen-option-${optEls[newPos]}`).textContent = wissenCurrent.opts[origIdx];
-                if (origIdx === wissenCurrent.correct) newCorrectIdx = newPos;
+                document.getElementById('wissen-option-' + optEls[newPos]).textContent = wissenCurrent.opts[origIdx];
+                if (origIdx === wissenCurrent.correct) newCorrect = newPos;
             });
-            wissenCurrent._shuffledCorrect = newCorrectIdx; // 0=A,1=B,2=C,3=D
+            wissenCurrent._shuffledCorrect = newCorrect;
 
-            // Reset
-            document.querySelectorAll('#wissen-options .letter-option').forEach(o => o.classList.remove('selected','correct','incorrect'));
+            document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
+                o.classList.remove('selected', 'correct', 'incorrect');
+            });
             const fb = document.getElementById('wissen-feedback');
             fb.className = 'feedback hidden';
             fb.textContent = '';
         }
 
         function selectWissenAnswer(option) {
-            wissenSelected = option; // 'A','B','C','D'
+            wissenSelected = option;
             document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
-                o.classList.remove('selected');
-                if (o.dataset.option === option) o.classList.add('selected');
+                o.classList.toggle('selected', o.dataset.option === option);
             });
         }
 
@@ -1965,54 +1644,104 @@
                 else if (o.dataset.option === wissenSelected && !isCorrect) o.classList.add('incorrect');
             });
 
-            const correctText = document.getElementById(`wissen-option-${correctOpt.toLowerCase()}`).textContent;
+            const correctText = document.getElementById('wissen-option-' + correctOpt.toLowerCase()).textContent;
             const fb = document.getElementById('wissen-feedback');
-            fb.textContent = isCorrect
-                ? `✓ Richtig!`
-                : `✗ Falsch. Richtige Antwort: ${correctText}`;
-            fb.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            fb.textContent = isCorrect ? '✓ Richtig!' : '✗ Falsch. Richtige Antwort: ' + correctText;
+            fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
 
             updateWissenStats();
             setTimeout(generateNewWissenFrage, 2500);
         }
 
-        function setWissenSubject(subj) {
-            wissenSubject = subj;
+        function setWissenSubject(s) {
+            wissenSubject = s;
             document.querySelectorAll('[data-subject]').forEach(b => {
-                b.classList.toggle('active', b.dataset.subject === subj);
+                b.classList.toggle('active', b.dataset.subject === s);
             });
-            document.getElementById('wissen-subject-stat').textContent = subjectNames[subj];
+            document.getElementById('wissen-subject-stat').textContent = subjectNames[s];
             generateNewWissenFrage();
         }
 
         function updateWissenStats() {
             document.getElementById('wissen-correct-count').textContent = wissenCorrect;
             document.getElementById('wissen-total-count').textContent = wissenTotal;
-            document.getElementById('wissen-success-rate').textContent = wissenTotal > 0
-                ? `${Math.round((wissenCorrect / wissenTotal) * 100)}%` : '0%';
+            const rate = wissenTotal > 0 ? Math.round((wissenCorrect / wissenTotal) * 100) : 0;
+            document.getElementById('wissen-success-rate').textContent = rate + '%';
         }
 
-        // Event Listeners Wissen
-        document.querySelectorAll('[data-subject]').forEach(btn => {
-            btn.addEventListener('click', () => setWissenSubject(btn.dataset.subject));
-        });
-        document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
-            o.addEventListener('click', () => selectWissenAnswer(o.dataset.option));
-        });
-        document.getElementById('wissen-check-btn').addEventListener('click', checkWissenAnswer);
-        document.getElementById('wissen-new-btn').addEventListener('click', generateNewWissenFrage);
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function switchModule(name) {
+            currentModule = name;
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.module === name);
+            });
+            document.querySelectorAll('.module').forEach(m => {
+                m.classList.toggle('active', m.id === name + '-module');
+            });
+            if (name === 'wortfluessigkeit' && !currentWordData) generateNewWord();
+            if (name === 'zahlenfolgen' && !zfCurrent) generateNewZahlenfolge();
+            if (name === 'wissen' && !wissenCurrent) generateNewWissenFrage();
+        }
 
-        // Tastatur-Shortcuts Wissen
-        document.addEventListener('keydown', (e) => {
-            if (currentModule === 'wissen') {
-                if (e.key === 'Escape') generateNewWissenFrage();
-                else if (e.key === 'Enter') { e.preventDefault(); checkWissenAnswer(); }
-                else if (['a','b','c','d'].includes(e.key.toLowerCase())) selectWissenAnswer(e.key.toUpperCase());
-            }
-        });
+        // ============================================================
+        // INITIALISIERUNG (alle Event-Listener)
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.addEventListener('click', () => switchModule(t.dataset.module));
+            });
 
-        // Initialisierung
-        document.addEventListener('DOMContentLoaded', () => {
+            // Wortflüssigkeit
+            document.querySelectorAll('.difficulty-btn[data-difficulty]').forEach(b => {
+                b.addEventListener('click', () => setDifficulty(b.dataset.difficulty));
+            });
+            document.querySelectorAll('#letter-options .letter-option').forEach(o => {
+                o.addEventListener('click', () => selectAnswer(o.dataset.option));
+            });
+            document.getElementById('show-word-btn').addEventListener('click', showWord);
+            document.getElementById('check-answer-btn').addEventListener('click', checkAnswer);
+            document.getElementById('new-word-btn').addEventListener('click', generateNewWord);
+
+            // Zahlenfolgen
+            document.querySelectorAll('#zf-options .letter-option').forEach(o => {
+                o.addEventListener('click', () => selectZfAnswer(o.dataset.option));
+            });
+            document.getElementById('zf-check-btn').addEventListener('click', checkZfAnswer);
+            document.getElementById('zf-show-btn').addEventListener('click', showZfSolution);
+            document.getElementById('zf-new-btn').addEventListener('click', generateNewZahlenfolge);
+
+            // Wissen
+            document.querySelectorAll('[data-subject]').forEach(b => {
+                b.addEventListener('click', () => setWissenSubject(b.dataset.subject));
+            });
+            document.querySelectorAll('#wissen-options .letter-option').forEach(o => {
+                o.addEventListener('click', () => selectWissenAnswer(o.dataset.option));
+            });
+            document.getElementById('wissen-check-btn').addEventListener('click', checkWissenAnswer);
+            document.getElementById('wissen-new-btn').addEventListener('click', generateNewWissenFrage);
+
+            // Tastatur
+            document.addEventListener('keydown', e => {
+                if (currentModule === 'wortfluessigkeit') {
+                    if (e.key === 'Escape') generateNewWord();
+                    else if (e.key === 'F1') { e.preventDefault(); showWord(); }
+                    else if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
+                    else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) selectAnswer(e.key.toUpperCase());
+                } else if (currentModule === 'zahlenfolgen') {
+                    if (e.key === 'Escape') generateNewZahlenfolge();
+                    else if (e.key === 'Enter') { e.preventDefault(); checkZfAnswer(); }
+                    else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) selectZfAnswer(e.key.toUpperCase());
+                } else if (currentModule === 'wissen') {
+                    if (e.key === 'Escape') generateNewWissenFrage();
+                    else if (e.key === 'Enter') { e.preventDefault(); checkWissenAnswer(); }
+                    else if (['a','b','c','d'].includes(e.key.toLowerCase())) selectWissenAnswer(e.key.toUpperCase());
+                }
+            });
+
+            // Erste Aufgaben generieren
             generateNewWord();
             generateNewZahlenfolge();
             generateNewWissenFrage();
