@@ -1079,6 +1079,9 @@
             if (moduleName === 'wortfluessigkeit' && !currentWordData) {
                 generateNewWord();
             }
+            if (moduleName === 'zahlenfolgen' && !zfCurrent) {
+                generateNewZahlenfolge();
+            }
         }
         
         // Event Listeners
@@ -1451,10 +1454,13 @@
                 else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) selectZfAnswer(e.key.toUpperCase());
             }
         });
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', () => {
             generateNewWord();
+            generateNewZahlenfolge();
             updateStats();
-            console.log('MedAT Trainer geladen!');
-            console.log('Wortflüssigkeit: ESC=Neue Aufgabe, F1=Wort anzeigen, Enter=Antwort prüfen, A-E=Auswählen');
+            updateZfStats();
         });
     </script>
 </body>
