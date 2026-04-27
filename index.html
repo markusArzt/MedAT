@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>medAT Anagramm Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Sophisticated Academic Color Palette */
+            --primary-navy: #0f1b3c;
+            --secondary-navy: #1a2c5b;
+            --accent-gold: #d4af37;
+            --accent-emerald: #2d5a3d;
+            --warm-white: #fdfcf8;
+            --soft-gray: #f5f4f0;
+            --text-primary: #2c2c2c;
+            --text-secondary: #5a5a5a;
+            --border-light: #e8e6df;
+            --shadow-subtle: #d4d2c8;
+            
+            /* Typography */
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Source Code Pro', monospace;
+            
+            /* Effects */
+            --shadow-paper: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-serif);
+            background: linear-gradient(135deg, var(--warm-white) 0%, var(--soft-gray) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Subtle background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(15, 27, 60, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-emerald));
+            border-radius: 1px;
+        }
+        
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: var(--primary-navy);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            font-weight: 400;
+            font-style: italic;
+        }
+        
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .word-card {
+            background: var(--warm-white);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-paper);
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+        
+        .word-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-emerald));
+        }
+        
+        .word-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-elevated);
+        }
+        
+        .scrambled-display {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .scrambled-letters {
+            font-family: var(--font-mono);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 600;
+            color: var(--primary-navy);
+            letter-spacing: 0.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            position: relative;
+        }
+        
+        .letter {
+            display: inline-block;
+            padding: 0.5rem 0.75rem;
+            margin: 0 0.25rem;
+            background: var(--soft-gray);
+            border-radius: 12px;
+            border: 2px solid var(--border-light);
+            transition: var(--transition-smooth);
+            animation: letterFloat 0.8s ease forwards;
+        }
+        
+        @keyframes letterFloat {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .letter:nth-child(1) { animation-delay: 0.1s; }
+        .letter:nth-child(2) { animation-delay: 0.15s; }
+        .letter:nth-child(3) { animation-delay: 0.2s; }
+        .letter:nth-child(4) { animation-delay: 0.25s; }
+        .letter:nth-child(5) { animation-delay: 0.3s; }
+        .letter:nth-child(6) { animation-delay: 0.35s; }
+        .letter:nth-child(7) { animation-delay: 0.4s; }
+        .letter:nth-child(8) { animation-delay: 0.45s; }
+        .letter:nth-child(9) { animation-delay: 0.5s; }
+        .letter:nth-child(10) { animation-delay: 0.55s; }
+        
+        .hint-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .hint-display {
+            font-size: 1.2rem;
+            color: var(--accent-emerald);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            min-height: 2rem;
+            font-style: italic;
+        }
+        
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .word-input {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            padding: 1.5rem 2rem;
+            border: 3px solid var(--border-light);
+            border-radius: 16px;
+            background: var(--warm-white);
+            color: var(--text-primary);
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.1rem;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+        }
+        
+        .word-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            transform: scale(1.02);
+        }
+        
+        .word-input.correct {
+            border-color: var(--accent-emerald);
+            background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+            animation: correctPulse 0.6s ease;
+        }
+        
+        .word-input.incorrect {
+            border-color: #dc2626;
+            background: #fef2f2;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-gold), #b8941f);
+            color: var(--warm-white);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--warm-white);
+            color: var(--primary-navy);
+            border: 2px solid var(--accent-emerald);
+            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.15);
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--accent-emerald);
+            color: var(--warm-white);
+            transform: translateY(-3px);
+        }
+        
+        .stats {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-paper);
+            border: 1px solid var(--border-light);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary-navy);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            font-weight: 500;
+        }
+        
+        .feedback {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+        }
+        
+        .feedback.correct {
+            background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+            color: var(--accent-emerald);
+            border: 1px solid rgba(45, 90, 61, 0.2);
+        }
+        
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #fef2f2, #fde8e8);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+        
+        .word-list {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-paper);
+            border: 1px solid var(--border-light);
+            margin-top: 2rem;
+        }
+        
+        .word-list h3 {
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+        
+        .solved-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        
+        .solved-word {
+            background: linear-gradient(135deg, var(--accent-emerald), #234a32);
+            color: var(--warm-white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(45, 90, 61, 0.2);
+            animation: slideInSolved 0.5s ease;
+        }
+        
+        @keyframes slideInSolved {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem 1rem;
+            }
+            
+            .word-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .scrambled-letters {
+                font-size: 2rem;
+                letter-spacing: 0.3rem;
+            }
+            
+            .letter {
+                padding: 0.4rem 0.6rem;
+                margin: 0 0.15rem;
+            }
+            
+            .word-input {
+                font-size: 1.3rem;
+                padding: 1.2rem 1.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+        
+        /* Focus accessibility */
+        .btn:focus,
+        .word-input:focus {
+            outline: 3px solid var(--accent-gold);
+            outline-offset: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Anagramm Trainer</h1>
+            <p class="subtitle">Entwirre die Buchstaben und finde das ursprüngliche Wort</p>
+        </header>
+        
+        <main class="game-container">
+            <div class="word-card">
+                <div class="scrambled-display">
+                    <div id="scrambled-word" class="scrambled-letters"></div>
+                </div>
+                
+                <div class="hint-section">
+                    <div id="hint-display" class="hint-display"></div>
+                </div>
+                
+                <div class="input-section">
+                    <input type="text" 
+                           id="word-input" 
+                           class="word-input" 
+                           placeholder="Gib das Lösungswort ein..."
+                           autocomplete="off"
+                           spellcheck="false">
+                    
+                    <div class="controls">
+                        <button id="hint-btn" class="btn btn-secondary">💡 Tipp anzeigen</button>
+                        <button id="skip-btn" class="btn btn-secondary">⏭ Überspringen</button>
+                        <button id="new-word-btn" class="btn btn-primary">🔄 Neues Wort</button>
+                    </div>
+                </div>
+                
+                <div id="feedback" class="feedback hidden"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span id="correct-count" class="stat-value">0</span>
+                    <span class="stat-label">Richtig</span>
+                </div>
+                <div class="stat-item">
+                    <span id="total-count" class="stat-value">0</span>
+                    <span class="stat-label">Gesamt</span>
+                </div>
+                <div class="stat-item">
+                    <span id="success-rate" class="stat-value">0%</span>
+                    <span class="stat-label">Erfolgsrate</span>
+                </div>
+            </div>
+            
+            <div class="word-list">
+                <h3>Gelöste Wörter</h3>
+                <div id="solved-words" class="solved-words"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Wortlisten - erweitert für medAT-relevante Begriffe
+        const wordCategories = {
+            medical: [
+                'HERZ', 'LUNGE', 'LEBER', 'NIERE', 'GEHIRN', 'MAGEN', 'DARM', 'BLUT',
+                'KNOCHEN', 'MUSKEL', 'HAUT', 'AUGE', 'OHR', 'NASE', 'MUND', 'ZAHN',
+                'ARZT', 'PATIENT', 'DIAGNOSE', 'THERAPIE', 'MEDIZIN', 'SPRITZE',
+                'FIEBER', 'SCHMERZ', 'HEILUNG', 'VIRUS', 'BAKTERIE', 'IMPFUNG',
+                'OPERATION', 'CHIRURG', 'PFLEGER', 'KLINIK', 'AMBULANZ'
+            ],
+            general: [
+                'HAUS', 'BAUM', 'WASSER', 'FEUER', 'ERDE', 'LUFT', 'SONNE', 'MOND',
+                'STERN', 'BERG', 'TAL', 'MEER', 'FLUSS', 'WALD', 'WIESE', 'BLUME',
+                'TIER', 'VOGEL', 'FISCH', 'HUND', 'KATZE', 'PFERD', 'BUCH', 'SCHULE',
+                'LEHRER', 'FREUND', 'FAMILIE', 'LIEBE', 'HOFFNUNG', 'TRAUM', 'ZEIT',
+                'LEBEN', 'FRIEDEN', 'MUSIK', 'KUNST', 'FARBE', 'LICHT', 'SCHATTEN',
+                'WINTER', 'SOMMER', 'HERBST', 'FRUEHLING'
+            ],
+            science: [
+                'ATOM', 'MOLEKUEL', 'ZELLE', 'ENERGIE', 'KRAFT', 'BEWEGUNG',
+                'SCHWERKRAFT', 'ELEKTRON', 'PROTON', 'NEUTRON', 'REAKTION',
+                'EXPERIMENT', 'FORSCHUNG', 'THEORIE', 'HYPOTHESE', 'BEWEIS',
+                'PHYSIK', 'CHEMIE', 'BIOLOGIE', 'MATHEMATIK'
+            ]
+        };
+        
+        // Alle Wörter kombinieren
+        const allWords = [
+            ...wordCategories.medical,
+            ...wordCategories.general,
+            ...wordCategories.science
+        ];
+        
+        // Spielvariablen
+        let currentWord = '';
+        let scrambledWord = '';
+        let hintUsed = false;
+        let correctCount = 0;
+        let totalCount = 0;
+        let solvedWords = new Set();
+        
+        // DOM Elemente
+        const scrambledWordElement = document.getElementById('scrambled-word');
+        const wordInput = document.getElementById('word-input');
+        const hintDisplay = document.getElementById('hint-display');
+        const feedbackElement = document.getElementById('feedback');
+        const hintBtn = document.getElementById('hint-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const newWordBtn = document.getElementById('new-word-btn');
+        const correctCountElement = document.getElementById('correct-count');
+        const totalCountElement = document.getElementById('total-count');
+        const successRateElement = document.getElementById('success-rate');
+        const solvedWordsElement = document.getElementById('solved-words');
+        
+        // Fisher-Yates Shuffle Algorithmus
+        function shuffleWord(word) {
+            const letters = word.split('');
+            let shuffled;
+            let attempts = 0;
+            
+            // Wiederhole bis das Wort wirklich durcheinander ist
+            do {
+                shuffled = [...letters];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                attempts++;
+                // Verhindere endlose Schleifen bei kurzen Wörtern
+                if (attempts > 100) break;
+            } while (shuffled.join('') === word && word.length > 1);
+            
+            return shuffled.join('');
+        }
+        
+        function getRandomWord() {
+            const availableWords = allWords.filter(word => !solvedWords.has(word));
+            
+            if (availableWords.length === 0) {
+                // Alle Wörter gelöst - Reset für neues Spiel
+                solvedWords.clear();
+                updateSolvedWordsList();
+                return allWords[Math.floor(Math.random() * allWords.length)];
+            }
+            
+            return availableWords[Math.floor(Math.random() * availableWords.length)];
+        }
+        
+        function displayScrambledWord() {
+            scrambledWordElement.innerHTML = '';
+            
+            [...scrambledWord].forEach((letter, index) => {
+                const letterSpan = document.createElement('span');
+                letterSpan.className = 'letter';
+                letterSpan.textContent = letter;
+                letterSpan.style.animationDelay = `${index * 0.05}s`;
+                scrambledWordElement.appendChild(letterSpan);
+            });
+        }
+        
+        function newWord() {
+            currentWord = getRandomWord();
+            scrambledWord = shuffleWord(currentWord);
+            hintUsed = false;
+            
+            displayScrambledWord();
+            clearFeedback();
+            clearHint();
+            clearInput();
+            
+            // Reset button states
+            hintBtn.disabled = false;
+            hintBtn.textContent = '💡 Tipp anzeigen';
+            
+            wordInput.focus();
+        }
+        
+        function showHint() {
+            if (!hintUsed) {
+                const firstLetter = currentWord.charAt(0);
+                hintDisplay.textContent = `Das Wort beginnt mit: ${firstLetter}`;
+                hintBtn.textContent = '💡 Tipp verwendet';
+                hintBtn.disabled = true;
+                hintUsed = true;
+            }
+        }
+        
+        function clearHint() {
+            hintDisplay.textContent = '';
+        }
+        
+        function clearInput() {
+            wordInput.value = '';
+            wordInput.className = 'word-input';
+        }
+        
+        function clearFeedback() {
+            feedbackElement.textContent = '';
+            feedbackElement.className = 'feedback hidden';
+        }
+        
+        function showFeedback(message, isCorrect) {
+            feedbackElement.textContent = message;
+            feedbackElement.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+        }
+        
+        function updateStats() {
+            correctCountElement.textContent = correctCount;
+            totalCountElement.textContent = totalCount;
+            
+            const rate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
+            successRateElement.textContent = `${rate}%`;
+        }
+        
+        function updateSolvedWordsList() {
+            solvedWordsElement.innerHTML = '';
+            [...solvedWords].forEach(word => {
+                const wordElement = document.createElement('span');
+                wordElement.className = 'solved-word';
+                wordElement.textContent = word;
+                solvedWordsElement.appendChild(wordElement);
+            });
+        }
+        
+        function addSolvedWord(word) {
+            const wordElement = document.createElement('span');
+            wordElement.className = 'solved-word';
+            wordElement.textContent = word;
+            solvedWordsElement.appendChild(wordElement);
+        }
+        
+        function checkAnswer() {
+            const userInput = wordInput.value.trim().toUpperCase();
+            
+            if (!userInput) return;
+            
+            totalCount++;
+            
+            if (userInput === currentWord) {
+                correctCount++;
+                solvedWords.add(currentWord);
+                addSolvedWord(currentWord);
+                
+                wordInput.className = 'word-input correct';
+                showFeedback(`Richtig! Das Wort war "${currentWord}".`, true);
+                
+                setTimeout(() => {
+                    newWord();
+                }, 2000);
+            } else {
+                wordInput.className = 'word-input incorrect';
+                showFeedback(`Falsch! "${userInput}" ist nicht richtig. Versuche es nochmal!`, false);
+                
+                setTimeout(() => {
+                    clearInput();
+                    clearFeedback();
+                }, 2000);
+            }
+            
+            updateStats();
+        }
+        
+        function skipWord() {
+            totalCount++;
+            showFeedback(`Das Wort war "${currentWord}". Neues Wort wird geladen...`, false);
+            updateStats();
+            
+            setTimeout(() => {
+                newWord();
+            }, 2000);
+        }
+        
+        // Event Listeners
+        wordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        // Auto-check wenn Wort komplett ist
+        wordInput.addEventListener('input', () => {
+            const userInput = wordInput.value.trim().toUpperCase();
+            if (userInput.length === currentWord.length) {
+                // Kurze Verzögerung für bessere UX
+                setTimeout(() => {
+                    if (wordInput.value.trim().toUpperCase().length === currentWord.length) {
+                        checkAnswer();
+                    }
+                }, 500);
+            }
+        });
+        
+        hintBtn.addEventListener('click', showHint);
+        skipBtn.addEventListener('click', skipWord);
+        newWordBtn.addEventListener('click', newWord);
+        
+        // Tastatur-Shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                newWord();
+            } else if (e.key === 'F1') {
+                e.preventDefault();
+                if (!hintUsed) showHint();
+            } else if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                skipWord();
+            }
+        });
+        
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', () => {
+            newWord();
+            updateStats();
+            console.log('Anagramm Trainer geladen!');
+            console.log('Shortcuts: ESC = Neues Wort, F1 = Tipp, Ctrl+S = Überspringen');
+        });
+    </script>
+</body>
+</html>
