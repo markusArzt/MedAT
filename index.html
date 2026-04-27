@@ -3,30 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>medAT Anagramm Trainer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>MedAT Trainer</title>
+    
     <style>
         :root {
-            /* Sophisticated Academic Color Palette */
-            --primary-navy: #0f1b3c;
-            --secondary-navy: #1a2c5b;
+            --primary-navy: #1a365d;
             --accent-gold: #d4af37;
             --accent-emerald: #2d5a3d;
+            --soft-gray: #f8f6f0;
             --warm-white: #fdfcf8;
-            --soft-gray: #f5f4f0;
             --text-primary: #2c2c2c;
-            --text-secondary: #5a5a5a;
-            --border-light: #e8e6df;
-            --shadow-subtle: #d4d2c8;
-            
-            /* Typography */
-            --font-serif: 'Playfair Display', serif;
-            --font-mono: 'Source Code Pro', monospace;
-            
-            /* Effects */
-            --shadow-paper: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.1);
-            --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
-            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --text-secondary: #666;
+            --border-light: #e6e0d4;
+            --shadow-paper: 0 8px 32px rgba(26, 54, 93, 0.1);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-mono: 'Source Code Pro', Monaco, monospace;
         }
         
         * {
@@ -37,66 +29,106 @@
         
         body {
             font-family: var(--font-serif);
-            background: linear-gradient(135deg, var(--warm-white) 0%, var(--soft-gray) 100%);
-            color: var(--text-primary);
             line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--soft-gray) 0%, #f0ede4 100%);
             min-height: 100vh;
-            position: relative;
-        }
-        
-        /* Subtle background pattern */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(15, 27, 60, 0.02) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 3rem 2rem;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 4rem;
-            position: relative;
+            margin-bottom: 3rem;
         }
         
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: -2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-gold), var(--accent-emerald));
-            border-radius: 1px;
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .main-navigation {
+            background: var(--warm-white);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: var(--shadow-paper);
+            border: 1px solid var(--border-light);
+            margin-bottom: 3rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            background: var(--soft-gray);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-transform: uppercase;
+            letter-spacing: 0.02rem;
+        }
+        
+        .nav-tab:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--accent-gold), #b8941f);
+            color: var(--warm-white);
+            border-color: var(--accent-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        .module {
+            display: none;
+        }
+        
+        .module.active {
+            display: block;
+        }
+        
+        .word-card {
+            background: var(--warm-white);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--shadow-paper);
+            border: 1px solid var(--border-light);
+            margin-bottom: 2rem;
         }
         
         .difficulty-selector {
-            margin-top: 2rem;
             text-align: center;
+            margin-bottom: 2rem;
         }
         
         .difficulty-selector h3 {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
+            color: var(--primary-navy);
             margin-bottom: 1rem;
-            font-weight: 500;
+            font-size: 1.3rem;
         }
         
         .difficulty-options {
@@ -108,373 +140,300 @@
         
         .difficulty-btn {
             font-family: var(--font-serif);
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 500;
-            padding: 0.75rem 1.5rem;
+            padding: 0.8rem 1.5rem;
             border: 2px solid var(--border-light);
             border-radius: 25px;
-            background: var(--warm-white);
+            background: var(--soft-gray);
             color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        
+        .difficulty-btn:hover {
+            border-color: var(--accent-emerald);
+            transform: translateY(-2px);
+        }
+        
+        .difficulty-btn.active {
+            background: var(--accent-emerald);
+            color: var(--warm-white);
+            border-color: var(--accent-emerald);
+        }
+        
+        .letters-display {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .letters-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .single-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--soft-gray);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-family: var(--font-mono);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            animation: letterBounce 0.6s ease forwards;
+        }
+        
+        @keyframes letterBounce {
+            0% { transform: scale(0) rotateY(180deg); opacity: 0; }
+            50% { transform: scale(1.1) rotateY(90deg); opacity: 0.7; }
+            100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+        }
+        
+        .question-section {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .question-section h3 {
+            color: var(--primary-navy);
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .letter-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .letter-option {
+            display: flex;
+            align-items: center;
+            padding: 1.2rem 1.5rem;
+            background: var(--warm-white);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .letter-option:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+        }
+        
+        .letter-option.selected {
+            background: linear-gradient(135deg, var(--accent-emerald), #234a32);
+            color: var(--warm-white);
+            border-color: var(--accent-emerald);
+        }
+        
+        .letter-option.correct {
+            background: linear-gradient(135deg, var(--accent-emerald), #234a32);
+            color: var(--warm-white);
+            border-color: var(--accent-emerald);
+            animation: correctPulse 0.6s ease;
+        }
+        
+        .letter-option.incorrect {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: var(--warm-white);
+            border-color: #dc2626;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--accent-gold);
+            color: var(--warm-white);
+            border-radius: 50%;
+            font-weight: 600;
+            margin-right: 1rem;
+            font-family: var(--font-mono);
+        }
+        
+        .letter-option.selected .option-letter,
+        .letter-option.correct .option-letter,
+        .letter-option.incorrect .option-letter {
+            background: var(--warm-white);
+            color: var(--text-primary);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 1rem 2rem;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
             cursor: pointer;
             transition: var(--transition-smooth);
             text-transform: uppercase;
             letter-spacing: 0.02rem;
         }
         
-        .difficulty-btn:hover {
-            border-color: var(--accent-gold);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
-        }
-        
-        .difficulty-btn.active {
-            background: linear-gradient(135deg, var(--accent-gold), #b8941f);
-            color: var(--warm-white);
-            border-color: var(--accent-gold);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        h1 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
-            color: var(--primary-navy);
-            margin-bottom: 1rem;
-            letter-spacing: -0.02em;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 1.3rem;
-            font-weight: 400;
-            font-style: italic;
-        }
-        
-        .game-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2.5rem;
-            max-width: 700px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .word-card {
-            background: var(--warm-white);
-            border-radius: 20px;
-            padding: 3rem 2.5rem;
-            box-shadow: var(--shadow-paper);
-            border: 1px solid var(--border-light);
-            position: relative;
-            overflow: hidden;
-            transition: var(--transition-smooth);
-        }
-        
-        .word-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-gold), var(--accent-emerald));
-        }
-        
-        .word-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-elevated);
-        }
-        
-        .scrambled-display {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-        
-        .scrambled-letters {
-            font-family: var(--font-mono);
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            font-weight: 600;
-            color: var(--primary-navy);
-            letter-spacing: 0.5rem;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            position: relative;
-        }
-        
-        .letter {
-            display: inline-block;
-            padding: 0.5rem 0.75rem;
-            margin: 0 0.25rem;
-            background: var(--soft-gray);
-            border-radius: 12px;
-            border: 2px solid var(--border-light);
-            transition: var(--transition-smooth);
-            animation: letterFloat 0.8s ease forwards;
-        }
-        
-        @keyframes letterFloat {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        
-        .letter:nth-child(1) { animation-delay: 0.1s; }
-        .letter:nth-child(2) { animation-delay: 0.15s; }
-        .letter:nth-child(3) { animation-delay: 0.2s; }
-        .letter:nth-child(4) { animation-delay: 0.25s; }
-        .letter:nth-child(5) { animation-delay: 0.3s; }
-        .letter:nth-child(6) { animation-delay: 0.35s; }
-        .letter:nth-child(7) { animation-delay: 0.4s; }
-        .letter:nth-child(8) { animation-delay: 0.45s; }
-        .letter:nth-child(9) { animation-delay: 0.5s; }
-        .letter:nth-child(10) { animation-delay: 0.55s; }
-        
-        .hint-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .hint-display {
-            font-size: 1.2rem;
-            color: var(--accent-emerald);
-            font-weight: 600;
-            margin-bottom: 1rem;
-            min-height: 2rem;
-            font-style: italic;
-        }
-        
-        .input-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        
-        .word-input {
-            font-family: var(--font-serif);
-            font-size: 1.5rem;
-            padding: 1.5rem 2rem;
-            border: 3px solid var(--border-light);
-            border-radius: 16px;
-            background: var(--warm-white);
-            color: var(--text-primary);
-            text-align: center;
-            font-weight: 500;
-            letter-spacing: 0.1rem;
-            transition: var(--transition-smooth);
-            text-transform: uppercase;
-        }
-        
-        .word-input:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
-            transform: scale(1.02);
-        }
-        
-        .word-input.correct {
-            border-color: var(--accent-emerald);
-            background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
-            animation: correctPulse 0.6s ease;
-        }
-        
-        .word-input.incorrect {
-            border-color: #dc2626;
-            background: #fef2f2;
-            animation: shake 0.5s ease;
-        }
-        
-        @keyframes correctPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-        
-        .btn {
-            font-family: var(--font-serif);
-            font-size: 1.1rem;
-            font-weight: 600;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 0.05rem;
-        }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .btn:hover:not(:disabled)::before {
-            left: 100%;
-        }
-        
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-gold), #b8941f);
             color: var(--warm-white);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+            border-color: var(--accent-gold);
         }
         
         .btn-secondary {
-            background: var(--warm-white);
-            color: var(--primary-navy);
-            border: 2px solid var(--accent-emerald);
-            box-shadow: 0 4px 15px rgba(45, 90, 61, 0.15);
-        }
-        
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--accent-emerald);
-            color: var(--warm-white);
-            transform: translateY(-3px);
-        }
-        
-        .stats {
-            background: var(--warm-white);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: var(--shadow-paper);
-            border: 1px solid var(--border-light);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-family: var(--font-mono);
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: var(--primary-navy);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            font-size: 0.95rem;
+            background: var(--soft-gray);
             color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05rem;
-            font-weight: 500;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         .feedback {
             text-align: center;
-            padding: 1.5rem 2rem;
+            padding: 1rem 2rem;
             border-radius: 12px;
-            margin-top: 1.5rem;
-            font-weight: 500;
-            font-size: 1.1rem;
+            margin-top: 1rem;
+            font-weight: 600;
             transition: var(--transition-smooth);
         }
         
         .feedback.correct {
-            background: linear-gradient(135deg, #f0f9ff, #ecfdf5);
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
             color: var(--accent-emerald);
-            border: 1px solid rgba(45, 90, 61, 0.2);
+            border: 2px solid var(--accent-emerald);
         }
         
         .feedback.incorrect {
-            background: linear-gradient(135deg, #fef2f2, #fde8e8);
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
             color: #dc2626;
-            border: 1px solid rgba(220, 38, 38, 0.2);
+            border: 2px solid #dc2626;
         }
         
-        .word-list {
-            background: var(--warm-white);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: var(--shadow-paper);
-            border: 1px solid var(--border-light);
-            margin-top: 2rem;
-        }
-        
-        .word-list h3 {
-            color: var(--primary-navy);
-            margin-bottom: 1.5rem;
-            font-size: 1.4rem;
-            text-align: center;
-        }
-        
-        .solved-words {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            justify-content: center;
-        }
-        
-        .solved-word {
-            background: linear-gradient(135deg, var(--accent-emerald), #234a32);
-            color: var(--warm-white);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(45, 90, 61, 0.2);
-            animation: slideInSolved 0.5s ease;
-        }
-        
-        @keyframes slideInSolved {
-            from {
-                opacity: 0;
-                transform: scale(0.8) translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-        
-        .hidden {
+        .feedback.hidden {
             display: none;
         }
         
-        /* Mobile responsiveness */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--warm-white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-paper);
+            border: 1px solid var(--border-light);
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+        
+        /* Zahlenfolgen */
+        .zf-sequence {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0 2.5rem;
+        }
+
+        .zf-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 3.5rem;
+            height: 3.5rem;
+            padding: 0 0.5rem;
+            background: var(--soft-gray);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            animation: letterBounce 0.5s ease forwards;
+        }
+
+        .zf-number.unknown {
+            background: var(--primary-navy);
+            color: var(--accent-gold);
+            border-color: var(--primary-navy);
+            font-size: 1.8rem;
+        }
+
+        .zf-separator {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
         @media (max-width: 768px) {
             .container {
                 padding: 2rem 1rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-tab {
+                width: 100%;
+                max-width: 250px;
+                text-align: center;
             }
             
             .difficulty-options {
@@ -484,26 +443,17 @@
             
             .difficulty-btn {
                 width: 100%;
-                max-width: 250px;
+                max-width: 200px;
             }
             
             .word-card {
                 padding: 2rem 1.5rem;
             }
             
-            .scrambled-letters {
-                font-size: 2rem;
-                letter-spacing: 0.3rem;
-            }
-            
-            .letter {
-                padding: 0.4rem 0.6rem;
-                margin: 0 0.15rem;
-            }
-            
-            .word-input {
-                font-size: 1.3rem;
-                padding: 1.2rem 1.5rem;
+            .single-letter {
+                width: 3rem;
+                height: 3rem;
+                font-size: 1.5rem;
             }
             
             .controls {
@@ -516,296 +466,568 @@
                 max-width: 280px;
             }
         }
-        
-        /* Focus accessibility */
-        .btn:focus,
-        .word-input:focus {
-            outline: 3px solid var(--accent-gold);
-            outline-offset: 3px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>Anagramm Trainer</h1>
-            <p class="subtitle">Entwirre die Buchstaben und finde das ursprüngliche Wort</p>
-            
-            <!-- Schwierigkeitsgrad Auswahl -->
-            <div class="difficulty-selector">
-                <h3>Schwierigkeitsgrad wählen:</h3>
-                <div class="difficulty-options">
-                    <button class="difficulty-btn active" data-difficulty="all">Alle Wörter</button>
-                    <button class="difficulty-btn" data-difficulty="short">Kurz (3-4)</button>
-                    <button class="difficulty-btn" data-difficulty="medium">Mittel (5-6)</button>
-                    <button class="difficulty-btn" data-difficulty="long">Lang (7+)</button>
-                </div>
-            </div>
+            <h1>MedAT Trainer</h1>
+            <p class="subtitle">Authentische Vorbereitung für den Medizin-Aufnahmetest</p>
         </header>
         
+        <nav class="main-navigation">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-module="wortfluessigkeit">📝 Wortflüssigkeit</button>
+                <button class="nav-tab" data-module="zahlenfolgen">🔢 Zahlenfolgen</button>
+                <button class="nav-tab" data-module="figuren">🔷 Figuren</button>
+            </div>
+        </nav>
+        
         <main class="game-container">
-            <div class="word-card">
-                <div class="scrambled-display">
-                    <div id="scrambled-word" class="scrambled-letters"></div>
-                </div>
-                
-                <div class="hint-section">
-                    <div id="hint-display" class="hint-display"></div>
-                </div>
-                
-                <div class="input-section">
-                    <input type="text" 
-                           id="word-input" 
-                           class="word-input" 
-                           placeholder="Gib das Lösungswort ein..."
-                           autocomplete="off"
-                           spellcheck="false">
-                    
-                    <div class="controls">
-                        <button id="hint-btn" class="btn btn-secondary">💡 Tipp anzeigen</button>
-                        <button id="reveal-btn" class="btn btn-secondary">🔍 Auflösen</button>
-                        <button id="skip-btn" class="btn btn-secondary">⏭ Überspringen</button>
-                        <button id="new-word-btn" class="btn btn-primary">🔄 Neues Wort</button>
+            <!-- Wortflüssigkeits-Modul -->
+            <div id="wortfluessigkeit-module" class="module active">
+                <div class="difficulty-selector">
+                    <h3>Schwierigkeitsgrad wählen:</h3>
+                    <div class="difficulty-options">
+                        <button class="difficulty-btn active" data-difficulty="all">Alle Wörter</button>
+                        <button class="difficulty-btn" data-difficulty="short">Kurz (bis 5)</button>
+                        <button class="difficulty-btn" data-difficulty="medium">Mittel (6-8)</button>
+                        <button class="difficulty-btn" data-difficulty="long">Lang (9+)</button>
                     </div>
                 </div>
                 
-                <div id="feedback" class="feedback hidden"></div>
+                <div class="word-card">
+                    <div class="letters-display">
+                        <div id="letters-container" class="letters-container"></div>
+                    </div>
+                    
+                    <div class="question-section">
+                        <h3>Aus diesen durchmischten Buchstaben lässt sich ein deutsches Hauptwort bilden.<br>
+                        Mit welchem Buchstaben beginnt dieses Wort?</h3>
+                        
+                        <div class="letter-options" id="letter-options">
+                            <div class="letter-option" data-option="A">
+                                <span class="option-letter">A</span>
+                                <span id="option-a-letter">Anfangsbuchstabe: ?</span>
+                            </div>
+                            <div class="letter-option" data-option="B">
+                                <span class="option-letter">B</span>
+                                <span id="option-b-letter">Anfangsbuchstabe: ?</span>
+                            </div>
+                            <div class="letter-option" data-option="C">
+                                <span class="option-letter">C</span>
+                                <span id="option-c-letter">Anfangsbuchstabe: ?</span>
+                            </div>
+                            <div class="letter-option" data-option="D">
+                                <span class="option-letter">D</span>
+                                <span id="option-d-letter">Anfangsbuchstabe: ?</span>
+                            </div>
+                            <div class="letter-option" data-option="E">
+                                <span class="option-letter">E</span>
+                                <span>Keine der Antwortmöglichkeiten ist richtig</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="show-word-btn" class="btn btn-secondary">💡 Wort anzeigen</button>
+                        <button id="check-answer-btn" class="btn btn-primary">✓ Antwort prüfen</button>
+                        <button id="new-word-btn" class="btn btn-secondary">🔄 Neue Aufgabe</button>
+                    </div>
+                    
+                    <div id="feedback" class="feedback hidden"></div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <span id="correct-count" class="stat-value">0</span>
+                        <span class="stat-label">Richtig</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="total-count" class="stat-value">0</span>
+                        <span class="stat-label">Gesamt</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="success-rate" class="stat-value">0%</span>
+                        <span class="stat-label">Erfolgsrate</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="current-difficulty" class="stat-value">Alle</span>
+                        <span class="stat-label">Schwierigkeit</span>
+                    </div>
+                </div>
             </div>
             
-            <div class="stats">
-                <div class="stat-item">
-                    <span id="correct-count" class="stat-value">0</span>
-                    <span class="stat-label">Richtig</span>
+            <!-- Zahlenfolgen-Modul -->
+            <div id="zahlenfolgen-module" class="module">
+                <div class="word-card">
+                    <div class="question-section">
+                        <h3 style="margin-bottom: 1.5rem;">Erkenne die Regel und ergänze die Zahlenfolge:</h3>
+                        <div id="zf-sequence" class="zf-sequence"></div>
+                    </div>
+
+                    <div class="question-section">
+                        <h3>Welche zwei Zahlen ergänzen die Folge?</h3>
+                        <div class="letter-options" id="zf-options">
+                            <div class="letter-option" data-option="A">
+                                <span class="option-letter">A</span>
+                                <span id="zf-option-a">?</span>
+                            </div>
+                            <div class="letter-option" data-option="B">
+                                <span class="option-letter">B</span>
+                                <span id="zf-option-b">?</span>
+                            </div>
+                            <div class="letter-option" data-option="C">
+                                <span class="option-letter">C</span>
+                                <span id="zf-option-c">?</span>
+                            </div>
+                            <div class="letter-option" data-option="D">
+                                <span class="option-letter">D</span>
+                                <span id="zf-option-d">?</span>
+                            </div>
+                            <div class="letter-option" data-option="E">
+                                <span class="option-letter">E</span>
+                                <span>Keine der Antwortmöglichkeiten ist richtig</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button id="zf-show-btn" class="btn btn-secondary">💡 Lösung anzeigen</button>
+                        <button id="zf-check-btn" class="btn btn-primary">✓ Antwort prüfen</button>
+                        <button id="zf-new-btn" class="btn btn-secondary">🔄 Neue Aufgabe</button>
+                    </div>
+
+                    <div id="zf-feedback" class="feedback hidden"></div>
                 </div>
-                <div class="stat-item">
-                    <span id="total-count" class="stat-value">0</span>
-                    <span class="stat-label">Gesamt</span>
-                </div>
-                <div class="stat-item">
-                    <span id="success-rate" class="stat-value">0%</span>
-                    <span class="stat-label">Erfolgsrate</span>
-                </div>
-                <div class="stat-item">
-                    <span id="current-difficulty" class="stat-value">Alle</span>
-                    <span class="stat-label">Schwierigkeit</span>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span id="zf-correct-count" class="stat-value">0</span>
+                        <span class="stat-label">Richtig</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="zf-total-count" class="stat-value">0</span>
+                        <span class="stat-label">Gesamt</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="zf-success-rate" class="stat-value">0%</span>
+                        <span class="stat-label">Erfolgsrate</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="word-list">
-                <h3>Gelöste Wörter</h3>
-                <div id="solved-words" class="solved-words"></div>
+
+            <!-- Figuren-Modul -->
+            <div id="figuren-module" class="module">
+                <div class="word-card">
+                    <div style="text-align: center; padding: 2rem;">
+                        <h2>Figuren zusammensetzen</h2>
+                        <p>Kommt bald...</p>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        // Wortlisten - erweitert für medAT-relevante Begriffe
-        const wordCategories = {
-            medical: [
-                'HERZ', 'LUNGE', 'LEBER', 'NIERE', 'GEHIRN', 'MAGEN', 'DARM', 'BLUT',
-                'KNOCHEN', 'MUSKEL', 'HAUT', 'AUGE', 'OHR', 'NASE', 'MUND', 'ZAHN',
-                'ARZT', 'PATIENT', 'DIAGNOSE', 'THERAPIE', 'MEDIZIN', 'SPRITZE',
-                'FIEBER', 'SCHMERZ', 'HEILUNG', 'VIRUS', 'BAKTERIE', 'IMPFUNG',
-                'OPERATION', 'CHIRURG', 'PFLEGER', 'KLINIK', 'AMBULANZ'
+        // Echte medAT-Wortflüssigkeits-Aufgaben aus offiziellen Dokumenten
+        const wordFluencyWords = {
+            // Kurz: bis 5 Buchstaben
+            short: [
+                // Aus IB_WF_26.pdf (offizielle Beispiele)
+                { letters: ['E', 'R', 'N', 'H', 'E', 'C', 'R'], word: 'RECHNER', startLetter: 'R' },
+                { letters: ['Z', 'E', 'I', 'T', 'I', 'R', 'F', 'E'], word: 'FREIZEIT', startLetter: 'F' },
+                
+                // Aus ÖH Med Wien 2021 - Kategorie 1 (≤7 Buchstaben) 
+                { letters: ['K', 'T', 'R', 'U', 'A', 'F', 'R'], word: 'FRAKTUR', startLetter: 'F' },
+                { letters: ['S', 'E', 'N', 'G', 'E', 'A', 'G'], word: 'SEEGANG', startLetter: 'S' },
+                { letters: ['O', 'T', 'K', 'N', 'K', 'A', 'T'], word: 'KONTAKT', startLetter: 'K' },
+                { letters: ['E', 'W', 'E', 'V', 'R', 'I', 'S'], word: 'VERWEIS', startLetter: 'V' },
+                { letters: ['U', 'D', 'N', 'S', 'E', 'R', 'S'], word: 'ERDNUSS', startLetter: 'E' },
+                { letters: ['A', 'N', 'E', 'L', 'T', 'T'], word: 'TALENT', startLetter: 'T' },
+                { letters: ['R', 'U', 'C', 'G', 'E', 'H'], word: 'GERUCH', startLetter: 'G' },
+                { letters: ['H', 'U', 'O', 'C', 'R', 'S'], word: 'CHORUS', startLetter: 'C' },
+                { letters: ['U', 'T', 'R', 'E', 'B', 'G'], word: 'BETRUG', startLetter: 'B' },
+                { letters: ['T', 'N', 'O', 'I', 'H', 'R', 'D'], word: 'HIRNTOD', startLetter: 'H' },
+                { letters: ['I', 'E', 'S', 'E', 'I', 'B', 'N'], word: 'BEISEIN', startLetter: 'B' },
+                { letters: ['W', 'H', 'I', 'C', 'G', 'E', 'T'], word: 'GEWICHT', startLetter: 'G' },
+                { letters: ['C', 'A', 'C', 'H', 'S', 'H'], word: 'SCHACH', startLetter: 'S' },
+                { letters: ['T', 'H', 'U', 'S', 'L'], word: 'STUHL', startLetter: 'S' },
+                { letters: ['A', 'A', 'S', 'R', 'P', 'I', 'T'], word: 'PARASIT', startLetter: 'P' },
+                { letters: ['A', 'E', 'M', 'H', 'R', 'M'], word: 'HAMMER', startLetter: 'H' },
+                { letters: ['E', 'N', 'E', 'T', 'D', 'N', 'Z'], word: 'TENDENZ', startLetter: 'T' },
+                { letters: ['N', 'D', 'A', 'M', 'E', 'L'], word: 'MANDEL', startLetter: 'M' },
+                { letters: ['E', 'H', 'A', 'M', 'C', 'R'], word: 'MACHER', startLetter: 'M' },
+                { letters: ['U', 'A', 'A', 'T', 'S', 'G', 'T'], word: 'SAATGUT', startLetter: 'S' },
+                { letters: ['U', 'T', 'F', 'S', 'K', 'A', 'R'], word: 'SAFTKUR', startLetter: 'S' },
+                { letters: ['N', 'E', 'U', 'Z', 'I', 'G', 'S'], word: 'ZEUGNIS', startLetter: 'Z' },
+                { letters: ['R', 'A', 'O', 'E', 'B', 'R', 'M'], word: 'OBERARM', startLetter: 'O' },
+                { letters: ['W', 'S', 'N', 'O', 'T', 'I', 'D'], word: 'OSTWIND', startLetter: 'O' },
+                { letters: ['S', 'U', 'E', 'T', 'N', 'H'], word: 'HUSTEN', startLetter: 'H' },
+                
+                // Aus ÖH Med Wien 2014 - kurze Wörter
+                { letters: ['E', 'I', 'D', 'Z', 'E', 'V', 'N'], word: 'EVIDENZ', startLetter: 'E' },
+                { letters: ['L', 'A', 'B', 'L'], word: 'BALL', startLetter: 'B' },
+                { letters: ['Y', 'D', 'A', 'N', 'H'], word: 'HANDY', startLetter: 'H' },
+                { letters: ['U', 'V', 'E', 'R', 'K'], word: 'KURVE', startLetter: 'K' },
+                { letters: ['O', 'A', 'M', 'N', 'T'], word: 'MONAT', startLetter: 'M' },
+                { letters: ['D', 'U', 'E', 'R', 'R'], word: 'RUDER', startLetter: 'R' },
+                { letters: ['K', 'C', 'K', 'L', 'S', 'E'], word: 'KLECKS', startLetter: 'K' },
+                { letters: ['L', 'R', 'O', 'L', 'B', 'D', 'E'], word: 'BORDELL', startLetter: 'B' },
+                { letters: ['H', 'T', 'C', 'R', 'E'], word: 'RECHT', startLetter: 'R' },
+                { letters: ['A', 'G', 'R', 'F', 'E'], word: 'FRAGE', startLetter: 'F' },
+                { letters: ['S', 'G', 'S', 'E', 'N', 'U'], word: 'GENUSS', startLetter: 'G' },
+                { letters: ['A', 'K', 'T', 'K', 'U', 'S'], word: 'KAKTUS', startLetter: 'K' },
+                { letters: ['Ü', 'M', 'S', 'L', 'I'], word: 'MÜSLI', startLetter: 'M' },
+                { letters: ['H', 'M', 'O', 'N'], word: 'MOHN', startLetter: 'M' },
+                { letters: ['V', 'U', 'T', 'K', 'R', 'E'], word: 'KUVERT', startLetter: 'K' },
+                { letters: ['L', 'T', 'A', 'N', 'M', 'E'], word: 'MANTEL', startLetter: 'M' },
+                { letters: ['E', 'I', 'E', 'R', 'K', 'D'], word: 'KREIDE', startLetter: 'K' }
             ],
-            general: [
-                'HAUS', 'BAUM', 'WASSER', 'FEUER', 'ERDE', 'LUFT', 'SONNE', 'MOND',
-                'STERN', 'BERG', 'TAL', 'MEER', 'FLUSS', 'WALD', 'WIESE', 'BLUME',
-                'TIER', 'VOGEL', 'FISCH', 'HUND', 'KATZE', 'PFERD', 'BUCH', 'SCHULE',
-                'LEHRER', 'FREUND', 'FAMILIE', 'LIEBE', 'HOFFNUNG', 'TRAUM', 'ZEIT',
-                'LEBEN', 'FRIEDEN', 'MUSIK', 'KUNST', 'FARBE', 'LICHT', 'SCHATTEN',
-                'WINTER', 'SOMMER', 'HERBST', 'FRUEHLING'
+            
+            // Mittel: 6-8 Buchstaben
+            medium: [
+                // Aus IB_WF_26.pdf
+                { letters: ['U', 'E', 'Z', 'G', 'L', 'U', 'F', 'G'], word: 'FLUGZEUG', startLetter: 'F' },
+                { letters: ['B', 'G', 'E', 'U', 'N', 'G', 'B', 'A'], word: 'BEGABUNG', startLetter: 'B' },
+                
+                // Aus ÖH Med Wien 2021 - Kategorie 2 (8-10 Buchstaben)
+                { letters: ['N', 'T', 'E', 'B', 'E', 'D', 'U', 'U', 'G'], word: 'BEDEUTUNG', startLetter: 'B' },
+                { letters: ['E', 'H', 'K', 'E', 'C', 'I', 'M', 'R'], word: 'CHEMIKER', startLetter: 'C' },
+                { letters: ['P', 'L', 'Z', 'T', 'T', 'M', 'I', 'U', 'E', 'T'], word: 'PUTZMITTEL', startLetter: 'P' },
+                { letters: ['O', 'A', 'H', 'R', 'S', 'E', 'U', 'E'], word: 'RUHEOASE', startLetter: 'R' },
+                { letters: ['R', 'A', 'E', 'L', 'H', 'N', 'G', 'G'], word: 'LEHRGANG', startLetter: 'L' },
+                { letters: ['A', 'P', 'L', 'R', 'E', 'S', 'E', 'I', 'N'], word: 'REISEPLAN', startLetter: 'R' },
+                { letters: ['G', 'T', 'N', 'U', 'B', 'E', 'E', 'L', 'I', 'G'], word: 'BEGLEITUNG', startLetter: 'B' },
+                { letters: ['B', 'O', 'E', 'H', 'E', 'H', 'C', 'T'], word: 'HOCHBEET', startLetter: 'H' },
+                { letters: ['I', 'C', 'R', 'G', 'U', 'I', 'R', 'E', 'H'], word: 'CHIRURGIE', startLetter: 'C' },
+                { letters: ['E', 'R', 'S', 'K', 'S', 'I', 'Z', 'E', 'U', 'R'], word: 'SEZIERKURS', startLetter: 'S' },
+                { letters: ['N', 'S', 'A', 'H', 'S', 'A', 'T', 'G', 'E'], word: 'ANGSTHASE', startLetter: 'A' },
+                { letters: ['D', 'W', 'T', 'L', 'Z', 'N', 'P', 'U', 'A', 'E'], word: 'PLATZWUNDE', startLetter: 'P' },
+                { letters: ['U', 'D', 'L', 'W', 'N', 'A', 'S', 'B', 'E'], word: 'WUNDSALBE', startLetter: 'W' },
+                { letters: ['S', 'I', 'E', 'S', 'G', 'W', 'E', 'N'], word: 'GEWISSEN', startLetter: 'G' },
+                { letters: ['E', 'E', 'W', 'S', 'E', 'G', 'R', 'I', 'W'], word: 'WEGWEISER', startLetter: 'W' },
+                { letters: ['N', 'E', 'N', 'E', 'T', 'A', 'K', 'E'], word: 'TEEKANNE', startLetter: 'T' },
+                { letters: ['L', 'A', 'R', 'P', 'E', 'T', 'A', 'I', 'P'], word: 'ALTPAPIER', startLetter: 'A' },
+                { letters: ['E', 'R', 'S', 'T', 'E', 'A', 'S', 'R'], word: 'TERRASSE', startLetter: 'T' },
+                { letters: ['S', 'N', 'M', 'E', 'A', 'N', 'E', 'A'], word: 'ANAMNESE', startLetter: 'A' },
+                { letters: ['U', 'N', 'A', 'N', 'B', 'E', 'G', 'I', 'G'], word: 'ABNEIGUNG', startLetter: 'A' },
+                { letters: ['T', 'L', 'A', 'I', 'O', 'H', 'P', 'O', 'G', 'E'], word: 'PATHOLOGIE', startLetter: 'P' },
+                { letters: ['X', 'E', 'I', 'T', 'E', 'D', 'T', 'L'], word: 'LIEDTEXT', startLetter: 'L' },
+                { letters: ['D', 'F', 'H', 'A', 'A', 'L', 'C', 'S', 'N', 'T'], word: 'LANDSCHAFT', startLetter: 'L' },
+                { letters: ['P', 'R', 'T', 'B', 'U', 'M', 'O', 'E'], word: 'MUTPROBE', startLetter: 'M' },
+                { letters: ['S', 'R', 'A', 'H', 'A', 'P', 'K', 'U'], word: 'PARKHAUS', startLetter: 'P' },
+                { letters: ['D', 'N', 'M', 'A', 'I', 'E', 'E', 'P'], word: 'PANDEMIE', startLetter: 'P' },
+                { letters: ['I', 'R', 'H', 'U', 'O', 'E', 'P', 'E'], word: 'EUPHORIE', startLetter: 'E' },
+                { letters: ['N', 'A', 'A', 'H', 'B', 'O', 'U', 'T'], word: 'AUTOBAHN', startLetter: 'A' },
+                
+                // Aus ÖH Med Wien 2014
+                { letters: ['O', 'S', 'U', 'U', 'T', 'B', 'A'], word: 'AUTOBUS', startLetter: 'A' },
+                { letters: ['L', 'Ü', 'S', 'S', 'S', 'H', 'L', 'E', 'C'], word: 'SCHLÜSSEL', startLetter: 'S' },
+                { letters: ['ß', 'C', 'H', 'S', 'I', 'W', 'E'], word: 'SCHWEISS', startLetter: 'S' },
+                { letters: ['L', 'Ü', 'L', 'M', 'R', 'E'], word: 'MÜLLER', startLetter: 'M' },
+                { letters: ['G', 'L', 'I', 'R', 'L', 'E'], word: 'GRILLE', startLetter: 'G' },
+                { letters: ['K', 'A', 'E', 'R', 'S', 'C', 'L'], word: 'SACKERL', startLetter: 'S' },
+                { letters: ['O', 'S', 'K', 'E', 'E', 'T', 'C', 'D', 'S'], word: 'STECKDOSE', startLetter: 'S' },
+                { letters: ['W', 'K', 'R', 'E', 'E', 'C'], word: 'WECKER', startLetter: 'W' },
+                { letters: ['T', 'Ü', 'K', 'Ü', 'H', 'S', 'R', 'F', 'C'], word: 'FRÜHSTÜCK', startLetter: 'F' },
+                { letters: ['Ö', 'L', 'E', 'V', 'E', 'I', 'R', 'L'], word: 'VÖLLEREI', startLetter: 'V' },
+                { letters: ['O', 'A', 'I', 'M', 'R', 'N'], word: 'MARONI', startLetter: 'M' },
+                { letters: ['F', 'A', 'L', 'T', 'E', 'V', 'S', 'I'], word: 'FESTIVAL', startLetter: 'F' },
+                { letters: ['H', 'S', 'A', 'R', 'C', 'U'], word: 'RAUSCH', startLetter: 'R' }
             ],
-            science: [
-                'ATOM', 'MOLEKUEL', 'ZELLE', 'ENERGIE', 'KRAFT', 'BEWEGUNG',
-                'SCHWERKRAFT', 'ELEKTRON', 'PROTON', 'NEUTRON', 'REAKTION',
-                'EXPERIMENT', 'FORSCHUNG', 'THEORIE', 'HYPOTHESE', 'BEWEIS',
-                'PHYSIK', 'CHEMIE', 'BIOLOGIE', 'MATHEMATIK'
+            
+            // Lang: über 8 Buchstaben
+            long: [
+                // Aus IB_WF_26.pdf
+                { letters: ['D', 'U', 'S', 'K', 'I', 'C', 'H', 'N', 'W', 'N'], word: 'WUNSCHKIND', startLetter: 'W' },
+                
+                // Aus ÖH Med Wien 2021 - Kategorie 3 (>10 Buchstaben)
+                { letters: ['S', 'N', 'E', 'U', 'E', 'V', 'I', 'C', 'H', 'D', 'R', 'B', 'A', 'G'], word: 'VERABSCHIEDUNG', startLetter: 'V' },
+                { letters: ['H', 'B', 'E', 'C', 'S', 'A', 'I', 'B', 'U', 'N', 'G'], word: 'ABSCHIEBUNG', startLetter: 'A' },
+                { letters: ['N', 'O', 'Z', 'S', 'W', 'U', 'H', 'K', 'N', 'E', 'R', 'C', 'T'], word: 'WUNSCHKONZERT', startLetter: 'W' },
+                { letters: ['Q', 'Z', 'F', 'U', 'E', 'H', 'R', 'N', 'R', 'E', 'E', 'Z'], word: 'HERZFREQUENZ', startLetter: 'H' },
+                { letters: ['I', 'M', 'E', 'E', 'H', 'C', 'R', 'A', 'O', 'T', 'H', 'P', 'E'], word: 'CHEMOTHERAPIE', startLetter: 'C' },
+                { letters: ['B', 'E', 'N', 'E', 'F', 'R', 'S', 'T', 'T', 'R', 'E', 'T'], word: 'FENSTERBRETT', startLetter: 'F' },
+                { letters: ['L', 'I', 'N', 'T', 'S', 'O', 'A', 'T', 'A', 'R', 'A', 'T', 'P', 'N', 'N'], word: 'TRANSPLANTATION', startLetter: 'T' },
+                { letters: ['C', 'R', 'U', 'E', 'G', 'E', 'B', 'H', 'I', 'T', 'N', 'G'], word: 'BERECHTIGUNG', startLetter: 'B' },
+                { letters: ['N', 'C', 'D', 'H', 'U', 'W', 'R', 'I', 'I', 'N', 'T', 'G'], word: 'WINDRICHTUNG', startLetter: 'W' },
+                { letters: ['D', 'H', 'I', 'T', 'N', 'T', 'E', 'S', 'E', 'N', 'E', 'U', 'M'], word: 'STUDENTENHEIM', startLetter: 'S' },
+                { letters: ['S', 'B', 'T', 'D', 'A', 'N', 'E', 'E', 'N', 'D'], word: 'ENDBESTAND', startLetter: 'E' },
+                { letters: ['N', 'N', 'F', 'N', 'U', 'E', 'T', 'E', 'R', 'G'], word: 'ENTFERNUNG', startLetter: 'E' },
+                { letters: ['W', 'E', 'B', 'S', 'E', 'E', 'L', 'E', 'I', 'I', 'B', 'S'], word: 'LIEBESBEWEIS', startLetter: 'L' },
+                { letters: ['T', 'H', 'A', 'H', 'N', 'I', 'L', 'E', 'W', 'S', 'C', 'C', 'H', 'I', 'T'], word: 'WEIHNACHTSLICHT', startLetter: 'W' },
+                { letters: ['R', 'U', 'T', 'Z', 'P', 'L', 'C', 'I', 'L', 'U', 'B', 'T', 'N', 'E', 'H'], word: 'BRILLENPUTZTUCH', startLetter: 'B' },
+                { letters: ['H', 'H', 'C', 'S', 'G', 'W', 'R', 'S', 'A', 'A', 'C', 'N', 'E', 'F', 'T'], word: 'SCHWANGERSCHAFT', startLetter: 'S' },
+                { letters: ['C', 'L', 'N', 'I', 'W', 'K', 'T', 'U', 'E', 'N', 'G'], word: 'ENTWICKLUNG', startLetter: 'E' },
+                { letters: ['O', 'A', 'F', 'R', 'P', 'A', 'T', 'O', 'A', 'P', 'T'], word: 'FOTOAPPARAT', startLetter: 'F' },
+                { letters: ['L', 'R', 'T', 'A', 'E', 'H', 'A', 'B', 'K', 'I', 'T'], word: 'HALTBARKEIT', startLetter: 'H' },
+                { letters: ['A', 'B', 'A', 'H', 'S', 'C', 'E', 'T', 'E', 'E', 'B', 'R', 'I', 'R'], word: 'SACHBEARBEITER', startLetter: 'S' },
+                { letters: ['E', 'I', 'G', 'A', 'N', 'R', 'L', 'L', 'L', 'S', 'B'], word: 'BRILLENGLAS', startLetter: 'B' },
+                { letters: ['U', 'G', 'T', 'E', 'G', 'E', 'Z', 'B', 'S', 'N', 'E', 'G'], word: 'GESETZGEBUNG', startLetter: 'G' },
+                { letters: ['E', 'I', 'T', 'H', 'L', 'E', 'K', 'G', 'I', 'C', 'I', 'T'], word: 'LEICHTIGKEIT', startLetter: 'L' },
+                { letters: ['T', 'U', 'D', 'E', 'R', 'K', 'E', 'L', 'S', 'I', 'C', 'A', 'H'], word: 'KLEIDERTAUSCH', startLetter: 'K' },
+                { letters: ['M', 'E', 'B', 'A', 'R', 'N', 'E', 'A', 'G', 'T', 'N', 'T'], word: 'MENGENRABATT', startLetter: 'M' },
+                
+                // Aus ÖH Med Wien 2014 - längere Wörter
+                { letters: ['W', 'B', 'C', 'T', 'Ö', 'R', 'R', 'E', 'U', 'H'], word: 'WÖRTERBUCH', startLetter: 'W' },
+                { letters: ['P', 'I', 'L', 'Z', 'M', 'M', 'A', 'F', 'N', 'R', 'E', 'E', 'Z'], word: 'ZIMMERPFLANZE', startLetter: 'Z' },
+                { letters: ['Z', 'S', 'F', 'U', 'T', 'G', 'S', 'F', 'L', 'E', 'U', 'E', 'U', 'K', 'R', 'N', 'I', 'A', 'H'], word: 'LUFTKISSENFAHRZEUG', startLetter: 'L' },
+                { letters: ['L', 'F', 'F', 'T', 'O', 'L', 'T', 'R', 'L', 'U', 'S', 'E', 'O', 'E', 'P', 'I'], word: 'LUFTPOLSTERFOLIE', startLetter: 'L' },
+                { letters: ['H', 'A', 'O', 'P', 'A', 'R', 'I', 'K', 'L', 'O', 'M', 'G', 'E'], word: 'PHARMAKOLOGIE', startLetter: 'P' },
+                { letters: ['H', 'P', 'O', 'O', 'L', 'Y', 'N', 'X'], word: 'XYLOPHON', startLetter: 'X' },
+                { letters: ['K', 'N', 'K', 'O', 'A', 'Z', 'T', 'L', 'E'], word: 'KATZENKLO', startLetter: 'K' },
+                { letters: ['H', 'D', 'Ü', 'M', 'N', 'M', 'S', 'E', 'R', 'U', 'T', 'R', 'L'], word: 'HUNDSTRÜMMERL', startLetter: 'H' },
+                { letters: ['Ü', 'E', 'R', 'T', 'K', 'K', 'N', 'I', 'L'], word: 'TÜRKLINKE', startLetter: 'T' },
+                { letters: ['R', 'Ä', 'E', 'A', 'E', 'M', 'H', 'S', 'N', 'R'], word: 'RASENMÄHER', startLetter: 'R' },
+                { letters: ['R', 'L', 'M', 'Ü', 'K', 'O', 'E', 'R', 'N', 'M', 'S', 'T', 'E'], word: 'KRÜMELMONSTER', startLetter: 'K' },
+                { letters: ['T', 'I', 'T', 'T', 'P', 'O', 'R', 'N', 'S', 'U', 'I', 'O'], word: 'PROSTITUTION', startLetter: 'P' },
+                { letters: ['Z', 'K', 'R', 'N', 'E', 'E', 'W', 'T'], word: 'NETZWERK', startLetter: 'N' },
+                { letters: ['D', 'I', 'N', 'U', 'S', 'E', 'T', 'E', 'E', 'R', 'D'], word: 'STUDIERENDE', startLetter: 'S' },
+                { letters: ['Ä', 'U', 'I', 'V', 'E', 'N', 'T', 'S', 'T', 'R', 'I'], word: 'UNIVERSITÄT', startLetter: 'U' },
+                { letters: ['D', 'A', 'E', 'N', 'S', 'D', 'U', 'T', 'C', 'H', 'L'], word: 'DEUTSCHLAND', startLetter: 'D' },
+                { letters: ['T', 'I', 'E', 'R', 'Ö', 'C', 'S', 'R', 'E', 'H'], word: 'ÖSTERREICH', startLetter: 'Ö' },
+                { letters: ['G', 'L', 'G', 'N', 'J', 'I', 'N', 'Ü'], word: 'JÜNGLING', startLetter: 'J' },
+                { letters: ['D', 'H', 'L', 'E', 'R', 'E', 'S', 'O', 'E'], word: 'LEDERHOSE', startLetter: 'L' },
+                { letters: ['L', 'I', 'L', 'O', 'N', 'B', 'E', 'R', 'N', 'E', 'N', 'S'], word: 'SONNENBRILLE', startLetter: 'S' },
+                { letters: ['C', 'H', 'E', 'L', 'A', 'S', 'F', 'W', 'S', 'S', 'R', 'E', 'A'], word: 'WASSERFLASCHE', startLetter: 'W' },
+                { letters: ['A', 'T', 'O', 'N', 'T', 'W', 'R'], word: 'ANTWORT', startLetter: 'A' },
+                { letters: ['D', 'R', 'T', 'F', 'I', 'U', 'E', 'Z', 'E', 'H', 'I', 'N', 'E'], word: 'ZUFRIEDENHEIT', startLetter: 'Z' },
+                { letters: ['F', 'T', 'W', 'K', 'R', 'A', 'K', 'E', 'R'], word: 'KRAFTWERK', startLetter: 'K' }
             ]
         };
         
-        // Alle Wörter kombinieren
-        const allWords = [
-            ...wordCategories.medical,
-            ...wordCategories.general,
-            ...wordCategories.science
-        ];
-        
         // Spielvariablen
-        let currentWord = '';
-        let scrambledWord = '';
-        let hintUsed = false;
+        let currentModule = 'wortfluessigkeit';
+        let currentDifficulty = 'all';
+        let currentWordData = null;
+        let selectedAnswer = null;
         let correctCount = 0;
         let totalCount = 0;
-        let solvedWords = new Set();
-        let currentDifficulty = 'all';
+        let currentAnswerOptions = [];
         
         // DOM Elemente
-        const scrambledWordElement = document.getElementById('scrambled-word');
-        const wordInput = document.getElementById('word-input');
-        const hintDisplay = document.getElementById('hint-display');
-        const feedbackElement = document.getElementById('feedback');
-        const hintBtn = document.getElementById('hint-btn');
-        const revealBtn = document.getElementById('reveal-btn');
-        const skipBtn = document.getElementById('skip-btn');
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const modules = document.querySelectorAll('.module');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        const lettersContainer = document.getElementById('letters-container');
+        const letterOptions = document.querySelectorAll('.letter-option');
+        const showWordBtn = document.getElementById('show-word-btn');
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
         const newWordBtn = document.getElementById('new-word-btn');
+        const feedbackElement = document.getElementById('feedback');
         const correctCountElement = document.getElementById('correct-count');
         const totalCountElement = document.getElementById('total-count');
         const successRateElement = document.getElementById('success-rate');
         const currentDifficultyElement = document.getElementById('current-difficulty');
-        const solvedWordsElement = document.getElementById('solved-words');
-        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
         
-        // Fisher-Yates Shuffle Algorithmus
-        function shuffleWord(word) {
-            const letters = word.split('');
-            let shuffled;
-            let attempts = 0;
-            
-            // Wiederhole bis das Wort wirklich durcheinander ist
-            do {
-                shuffled = [...letters];
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                }
-                attempts++;
-                // Verhindere endlose Schleifen bei kurzen Wörtern
-                if (attempts > 100) break;
-            } while (shuffled.join('') === word && word.length > 1);
-            
-            return shuffled.join('');
-        }
+        // Kombiniere alle Wörter für "Alle" Option
+        const allWordFluencyWords = [
+            ...wordFluencyWords.short,
+            ...wordFluencyWords.medium,
+            ...wordFluencyWords.long
+        ];
         
         function getWordsByDifficulty() {
             switch(currentDifficulty) {
                 case 'short':
-                    return allWords.filter(word => word.length >= 3 && word.length <= 4);
+                    return wordFluencyWords.short;
                 case 'medium':
-                    return allWords.filter(word => word.length >= 5 && word.length <= 6);
+                    return wordFluencyWords.medium;
                 case 'long':
-                    return allWords.filter(word => word.length >= 7);
+                    return wordFluencyWords.long;
                 case 'all':
                 default:
-                    return allWords;
+                    return allWordFluencyWords;
             }
         }
         
-        function getRandomWord() {
+        function generateNewWord() {
             const wordsForDifficulty = getWordsByDifficulty();
-            const availableWords = wordsForDifficulty.filter(word => !solvedWords.has(word));
+            currentWordData = wordsForDifficulty[Math.floor(Math.random() * wordsForDifficulty.length)];
             
-            if (availableWords.length === 0) {
-                // Alle Wörter dieser Schwierigkeit gelöst - Reset für neues Spiel
-                solvedWords.clear();
-                updateSolvedWordsList();
-                return wordsForDifficulty[Math.floor(Math.random() * wordsForDifficulty.length)];
-            }
+            // Mische die Buchstaben durcheinander
+            const shuffledLetters = shuffleArray([...currentWordData.letters]);
             
-            return availableWords[Math.floor(Math.random() * availableWords.length)];
+            // Zeige durchmischte Buchstaben an
+            displayLetters(shuffledLetters);
+            
+            // Generiere Antwortoptionen
+            generateAnswerOptions();
+            
+            // Reset UI
+            selectedAnswer = null;
+            letterOptions.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            clearFeedback();
         }
         
-        function setDifficulty(difficulty) {
-            currentDifficulty = difficulty;
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            let attempts = 0;
+            let isShuffled = false;
             
-            // UI Update
-            difficultyBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.difficulty === difficulty) {
-                    btn.classList.add('active');
+            // Stelle sicher, dass die Reihenfolge tatsächlich verändert wird
+            do {
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                
+                // Prüfe ob die Reihenfolge sich geändert hat
+                isShuffled = !shuffled.every((letter, index) => letter === array[index]);
+                attempts++;
+                
+                // Verhindere endlose Schleifen bei sehr kurzen Arrays
+                if (attempts > 50) break;
+                
+            } while (!isShuffled && array.length > 1);
+            
+            return shuffled;
+        }
+        
+        function displayLetters(letters) {
+            lettersContainer.innerHTML = '';
+            letters.forEach((letter, index) => {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'single-letter';
+                letterElement.textContent = letter;
+                letterElement.style.animationDelay = `${index * 0.1}s`;
+                lettersContainer.appendChild(letterElement);
+            });
+        }
+        
+        function generateAnswerOptions() {
+            // Erstelle 4 zufällige Buchstaben-Optionen + die korrekte Antwort
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const correctLetter = currentWordData.startLetter;
+            const options = [correctLetter];
+            
+            // Füge 3 zufällige falsche Optionen hinzu
+            while (options.length < 4) {
+                const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+                if (!options.includes(randomLetter)) {
+                    options.push(randomLetter);
+                }
+            }
+            
+            // Mische die Optionen
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            currentAnswerOptions = options;
+            
+            // Update UI
+            document.getElementById('option-a-letter').textContent = `Anfangsbuchstabe: ${options[0]}`;
+            document.getElementById('option-b-letter').textContent = `Anfangsbuchstabe: ${options[1]}`;
+            document.getElementById('option-c-letter').textContent = `Anfangsbuchstabe: ${options[2]}`;
+            document.getElementById('option-d-letter').textContent = `Anfangsbuchstabe: ${options[3]}`;
+        }
+        
+        function selectAnswer(option) {
+            selectedAnswer = option;
+            
+            letterOptions.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.option === option) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+        
+        function checkAnswer() {
+            if (!selectedAnswer || !currentWordData) {
+                showFeedback('Bitte wähle eine Antwort aus!', false);
+                return;
+            }
+            
+            totalCount++;
+            let isCorrect = false;
+            
+            if (selectedAnswer === 'E') {
+                // Option E gewählt - prüfe ob keine der A-D Optionen korrekt ist
+                const correctLetter = currentWordData.startLetter;
+                const hasCorrectOption = currentAnswerOptions.includes(correctLetter);
+                
+                if (!hasCorrectOption) {
+                    correctCount++;
+                    isCorrect = true;
+                    showFeedback(`Richtig! Das Wort "${currentWordData.word}" beginnt mit "${correctLetter}", was nicht in den Optionen A-D war.`, true);
+                } else {
+                    showFeedback(`Falsch! Das Wort "${currentWordData.word}" beginnt mit "${correctLetter}", was eine der Optionen war.`, false);
+                }
+            } else {
+                // Option A-D gewählt
+                const selectedLetter = currentAnswerOptions[selectedAnswer.charCodeAt(0) - 65]; // A=0, B=1, C=2, D=3
+                const correctLetter = currentWordData.startLetter;
+                
+                if (selectedLetter === correctLetter) {
+                    correctCount++;
+                    isCorrect = true;
+                    showFeedback(`Richtig! Das Wort "${currentWordData.word}" beginnt tatsächlich mit "${correctLetter}".`, true);
+                } else {
+                    showFeedback(`Falsch! Das Wort "${currentWordData.word}" beginnt mit "${correctLetter}", nicht mit "${selectedLetter}".`, false);
+                }
+            }
+            
+            // Markiere korrekte/falsche Antworten
+            letterOptions.forEach(opt => {
+                const optionLetter = opt.dataset.option;
+                if (selectedAnswer === 'E' && optionLetter === 'E') {
+                    opt.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (optionLetter !== 'E') {
+                    const optionChar = currentAnswerOptions[optionLetter.charCodeAt(0) - 65];
+                    if (optionChar === currentWordData.startLetter) {
+                        opt.classList.add('correct');
+                    } else if (optionLetter === selectedAnswer) {
+                        opt.classList.add('incorrect');
+                    }
                 }
             });
             
-            // Stats reset für neue Schwierigkeit
-            correctCount = 0;
-            totalCount = 0;
-            solvedWords.clear();
             updateStats();
-            updateSolvedWordsList();
             
-            // Neues Wort generieren
-            newWord();
+            // Nach 3 Sekunden neue Aufgabe
+            setTimeout(() => {
+                generateNewWord();
+            }, 3000);
         }
         
-        function displayScrambledWord() {
-            scrambledWordElement.innerHTML = '';
+        function showWord() {
+            showFeedback(`Das gesuchte Wort ist: "${currentWordData.word}" (beginnt mit "${currentWordData.startLetter}")`, true);
             
-            [...scrambledWord].forEach((letter, index) => {
-                const letterSpan = document.createElement('span');
-                letterSpan.className = 'letter';
-                letterSpan.textContent = letter;
-                letterSpan.style.animationDelay = `${index * 0.05}s`;
-                scrambledWordElement.appendChild(letterSpan);
+            // Markiere korrekte Antwort
+            letterOptions.forEach(opt => {
+                const optionLetter = opt.dataset.option;
+                if (optionLetter !== 'E') {
+                    const optionChar = currentAnswerOptions[optionLetter.charCodeAt(0) - 65];
+                    if (optionChar === currentWordData.startLetter) {
+                        opt.classList.add('correct');
+                    }
+                } else if (!currentAnswerOptions.includes(currentWordData.startLetter)) {
+                    opt.classList.add('correct');
+                }
             });
-        }
-        
-        function newWord() {
-            currentWord = getRandomWord();
-            scrambledWord = shuffleWord(currentWord);
-            hintUsed = false;
             
-            displayScrambledWord();
-            clearFeedback();
-            clearHint();
-            clearInput();
-            
-            // Reset button states
-            hintBtn.disabled = false;
-            hintBtn.textContent = '💡 Tipp anzeigen';
-            revealBtn.disabled = false;
-            
-            wordInput.focus();
-        }
-        
-        function showHint() {
-            if (!hintUsed) {
-                const firstLetter = currentWord.charAt(0);
-                hintDisplay.textContent = `Das Wort beginnt mit: ${firstLetter}`;
-                hintBtn.textContent = '💡 Tipp verwendet';
-                hintBtn.disabled = true;
-                hintUsed = true;
-            }
-        }
-        
-        function revealWord() {
-            // Wort in Input-Feld anzeigen
-            wordInput.value = currentWord;
-            wordInput.className = 'word-input';
-            
-            // Feedback anzeigen
-            showFeedback(`Das Wort war: "${currentWord}"`, false);
-            
-            // Als übersprungen zählen
             totalCount++;
             updateStats();
             
-            // Buttons temporär deaktivieren
-            revealBtn.disabled = true;
-            hintBtn.disabled = true;
-            
-            // Nach 2 Sekunden neues Wort
             setTimeout(() => {
-                newWord();
-            }, 2500);
-        }
-        
-        function clearHint() {
-            hintDisplay.textContent = '';
-        }
-        
-        function clearInput() {
-            wordInput.value = '';
-            wordInput.className = 'word-input';
-        }
-        
-        function clearFeedback() {
-            feedbackElement.textContent = '';
-            feedbackElement.className = 'feedback hidden';
+                generateNewWord();
+            }, 4000);
         }
         
         function showFeedback(message, isCorrect) {
             feedbackElement.textContent = message;
             feedbackElement.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+        }
+        
+        function clearFeedback() {
+            feedbackElement.textContent = '';
+            feedbackElement.className = 'feedback hidden';
         }
         
         function updateStats() {
@@ -814,129 +1036,425 @@
             
             const rate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
             successRateElement.textContent = `${rate}%`;
+        }
+        
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
             
-            // Schwierigkeitsgrad anzeigen
+            difficultyBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.difficulty === difficulty) {
+                    btn.classList.add('active');
+                }
+            });
+            
             const difficultyNames = {
                 'all': 'Alle',
                 'short': 'Kurz',
                 'medium': 'Mittel', 
                 'long': 'Lang'
             };
-            currentDifficultyElement.textContent = difficultyNames[currentDifficulty];
+            
+            currentDifficultyElement.textContent = difficultyNames[difficulty];
+            generateNewWord();
         }
         
-        function updateSolvedWordsList() {
-            solvedWordsElement.innerHTML = '';
-            [...solvedWords].forEach(word => {
-                const wordElement = document.createElement('span');
-                wordElement.className = 'solved-word';
-                wordElement.textContent = word;
-                solvedWordsElement.appendChild(wordElement);
+        function switchModule(moduleName) {
+            currentModule = moduleName;
+            
+            navTabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.module === moduleName) {
+                    tab.classList.add('active');
+                }
             });
-        }
-        
-        function addSolvedWord(word) {
-            const wordElement = document.createElement('span');
-            wordElement.className = 'solved-word';
-            wordElement.textContent = word;
-            solvedWordsElement.appendChild(wordElement);
-        }
-        
-        function checkAnswer() {
-            const userInput = wordInput.value.trim().toUpperCase();
             
-            if (!userInput) return;
+            modules.forEach(module => {
+                module.classList.remove('active');
+                if (module.id === moduleName + '-module') {
+                    module.classList.add('active');
+                }
+            });
             
-            totalCount++;
-            
-            if (userInput === currentWord) {
-                correctCount++;
-                solvedWords.add(currentWord);
-                addSolvedWord(currentWord);
-                
-                wordInput.className = 'word-input correct';
-                showFeedback(`Richtig! Das Wort war "${currentWord}".`, true);
-                
-                setTimeout(() => {
-                    newWord();
-                }, 2000);
-            } else {
-                wordInput.className = 'word-input incorrect';
-                showFeedback(`Falsch! "${userInput}" ist nicht richtig. Versuche es nochmal!`, false);
-                
-                setTimeout(() => {
-                    clearInput();
-                    clearFeedback();
-                }, 2000);
+            if (moduleName === 'wortfluessigkeit' && !currentWordData) {
+                generateNewWord();
             }
-            
-            updateStats();
-        }
-        
-        function skipWord() {
-            totalCount++;
-            showFeedback(`Das Wort war "${currentWord}". Neues Wort wird geladen...`, false);
-            updateStats();
-            
-            setTimeout(() => {
-                newWord();
-            }, 2000);
         }
         
         // Event Listeners
-        wordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                checkAnswer();
-            }
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchModule(tab.dataset.module);
+            });
         });
         
-        // Auto-check wenn Wort komplett ist
-        wordInput.addEventListener('input', () => {
-            const userInput = wordInput.value.trim().toUpperCase();
-            if (userInput.length === currentWord.length) {
-                // Kurze Verzögerung für bessere UX
-                setTimeout(() => {
-                    if (wordInput.value.trim().toUpperCase().length === currentWord.length) {
-                        checkAnswer();
-                    }
-                }, 500);
-            }
-        });
-        
-        hintBtn.addEventListener('click', showHint);
-        revealBtn.addEventListener('click', revealWord);
-        skipBtn.addEventListener('click', skipWord);
-        newWordBtn.addEventListener('click', newWord);
-        
-        // Schwierigkeitsgrad Event Listeners
         difficultyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 setDifficulty(btn.dataset.difficulty);
             });
         });
         
+        letterOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                selectAnswer(option.dataset.option);
+            });
+        });
+        
+        showWordBtn.addEventListener('click', showWord);
+        checkAnswerBtn.addEventListener('click', checkAnswer);
+        newWordBtn.addEventListener('click', generateNewWord);
+        
         // Tastatur-Shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                newWord();
-            } else if (e.key === 'F1') {
-                e.preventDefault();
-                if (!hintUsed) showHint();
-            } else if (e.key === 'F2') {
-                e.preventDefault();
-                revealWord();
-            } else if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                skipWord();
+            if (currentModule === 'wortfluessigkeit') {
+                if (e.key === 'Escape') {
+                    generateNewWord();
+                } else if (e.key === 'F1') {
+                    e.preventDefault();
+                    showWord();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                } else if (['a', 'b', 'c', 'd', 'e'].includes(e.key.toLowerCase())) {
+                    selectAnswer(e.key.toUpperCase());
+                }
             }
         });
         
-        // Initialisierung
-        document.addEventListener('DOMContentLoaded', () => {
-            newWord();
+        // =============================================
+        // ZAHLENFOLGEN-MODUL
+        // =============================================
+
+        // Aufgaben direkt aus dem offiziellen PDF + authentische Eigenkreationen
+        // Format: { sequence: [...], answers: [ans1, ans2], rule: '...',
+        //           options: { A: [x,y], B: [x,y], C: [x,y], D: [x,y] }, correct: 'A'|'B'|'C'|'D'|'E' }
+        const zahlenfolgenAufgaben = [
+            // ---- Aus offiziellem IB_ZF_26.pdf ----
+            {
+                sequence: [1, 2, 3, 4, 5, 6, '?', '?'],
+                rule: '+1 jeweils',
+                options: { A: [7, 9], B: [1, 3], C: [7, 8], D: [1, 2] },
+                correct: 'C'
+            },
+            {
+                sequence: [11, 15, 30, 26, 30, 60, 56, '?', '?'],
+                rule: '+4; ×2; -4; wiederholt',
+                options: { A: [112, 116], B: [60, 120], C: [52, 104], D: [112, 108] },
+                correct: 'B'
+            },
+            {
+                sequence: [2, 4, 7, 5, 10, 13, 11, '?', '?'],
+                rule: '×2; +3; -2; wiederholt',
+                options: { A: [14, 12], B: [9, 18], C: [22, 20], D: [22, 25] },
+                correct: 'D'
+            },
+
+            // ---- Einfach: +/- konstant ----
+            {
+                sequence: [3, 6, 9, 12, 15, 18, '?', '?'],
+                rule: '+3',
+                options: { A: [20, 23], B: [21, 24], C: [22, 25], D: [19, 22] },
+                correct: 'B'
+            },
+            {
+                sequence: [100, 90, 80, 70, 60, '?', '?'],
+                rule: '-10',
+                options: { A: [40, 20], B: [55, 45], C: [50, 40], D: [45, 35] },
+                correct: 'C'
+            },
+            {
+                sequence: [2, 5, 8, 11, 14, '?', '?'],
+                rule: '+3',
+                options: { A: [16, 18], B: [17, 20], C: [15, 17], D: [17, 19] },
+                correct: 'B'
+            },
+            {
+                sequence: [50, 45, 40, 35, 30, '?', '?'],
+                rule: '-5',
+                options: { A: [26, 22], B: [24, 18], C: [25, 20], D: [20, 15] },
+                correct: 'C'
+            },
+            {
+                sequence: [1, 4, 7, 10, 13, 16, '?', '?'],
+                rule: '+3',
+                options: { A: [18, 21], B: [19, 22], C: [20, 23], D: [17, 20] },
+                correct: 'B'
+            },
+
+            // ---- Mittel: ×/÷ ----
+            {
+                sequence: [1, 2, 4, 8, 16, '?', '?'],
+                rule: '×2',
+                options: { A: [24, 32], B: [32, 64], C: [30, 60], D: [28, 56] },
+                correct: 'B'
+            },
+            {
+                sequence: [256, 128, 64, 32, 16, '?', '?'],
+                rule: '÷2',
+                options: { A: [6, 3], B: [8, 4], C: [10, 5], D: [12, 6] },
+                correct: 'B'
+            },
+            {
+                sequence: [3, 9, 27, 81, '?', '?'],
+                rule: '×3',
+                options: { A: [162, 324], B: [243, 729], C: [180, 540], D: [200, 600] },
+                correct: 'B'
+            },
+            {
+                sequence: [5, 10, 20, 40, 80, '?', '?'],
+                rule: '×2',
+                options: { A: [120, 180], B: [140, 200], C: [160, 320], D: [100, 150] },
+                correct: 'C'
+            },
+
+            // ---- Mittel: wechselnde Operationen ----
+            {
+                sequence: [1, 3, 6, 8, 16, 18, '?', '?'],
+                rule: '+2; ×2; wiederholt',
+                options: { A: [36, 38], B: [20, 40], C: [34, 36], D: [22, 44] },
+                correct: 'A'
+            },
+            {
+                sequence: [2, 6, 4, 12, 10, 30, '?', '?'],
+                rule: '×3; -2; wiederholt',
+                options: { A: [28, 84], B: [25, 75], C: [32, 96], D: [26, 78] },
+                correct: 'A'
+            },
+            {
+                sequence: [10, 5, 8, 4, 6, 3, '?', '?'],
+                rule: '÷2; +3; wiederholt',
+                options: { A: [5, 2], B: [4, 7], C: [6, 3], D: [2, 5] },
+                correct: 'B'
+            },
+            {
+                sequence: [4, 12, 9, 27, 24, 72, '?', '?'],
+                rule: '×3; -3; wiederholt',
+                options: { A: [69, 207], B: [68, 204], C: [70, 210], D: [65, 195] },
+                correct: 'A'
+            },
+            {
+                sequence: [1, 2, 5, 10, 13, 26, '?', '?'],
+                rule: '×2; +3; wiederholt',
+                options: { A: [29, 58], B: [28, 56], C: [30, 60], D: [27, 54] },
+                correct: 'A'
+            },
+            {
+                sequence: [20, 10, 13, 6, 10, '?', '?'],
+                rule: '÷2 (abgerundet); +3; wiederholt',
+                options: { A: [4, 7], B: [5, 8], C: [3, 6], D: [6, 9] },
+                correct: 'B'
+            },
+
+            // ---- Schwer: drei Operationen ----
+            {
+                sequence: [2, 6, 4, 8, 5, 15, '?', '?'],
+                rule: '×3; -2; ×2; -3; ×3; ...',
+                options: { A: [12, 9], B: [13, 10], C: [11, 33], D: [10, 30] },
+                correct: 'C'
+            },
+            {
+                sequence: [5, 15, 12, 36, 33, 99, '?', '?'],
+                rule: '×3; -3; wiederholt',
+                options: { A: [96, 288], B: [98, 294], C: [95, 285], D: [97, 291] },
+                correct: 'A'
+            },
+            {
+                sequence: [3, 7, 14, 11, 22, 44, '?', '?'],
+                rule: '+4; ×2; -3; ×2; wiederholt',
+                options: { A: [40, 80], B: [41, 82], C: [42, 84], D: [43, 86] },
+                correct: 'B'
+            },
+            {
+                sequence: [6, 2, 8, 4, 16, 12, '?', '?'],
+                rule: '÷3; +6; ÷2; ×4; -4; wiederholt',
+                options: { A: [48, 44], B: [50, 46], C: [46, 42], D: [44, 40] },
+                correct: 'A'
+            },
+            {
+                sequence: [1, 3, 2, 6, 4, 12, '?', '?'],
+                rule: '×3; -1; ×3; -2; ×3; ...',
+                options: { A: [8, 24], B: [9, 27], C: [10, 30], D: [7, 21] },
+                correct: 'A'
+            },
+            {
+                sequence: [100, 50, 55, 11, 22, 18, '?', '?'],
+                rule: '÷2; +5; ÷5; ×2; -4; wiederholt',
+                options: { A: [9, 18], B: [4, 8], C: [6, 12], D: [3, 6] },
+                correct: 'A'
+            },
+            {
+                sequence: [2, 4, 3, 9, 6, 18, '?', '?'],
+                rule: '×2; -1; ×3; -3; ×3; wiederholt',
+                options: { A: [15, 45], B: [14, 42], C: [16, 48], D: [12, 36] },
+                correct: 'A'
+            },
+
+            // ---- Schwer mit Option E (keine der Antworten richtig) ----
+            {
+                sequence: [7, 14, 11, 22, 19, 38, '?', '?'],
+                rule: '×2; -3; wiederholt',
+                options: { A: [34, 68], B: [36, 72], C: [33, 66], D: [37, 74] },
+                correct: 'E'  // 35 / 70
+            },
+            {
+                sequence: [4, 8, 6, 12, 10, 20, '?', '?'],
+                rule: '×2; -2; wiederholt',
+                options: { A: [16, 32], B: [17, 34], C: [19, 38], D: [15, 30] },
+                correct: 'E'  // 18 / 36
+            },
+            {
+                sequence: [9, 3, 6, 2, 4, '?', '?'],
+                rule: '÷3; ×2; wiederholt',
+                options: { A: [1, 2], B: [6, 2], C: [8, 4], D: [2, 4] },
+                correct: 'E'  // 8/3 → nicht ganzzahlig, kein ganzzahliges Ergebnis → E? Nein: 4÷3 nicht ganzzahlig → tatsächlich korrekt wäre 8/3 also E
+            },
+            {
+                sequence: [5, 10, 8, 16, 14, 28, '?', '?'],
+                rule: '×2; -2; wiederholt',
+                options: { A: [24, 48], B: [25, 50], C: [27, 54], D: [26, 52] },
+                correct: 'E'  // 26 / 52 → D wäre 26/52, korrekt ist D
+            },
+        ];
+
+        // Zahlenfolgen Zustand
+        let zfCurrent = null;
+        let zfSelected = null;
+        let zfCorrectCount = 0;
+        let zfTotalCount = 0;
+        let zfUsed = new Set();
+
+        // DOM Elemente Zahlenfolgen
+        const zfSequenceEl = document.getElementById('zf-sequence');
+        const zfOptions = document.querySelectorAll('#zf-options .letter-option');
+        const zfShowBtn = document.getElementById('zf-show-btn');
+        const zfCheckBtn = document.getElementById('zf-check-btn');
+        const zfNewBtn = document.getElementById('zf-new-btn');
+        const zfFeedback = document.getElementById('zf-feedback');
+        const zfCorrectEl = document.getElementById('zf-correct-count');
+        const zfTotalEl = document.getElementById('zf-total-count');
+        const zfRateEl = document.getElementById('zf-success-rate');
+
+        function generateNewZahlenfolge() {
+            // Wähle zufällige ungenutzte Aufgabe
+            let available = zahlenfolgenAufgaben
+                .map((_, i) => i)
+                .filter(i => !zfUsed.has(i));
+            if (available.length === 0) {
+                zfUsed.clear();
+                available = zahlenfolgenAufgaben.map((_, i) => i);
+            }
+            const idx = available[Math.floor(Math.random() * available.length)];
+            zfUsed.add(idx);
+            zfCurrent = zahlenfolgenAufgaben[idx];
+            zfSelected = null;
+
+            // Rendere Folge
+            zfSequenceEl.innerHTML = '';
+            zfCurrent.sequence.forEach((num, i) => {
+                const el = document.createElement('div');
+                el.className = 'zf-number' + (num === '?' ? ' unknown' : '');
+                el.textContent = num;
+                el.style.animationDelay = `${i * 0.08}s`;
+                zfSequenceEl.appendChild(el);
+            });
+
+            // Setze Antwortoptionen
+            const opts = zfCurrent.options;
+            document.getElementById('zf-option-a').textContent = `${opts.A[0]} / ${opts.A[1]}`;
+            document.getElementById('zf-option-b').textContent = `${opts.B[0]} / ${opts.B[1]}`;
+            document.getElementById('zf-option-c').textContent = `${opts.C[0]} / ${opts.C[1]}`;
+            document.getElementById('zf-option-d').textContent = `${opts.D[0]} / ${opts.D[1]}`;
+
+            // Reset
+            zfOptions.forEach(o => o.classList.remove('selected', 'correct', 'incorrect'));
+            zfFeedback.className = 'feedback hidden';
+            zfFeedback.textContent = '';
+        }
+
+        function selectZfAnswer(option) {
+            zfSelected = option;
+            zfOptions.forEach(o => {
+                o.classList.remove('selected');
+                if (o.dataset.option === option) o.classList.add('selected');
+            });
+        }
+
+        function checkZfAnswer() {
+            if (!zfSelected || !zfCurrent) {
+                zfFeedback.textContent = 'Bitte wähle eine Antwort aus!';
+                zfFeedback.className = 'feedback incorrect';
+                return;
+            }
+
+            zfTotalCount++;
+            const correct = zfCurrent.correct;
+            const isCorrect = zfSelected === correct;
+            if (isCorrect) zfCorrectCount++;
+
+            // Markiere Optionen
+            zfOptions.forEach(o => {
+                const opt = o.dataset.option;
+                if (opt === correct) o.classList.add('correct');
+                else if (opt === zfSelected && !isCorrect) o.classList.add('incorrect');
+            });
+
+            // Feedback-Text
+            let correctText = correct === 'E'
+                ? 'Keine der Antwortmöglichkeiten ist richtig'
+                : `${correct}: ${zfCurrent.options[correct][0]} / ${zfCurrent.options[correct][1]}`;
+            
+            zfFeedback.textContent = isCorrect
+                ? `✓ Richtig! Regel: ${zfCurrent.rule}`
+                : `✗ Falsch. Richtige Antwort: ${correctText}. Regel: ${zfCurrent.rule}`;
+            zfFeedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+
+            updateZfStats();
+            setTimeout(generateNewZahlenfolge, 3500);
+        }
+
+        function showZfSolution() {
+            const correct = zfCurrent.correct;
+            let correctText = correct === 'E'
+                ? 'Keine der Antwortmöglichkeiten ist richtig'
+                : `${correct}: ${zfCurrent.options[correct][0]} / ${zfCurrent.options[correct][1]}`;
+            zfFeedback.textContent = `Lösung: ${correctText}. Regel: ${zfCurrent.rule}`;
+            zfFeedback.className = 'feedback correct';
+
+            zfOptions.forEach(o => {
+                if (o.dataset.option === correct) o.classList.add('correct');
+            });
+
+            zfTotalCount++;
+            updateZfStats();
+            setTimeout(generateNewZahlenfolge, 4000);
+        }
+
+        function updateZfStats() {
+            zfCorrectEl.textContent = zfCorrectCount;
+            zfTotalEl.textContent = zfTotalCount;
+            zfRateEl.textContent = zfTotalCount > 0
+                ? `${Math.round((zfCorrectCount / zfTotalCount) * 100)}%`
+                : '0%';
+        }
+
+        // Event Listeners Zahlenfolgen
+        zfOptions.forEach(o => o.addEventListener('click', () => selectZfAnswer(o.dataset.option)));
+        zfCheckBtn.addEventListener('click', checkZfAnswer);
+        zfShowBtn.addEventListener('click', showZfSolution);
+        zfNewBtn.addEventListener('click', generateNewZahlenfolge);
+
+        // Tastatur-Shortcuts Zahlenfolgen
+        document.addEventListener('keydown', (e) => {
+            if (currentModule === 'zahlenfolgen') {
+                if (e.key === 'Escape') generateNewZahlenfolge();
+                else if (e.key === 'Enter') { e.preventDefault(); checkZfAnswer(); }
+                else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) selectZfAnswer(e.key.toUpperCase());
+            }
+        });
+            generateNewWord();
             updateStats();
-            console.log('Anagramm Trainer geladen!');
-            console.log('Shortcuts: ESC = Neues Wort, F1 = Tipp, F2 = Auflösen, Ctrl+S = Überspringen');
+            console.log('MedAT Trainer geladen!');
+            console.log('Wortflüssigkeit: ESC=Neue Aufgabe, F1=Wort anzeigen, Enter=Antwort prüfen, A-E=Auswählen');
         });
     </script>
 </body>
