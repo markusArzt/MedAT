@@ -1,0 +1,169 @@
+// MedAT Trainer – Wortflüssigkeit Daten
+// Erweiterung: Einträge nach dem gleichen Schema hinzufügen:
+//   { letters: ['B','A','U','M'], startLetter: 'B', word: 'BAUM' }
+
+const wordFluencyWords = {
+            // Kurz: bis 5 Buchstaben
+            short: [
+                // Aus IB_WF_26.pdf (offizielle Beispiele)
+                { letters: ['E', 'R', 'N', 'H', 'E', 'C', 'R'], word: 'RECHNER', startLetter: 'R' },
+                { letters: ['Z', 'E', 'I', 'T', 'I', 'R', 'F', 'E'], word: 'FREIZEIT', startLetter: 'F' },
+                
+                // Aus ÖH Med Wien 2021 - Kategorie 1 (≤7 Buchstaben) 
+                { letters: ['K', 'T', 'R', 'U', 'A', 'F', 'R'], word: 'FRAKTUR', startLetter: 'F' },
+                { letters: ['S', 'E', 'N', 'G', 'E', 'A', 'G'], word: 'SEEGANG', startLetter: 'S' },
+                { letters: ['O', 'T', 'K', 'N', 'K', 'A', 'T'], word: 'KONTAKT', startLetter: 'K' },
+                { letters: ['E', 'W', 'E', 'V', 'R', 'I', 'S'], word: 'VERWEIS', startLetter: 'V' },
+                { letters: ['U', 'D', 'N', 'S', 'E', 'R', 'S'], word: 'ERDNUSS', startLetter: 'E' },
+                { letters: ['A', 'N', 'E', 'L', 'T', 'T'], word: 'TALENT', startLetter: 'T' },
+                { letters: ['R', 'U', 'C', 'G', 'E', 'H'], word: 'GERUCH', startLetter: 'G' },
+                { letters: ['H', 'U', 'O', 'C', 'R', 'S'], word: 'CHORUS', startLetter: 'C' },
+                { letters: ['U', 'T', 'R', 'E', 'B', 'G'], word: 'BETRUG', startLetter: 'B' },
+                { letters: ['T', 'N', 'O', 'I', 'H', 'R', 'D'], word: 'HIRNTOD', startLetter: 'H' },
+                { letters: ['I', 'E', 'S', 'E', 'I', 'B', 'N'], word: 'BEISEIN', startLetter: 'B' },
+                { letters: ['W', 'H', 'I', 'C', 'G', 'E', 'T'], word: 'GEWICHT', startLetter: 'G' },
+                { letters: ['C', 'A', 'C', 'H', 'S', 'H'], word: 'SCHACH', startLetter: 'S' },
+                { letters: ['T', 'H', 'U', 'S', 'L'], word: 'STUHL', startLetter: 'S' },
+                { letters: ['A', 'A', 'S', 'R', 'P', 'I', 'T'], word: 'PARASIT', startLetter: 'P' },
+                { letters: ['A', 'E', 'M', 'H', 'R', 'M'], word: 'HAMMER', startLetter: 'H' },
+                { letters: ['E', 'N', 'E', 'T', 'D', 'N', 'Z'], word: 'TENDENZ', startLetter: 'T' },
+                { letters: ['N', 'D', 'A', 'M', 'E', 'L'], word: 'MANDEL', startLetter: 'M' },
+                { letters: ['E', 'H', 'A', 'M', 'C', 'R'], word: 'MACHER', startLetter: 'M' },
+                { letters: ['U', 'A', 'A', 'T', 'S', 'G', 'T'], word: 'SAATGUT', startLetter: 'S' },
+                { letters: ['U', 'T', 'F', 'S', 'K', 'A', 'R'], word: 'SAFTKUR', startLetter: 'S' },
+                { letters: ['N', 'E', 'U', 'Z', 'I', 'G', 'S'], word: 'ZEUGNIS', startLetter: 'Z' },
+                { letters: ['R', 'A', 'O', 'E', 'B', 'R', 'M'], word: 'OBERARM', startLetter: 'O' },
+                { letters: ['W', 'S', 'N', 'O', 'T', 'I', 'D'], word: 'OSTWIND', startLetter: 'O' },
+                { letters: ['S', 'U', 'E', 'T', 'N', 'H'], word: 'HUSTEN', startLetter: 'H' },
+                
+                // Aus ÖH Med Wien 2014 - kurze Wörter
+                { letters: ['E', 'I', 'D', 'Z', 'E', 'V', 'N'], word: 'EVIDENZ', startLetter: 'E' },
+                { letters: ['L', 'A', 'B', 'L'], word: 'BALL', startLetter: 'B' },
+                { letters: ['Y', 'D', 'A', 'N', 'H'], word: 'HANDY', startLetter: 'H' },
+                { letters: ['U', 'V', 'E', 'R', 'K'], word: 'KURVE', startLetter: 'K' },
+                { letters: ['O', 'A', 'M', 'N', 'T'], word: 'MONAT', startLetter: 'M' },
+                { letters: ['D', 'U', 'E', 'R', 'R'], word: 'RUDER', startLetter: 'R' },
+                { letters: ['K', 'C', 'K', 'L', 'S', 'E'], word: 'KLECKS', startLetter: 'K' },
+                { letters: ['L', 'R', 'O', 'L', 'B', 'D', 'E'], word: 'BORDELL', startLetter: 'B' },
+                { letters: ['H', 'T', 'C', 'R', 'E'], word: 'RECHT', startLetter: 'R' },
+                { letters: ['A', 'G', 'R', 'F', 'E'], word: 'FRAGE', startLetter: 'F' },
+                { letters: ['S', 'G', 'S', 'E', 'N', 'U'], word: 'GENUSS', startLetter: 'G' },
+                { letters: ['A', 'K', 'T', 'K', 'U', 'S'], word: 'KAKTUS', startLetter: 'K' },
+                { letters: ['Ü', 'M', 'S', 'L', 'I'], word: 'MÜSLI', startLetter: 'M' },
+                { letters: ['H', 'M', 'O', 'N'], word: 'MOHN', startLetter: 'M' },
+                { letters: ['V', 'U', 'T', 'K', 'R', 'E'], word: 'KUVERT', startLetter: 'K' },
+                { letters: ['L', 'T', 'A', 'N', 'M', 'E'], word: 'MANTEL', startLetter: 'M' },
+                { letters: ['E', 'I', 'E', 'R', 'K', 'D'], word: 'KREIDE', startLetter: 'K' }
+            ],
+            
+            // Mittel: 6-8 Buchstaben
+            medium: [
+                // Aus IB_WF_26.pdf
+                { letters: ['U', 'E', 'Z', 'G', 'L', 'U', 'F', 'G'], word: 'FLUGZEUG', startLetter: 'F' },
+                { letters: ['B', 'G', 'E', 'U', 'N', 'G', 'B', 'A'], word: 'BEGABUNG', startLetter: 'B' },
+                
+                // Aus ÖH Med Wien 2021 - Kategorie 2 (8-10 Buchstaben)
+                { letters: ['N', 'T', 'E', 'B', 'E', 'D', 'U', 'U', 'G'], word: 'BEDEUTUNG', startLetter: 'B' },
+                { letters: ['E', 'H', 'K', 'E', 'C', 'I', 'M', 'R'], word: 'CHEMIKER', startLetter: 'C' },
+                { letters: ['P', 'L', 'Z', 'T', 'T', 'M', 'I', 'U', 'E', 'T'], word: 'PUTZMITTEL', startLetter: 'P' },
+                { letters: ['O', 'A', 'H', 'R', 'S', 'E', 'U', 'E'], word: 'RUHEOASE', startLetter: 'R' },
+                { letters: ['R', 'A', 'E', 'L', 'H', 'N', 'G', 'G'], word: 'LEHRGANG', startLetter: 'L' },
+                { letters: ['A', 'P', 'L', 'R', 'E', 'S', 'E', 'I', 'N'], word: 'REISEPLAN', startLetter: 'R' },
+                { letters: ['G', 'T', 'N', 'U', 'B', 'E', 'E', 'L', 'I', 'G'], word: 'BEGLEITUNG', startLetter: 'B' },
+                { letters: ['B', 'O', 'E', 'H', 'E', 'H', 'C', 'T'], word: 'HOCHBEET', startLetter: 'H' },
+                { letters: ['I', 'C', 'R', 'G', 'U', 'I', 'R', 'E', 'H'], word: 'CHIRURGIE', startLetter: 'C' },
+                { letters: ['E', 'R', 'S', 'K', 'S', 'I', 'Z', 'E', 'U', 'R'], word: 'SEZIERKURS', startLetter: 'S' },
+                { letters: ['N', 'S', 'A', 'H', 'S', 'A', 'T', 'G', 'E'], word: 'ANGSTHASE', startLetter: 'A' },
+                { letters: ['D', 'W', 'T', 'L', 'Z', 'N', 'P', 'U', 'A', 'E'], word: 'PLATZWUNDE', startLetter: 'P' },
+                { letters: ['U', 'D', 'L', 'W', 'N', 'A', 'S', 'B', 'E'], word: 'WUNDSALBE', startLetter: 'W' },
+                { letters: ['S', 'I', 'E', 'S', 'G', 'W', 'E', 'N'], word: 'GEWISSEN', startLetter: 'G' },
+                { letters: ['E', 'E', 'W', 'S', 'E', 'G', 'R', 'I', 'W'], word: 'WEGWEISER', startLetter: 'W' },
+                { letters: ['N', 'E', 'N', 'E', 'T', 'A', 'K', 'E'], word: 'TEEKANNE', startLetter: 'T' },
+                { letters: ['L', 'A', 'R', 'P', 'E', 'T', 'A', 'I', 'P'], word: 'ALTPAPIER', startLetter: 'A' },
+                { letters: ['E', 'R', 'S', 'T', 'E', 'A', 'S', 'R'], word: 'TERRASSE', startLetter: 'T' },
+                { letters: ['S', 'N', 'M', 'E', 'A', 'N', 'E', 'A'], word: 'ANAMNESE', startLetter: 'A' },
+                { letters: ['U', 'N', 'A', 'N', 'B', 'E', 'G', 'I', 'G'], word: 'ABNEIGUNG', startLetter: 'A' },
+                { letters: ['T', 'L', 'A', 'I', 'O', 'H', 'P', 'O', 'G', 'E'], word: 'PATHOLOGIE', startLetter: 'P' },
+                { letters: ['X', 'E', 'I', 'T', 'E', 'D', 'T', 'L'], word: 'LIEDTEXT', startLetter: 'L' },
+                { letters: ['D', 'F', 'H', 'A', 'A', 'L', 'C', 'S', 'N', 'T'], word: 'LANDSCHAFT', startLetter: 'L' },
+                { letters: ['P', 'R', 'T', 'B', 'U', 'M', 'O', 'E'], word: 'MUTPROBE', startLetter: 'M' },
+                { letters: ['S', 'R', 'A', 'H', 'A', 'P', 'K', 'U'], word: 'PARKHAUS', startLetter: 'P' },
+                { letters: ['D', 'N', 'M', 'A', 'I', 'E', 'E', 'P'], word: 'PANDEMIE', startLetter: 'P' },
+                { letters: ['I', 'R', 'H', 'U', 'O', 'E', 'P', 'E'], word: 'EUPHORIE', startLetter: 'E' },
+                { letters: ['N', 'A', 'A', 'H', 'B', 'O', 'U', 'T'], word: 'AUTOBAHN', startLetter: 'A' },
+                
+                // Aus ÖH Med Wien 2014
+                { letters: ['O', 'S', 'U', 'U', 'T', 'B', 'A'], word: 'AUTOBUS', startLetter: 'A' },
+                { letters: ['L', 'Ü', 'S', 'S', 'S', 'H', 'L', 'E', 'C'], word: 'SCHLÜSSEL', startLetter: 'S' },
+                { letters: ['ß', 'C', 'H', 'S', 'I', 'W', 'E'], word: 'SCHWEISS', startLetter: 'S' },
+                { letters: ['L', 'Ü', 'L', 'M', 'R', 'E'], word: 'MÜLLER', startLetter: 'M' },
+                { letters: ['G', 'L', 'I', 'R', 'L', 'E'], word: 'GRILLE', startLetter: 'G' },
+                { letters: ['K', 'A', 'E', 'R', 'S', 'C', 'L'], word: 'SACKERL', startLetter: 'S' },
+                { letters: ['O', 'S', 'K', 'E', 'E', 'T', 'C', 'D', 'S'], word: 'STECKDOSE', startLetter: 'S' },
+                { letters: ['W', 'K', 'R', 'E', 'E', 'C'], word: 'WECKER', startLetter: 'W' },
+                { letters: ['T', 'Ü', 'K', 'Ü', 'H', 'S', 'R', 'F', 'C'], word: 'FRÜHSTÜCK', startLetter: 'F' },
+                { letters: ['Ö', 'L', 'E', 'V', 'E', 'I', 'R', 'L'], word: 'VÖLLEREI', startLetter: 'V' },
+                { letters: ['O', 'A', 'I', 'M', 'R', 'N'], word: 'MARONI', startLetter: 'M' },
+                { letters: ['F', 'A', 'L', 'T', 'E', 'V', 'S', 'I'], word: 'FESTIVAL', startLetter: 'F' },
+                { letters: ['H', 'S', 'A', 'R', 'C', 'U'], word: 'RAUSCH', startLetter: 'R' }
+            ],
+            
+            // Lang: über 8 Buchstaben
+            long: [
+                // Aus IB_WF_26.pdf
+                { letters: ['D', 'U', 'S', 'K', 'I', 'C', 'H', 'N', 'W', 'N'], word: 'WUNSCHKIND', startLetter: 'W' },
+                
+                // Aus ÖH Med Wien 2021 - Kategorie 3 (>10 Buchstaben)
+                { letters: ['S', 'N', 'E', 'U', 'E', 'V', 'I', 'C', 'H', 'D', 'R', 'B', 'A', 'G'], word: 'VERABSCHIEDUNG', startLetter: 'V' },
+                { letters: ['H', 'B', 'E', 'C', 'S', 'A', 'I', 'B', 'U', 'N', 'G'], word: 'ABSCHIEBUNG', startLetter: 'A' },
+                { letters: ['N', 'O', 'Z', 'S', 'W', 'U', 'H', 'K', 'N', 'E', 'R', 'C', 'T'], word: 'WUNSCHKONZERT', startLetter: 'W' },
+                { letters: ['Q', 'Z', 'F', 'U', 'E', 'H', 'R', 'N', 'R', 'E', 'E', 'Z'], word: 'HERZFREQUENZ', startLetter: 'H' },
+                { letters: ['I', 'M', 'E', 'E', 'H', 'C', 'R', 'A', 'O', 'T', 'H', 'P', 'E'], word: 'CHEMOTHERAPIE', startLetter: 'C' },
+                { letters: ['B', 'E', 'N', 'E', 'F', 'R', 'S', 'T', 'T', 'R', 'E', 'T'], word: 'FENSTERBRETT', startLetter: 'F' },
+                { letters: ['L', 'I', 'N', 'T', 'S', 'O', 'A', 'T', 'A', 'R', 'A', 'T', 'P', 'N', 'N'], word: 'TRANSPLANTATION', startLetter: 'T' },
+                { letters: ['C', 'R', 'U', 'E', 'G', 'E', 'B', 'H', 'I', 'T', 'N', 'G'], word: 'BERECHTIGUNG', startLetter: 'B' },
+                { letters: ['N', 'C', 'D', 'H', 'U', 'W', 'R', 'I', 'I', 'N', 'T', 'G'], word: 'WINDRICHTUNG', startLetter: 'W' },
+                { letters: ['D', 'H', 'I', 'T', 'N', 'T', 'E', 'S', 'E', 'N', 'E', 'U', 'M'], word: 'STUDENTENHEIM', startLetter: 'S' },
+                { letters: ['S', 'B', 'T', 'D', 'A', 'N', 'E', 'E', 'N', 'D'], word: 'ENDBESTAND', startLetter: 'E' },
+                { letters: ['N', 'N', 'F', 'N', 'U', 'E', 'T', 'E', 'R', 'G'], word: 'ENTFERNUNG', startLetter: 'E' },
+                { letters: ['W', 'E', 'B', 'S', 'E', 'E', 'L', 'E', 'I', 'I', 'B', 'S'], word: 'LIEBESBEWEIS', startLetter: 'L' },
+                { letters: ['T', 'H', 'A', 'H', 'N', 'I', 'L', 'E', 'W', 'S', 'C', 'C', 'H', 'I', 'T'], word: 'WEIHNACHTSLICHT', startLetter: 'W' },
+                { letters: ['R', 'U', 'T', 'Z', 'P', 'L', 'C', 'I', 'L', 'U', 'B', 'T', 'N', 'E', 'H'], word: 'BRILLENPUTZTUCH', startLetter: 'B' },
+                { letters: ['H', 'H', 'C', 'S', 'G', 'W', 'R', 'S', 'A', 'A', 'C', 'N', 'E', 'F', 'T'], word: 'SCHWANGERSCHAFT', startLetter: 'S' },
+                { letters: ['C', 'L', 'N', 'I', 'W', 'K', 'T', 'U', 'E', 'N', 'G'], word: 'ENTWICKLUNG', startLetter: 'E' },
+                { letters: ['O', 'A', 'F', 'R', 'P', 'A', 'T', 'O', 'A', 'P', 'T'], word: 'FOTOAPPARAT', startLetter: 'F' },
+                { letters: ['L', 'R', 'T', 'A', 'E', 'H', 'A', 'B', 'K', 'I', 'T'], word: 'HALTBARKEIT', startLetter: 'H' },
+                { letters: ['A', 'B', 'A', 'H', 'S', 'C', 'E', 'T', 'E', 'E', 'B', 'R', 'I', 'R'], word: 'SACHBEARBEITER', startLetter: 'S' },
+                { letters: ['E', 'I', 'G', 'A', 'N', 'R', 'L', 'L', 'L', 'S', 'B'], word: 'BRILLENGLAS', startLetter: 'B' },
+                { letters: ['U', 'G', 'T', 'E', 'G', 'E', 'Z', 'B', 'S', 'N', 'E', 'G'], word: 'GESETZGEBUNG', startLetter: 'G' },
+                { letters: ['E', 'I', 'T', 'H', 'L', 'E', 'K', 'G', 'I', 'C', 'I', 'T'], word: 'LEICHTIGKEIT', startLetter: 'L' },
+                { letters: ['T', 'U', 'D', 'E', 'R', 'K', 'E', 'L', 'S', 'I', 'C', 'A', 'H'], word: 'KLEIDERTAUSCH', startLetter: 'K' },
+                { letters: ['M', 'E', 'B', 'A', 'R', 'N', 'E', 'A', 'G', 'T', 'N', 'T'], word: 'MENGENRABATT', startLetter: 'M' },
+                
+                // Aus ÖH Med Wien 2014 - längere Wörter
+                { letters: ['W', 'B', 'C', 'T', 'Ö', 'R', 'R', 'E', 'U', 'H'], word: 'WÖRTERBUCH', startLetter: 'W' },
+                { letters: ['P', 'I', 'L', 'Z', 'M', 'M', 'A', 'F', 'N', 'R', 'E', 'E', 'Z'], word: 'ZIMMERPFLANZE', startLetter: 'Z' },
+                { letters: ['Z', 'S', 'F', 'U', 'T', 'G', 'S', 'F', 'L', 'E', 'U', 'E', 'U', 'K', 'R', 'N', 'I', 'A', 'H'], word: 'LUFTKISSENFAHRZEUG', startLetter: 'L' },
+                { letters: ['L', 'F', 'F', 'T', 'O', 'L', 'T', 'R', 'L', 'U', 'S', 'E', 'O', 'E', 'P', 'I'], word: 'LUFTPOLSTERFOLIE', startLetter: 'L' },
+                { letters: ['H', 'A', 'O', 'P', 'A', 'R', 'I', 'K', 'L', 'O', 'M', 'G', 'E'], word: 'PHARMAKOLOGIE', startLetter: 'P' },
+                { letters: ['H', 'P', 'O', 'O', 'L', 'Y', 'N', 'X'], word: 'XYLOPHON', startLetter: 'X' },
+                { letters: ['K', 'N', 'K', 'O', 'A', 'Z', 'T', 'L', 'E'], word: 'KATZENKLO', startLetter: 'K' },
+                { letters: ['H', 'D', 'Ü', 'M', 'N', 'M', 'S', 'E', 'R', 'U', 'T', 'R', 'L'], word: 'HUNDSTRÜMMERL', startLetter: 'H' },
+                { letters: ['Ü', 'E', 'R', 'T', 'K', 'K', 'N', 'I', 'L'], word: 'TÜRKLINKE', startLetter: 'T' },
+                { letters: ['R', 'Ä', 'E', 'A', 'E', 'M', 'H', 'S', 'N', 'R'], word: 'RASENMÄHER', startLetter: 'R' },
+                { letters: ['R', 'L', 'M', 'Ü', 'K', 'O', 'E', 'R', 'N', 'M', 'S', 'T', 'E'], word: 'KRÜMELMONSTER', startLetter: 'K' },
+                { letters: ['T', 'I', 'T', 'T', 'P', 'O', 'R', 'N', 'S', 'U', 'I', 'O'], word: 'PROSTITUTION', startLetter: 'P' },
+                { letters: ['Z', 'K', 'R', 'N', 'E', 'E', 'W', 'T'], word: 'NETZWERK', startLetter: 'N' },
+                { letters: ['D', 'I', 'N', 'U', 'S', 'E', 'T', 'E', 'E', 'R', 'D'], word: 'STUDIERENDE', startLetter: 'S' },
+                { letters: ['Ä', 'U', 'I', 'V', 'E', 'N', 'T', 'S', 'T', 'R', 'I'], word: 'UNIVERSITÄT', startLetter: 'U' },
+                { letters: ['D', 'A', 'E', 'N', 'S', 'D', 'U', 'T', 'C', 'H', 'L'], word: 'DEUTSCHLAND', startLetter: 'D' },
+                { letters: ['T', 'I', 'E', 'R', 'Ö', 'C', 'S', 'R', 'E', 'H'], word: 'ÖSTERREICH', startLetter: 'Ö' },
+                { letters: ['G', 'L', 'G', 'N', 'J', 'I', 'N', 'Ü'], word: 'JÜNGLING', startLetter: 'J' },
+                { letters: ['D', 'H', 'L', 'E', 'R', 'E', 'S', 'O', 'E'], word: 'LEDERHOSE', startLetter: 'L' },
+                { letters: ['L', 'I', 'L', 'O', 'N', 'B', 'E', 'R', 'N', 'E', 'N', 'S'], word: 'SONNENBRILLE', startLetter: 'S' },
+                { letters: ['C', 'H', 'E', 'L', 'A', 'S', 'F', 'W', 'S', 'S', 'R', 'E', 'A'], word: 'WASSERFLASCHE', startLetter: 'W' },
+                { letters: ['A', 'T', 'O', 'N', 'T', 'W', 'R'], word: 'ANTWORT', startLetter: 'A' },
+                { letters: ['D', 'R', 'T', 'F', 'I', 'U', 'E', 'Z', 'E', 'H', 'I', 'N', 'E'], word: 'ZUFRIEDENHEIT', startLetter: 'Z' },
+                { letters: ['F', 'T', 'W', 'K', 'R', 'A', 'K', 'E', 'R'], word: 'KRAFTWERK', startLetter: 'K' }
+            ]
+        };;

@@ -420,6 +420,20 @@
             font-size: 1.2rem;
             font-weight: 600;
         }
+
+        /* SRS */
+        .srs-btn {
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.6rem 1.1rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .srs-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
         @media (max-width: 768px) {
             .container {
                 padding: 2rem 1rem;
@@ -677,6 +691,19 @@
                     </div>
 
                     <div id="wissen-feedback" class="feedback hidden"></div>
+
+                    <!-- SRS Bewertungsbuttons (erscheinen nach Antwort) -->
+                    <div id="srs-rating" style="display:none; margin-top:1.5rem; text-align:center;">
+                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:0.8rem;">Wie sicher warst du?</p>
+                        <div style="display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap;">
+                            <button class="srs-btn" data-rating="0" style="background:#dc2626; color:white;">😰 Gar nicht</button>
+                            <button class="srs-btn" data-rating="1" style="background:#ea580c; color:white;">😟 Kaum</button>
+                            <button class="srs-btn" data-rating="2" style="background:#d97706; color:white;">😐 Unsicher</button>
+                            <button class="srs-btn" data-rating="3" style="background:#65a30d; color:white;">🙂 Gut</button>
+                            <button class="srs-btn" data-rating="4" style="background:#16a34a; color:white;">😊 Sicher</button>
+                            <button class="srs-btn" data-rating="5" style="background:#0891b2; color:white;">🎯 Perfekt</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="stats">
@@ -697,949 +724,130 @@
                         <span class="stat-label">Fachbereich</span>
                     </div>
                 </div>
+
+                <!-- SRS Übersicht -->
+                <div class="word-card" style="margin-top:1rem;">
+                    <h3 style="text-align:center; color:var(--primary-navy); margin-bottom:1.2rem; font-size:1.1rem;">🗓 Spaced Repetition</h3>
+                    <div class="stats" style="margin-bottom:1rem;">
+                        <div class="stat-item">
+                            <span id="srs-due-count" class="stat-value" style="color:#dc2626;">0</span>
+                            <span class="stat-label">Fällig heute</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="srs-learning-count" class="stat-value" style="color:#d97706;">0</span>
+                            <span class="stat-label">In Lernung</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="srs-known-count" class="stat-value" style="color:#16a34a;">0</span>
+                            <span class="stat-label">Bekannt</span>
+                        </div>
+                        <div class="stat-item">
+                            <span id="srs-new-count" class="stat-value">0</span>
+                            <span class="stat-label">Neu</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap;">
+                        <button id="srs-due-btn" class="btn btn-primary" style="font-size:0.9rem; padding:0.7rem 1.5rem;">
+                            📚 Fällige Karten üben
+                        </button>
+                        <button id="srs-reset-btn" class="btn btn-secondary" style="font-size:0.9rem; padding:0.7rem 1.5rem;">
+                            🗑 SRS zurücksetzen
+                        </button>
+                    </div>
+                    <p id="srs-next-info" style="text-align:center; color:var(--text-secondary); font-size:0.85rem; margin-top:0.8rem;"></p>
+                </div>
             </div>
 
             <!-- Figuren-Modul -->
             <div id="figuren-module" class="module">
                 <div class="word-card">
-                    <div style="text-align: center; padding: 2rem;">
-                        <h2>Figuren zusammensetzen</h2>
-                        <p>Kommt bald...</p>
+                    <h3 style="text-align:center; color:var(--primary-navy); margin-bottom:0.5rem;">
+                        Figuren zusammensetzen
+                    </h3>
+                    <p style="text-align:center; color:var(--text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">
+                        Welche Figur entsteht, wenn die Einzelteile zusammengesetzt werden?
+                    </p>
+
+                    <!-- Einzelteile -->
+                    <div style="text-align:center; margin-bottom:1.5rem;">
+                        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.05rem;">Einzelteile</p>
+                        <canvas id="fz-parts-canvas" width="300" height="150"
+                            style="border:2px solid var(--border-light); border-radius:12px; background:var(--soft-gray); max-width:100%;"></canvas>
+                    </div>
+
+                    <!-- Antwortoptionen -->
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.8rem; text-align:center; text-transform:uppercase; letter-spacing:0.05rem;">Lösungsmöglichkeiten</p>
+                    <div id="fz-options-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; max-width:480px; margin:0 auto 1.5rem;">
+                        <div class="fz-opt-wrapper" data-opt="A">
+                            <span class="option-letter" style="background:var(--accent-gold); color:white; border-radius:50%; width:1.8rem; height:1.8rem; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; margin-bottom:0.3rem;">A</span>
+                            <canvas class="fz-opt-canvas" data-opt="A" width="160" height="100"
+                                style="border:2px solid var(--border-light); border-radius:10px; background:var(--warm-white); display:block; cursor:pointer; max-width:100%;"></canvas>
+                        </div>
+                        <div class="fz-opt-wrapper" data-opt="B">
+                            <span class="option-letter" style="background:var(--accent-gold); color:white; border-radius:50%; width:1.8rem; height:1.8rem; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; margin-bottom:0.3rem;">B</span>
+                            <canvas class="fz-opt-canvas" data-opt="B" width="160" height="100"
+                                style="border:2px solid var(--border-light); border-radius:10px; background:var(--warm-white); display:block; cursor:pointer; max-width:100%;"></canvas>
+                        </div>
+                        <div class="fz-opt-wrapper" data-opt="C">
+                            <span class="option-letter" style="background:var(--accent-gold); color:white; border-radius:50%; width:1.8rem; height:1.8rem; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; margin-bottom:0.3rem;">C</span>
+                            <canvas class="fz-opt-canvas" data-opt="C" width="160" height="100"
+                                style="border:2px solid var(--border-light); border-radius:10px; background:var(--warm-white); display:block; cursor:pointer; max-width:100%;"></canvas>
+                        </div>
+                        <div class="fz-opt-wrapper" data-opt="D">
+                            <span class="option-letter" style="background:var(--accent-gold); color:white; border-radius:50%; width:1.8rem; height:1.8rem; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; margin-bottom:0.3rem;">D</span>
+                            <canvas class="fz-opt-canvas" data-opt="D" width="160" height="100"
+                                style="border:2px solid var(--border-light); border-radius:10px; background:var(--warm-white); display:block; cursor:pointer; max-width:100%;"></canvas>
+                        </div>
+                    </div>
+                    <div style="text-align:center; margin-bottom:1.5rem;">
+                        <div class="fz-opt-wrapper" data-opt="E" style="display:inline-block;">
+                            <div data-opt="E" class="fz-opt-canvas letter-option" style="border:2px solid var(--border-light); border-radius:10px; background:var(--warm-white); cursor:pointer; padding:0.8rem 2rem; display:inline-flex; align-items:center; gap:0.8rem;">
+                                <span class="option-letter" style="background:var(--accent-gold); color:white; border-radius:50%; width:1.8rem; height:1.8rem; display:inline-flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0;">E</span>
+                                <span style="font-size:0.95rem;">Keine der Lösungsmöglichkeiten</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button id="fz-show-btn" class="btn btn-secondary">💡 Lösung anzeigen</button>
+                        <button id="fz-check-btn" class="btn btn-primary">✓ Antwort prüfen</button>
+                        <button id="fz-new-btn" class="btn btn-secondary">🔄 Neue Aufgabe</button>
+                    </div>
+                    <div id="fz-feedback" class="feedback hidden"></div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <span id="fz-correct-count" class="stat-value">0</span>
+                        <span class="stat-label">Richtig</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="fz-total-count" class="stat-value">0</span>
+                        <span class="stat-label">Gesamt</span>
+                    </div>
+                    <div class="stat-item">
+                        <span id="fz-success-rate" class="stat-value">0%</span>
+                        <span class="stat-label">Erfolgsrate</span>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="data_wortfluessigkeit.js"></script>
+    <script src="data_zahlenfolgen.js"></script>
+    <script src="data_wissen.js"></script>
+    <script src="data_figuren.js"></script>
     <script>
         // ============================================================
         // DATEN
         // ============================================================
-        const wordFluencyWords = {
-            // Kurz: bis 5 Buchstaben
-            short: [
-                // Aus IB_WF_26.pdf (offizielle Beispiele)
-                { letters: ['E', 'R', 'N', 'H', 'E', 'C', 'R'], word: 'RECHNER', startLetter: 'R' },
-                { letters: ['Z', 'E', 'I', 'T', 'I', 'R', 'F', 'E'], word: 'FREIZEIT', startLetter: 'F' },
-                
-                // Aus ÖH Med Wien 2021 - Kategorie 1 (≤7 Buchstaben) 
-                { letters: ['K', 'T', 'R', 'U', 'A', 'F', 'R'], word: 'FRAKTUR', startLetter: 'F' },
-                { letters: ['S', 'E', 'N', 'G', 'E', 'A', 'G'], word: 'SEEGANG', startLetter: 'S' },
-                { letters: ['O', 'T', 'K', 'N', 'K', 'A', 'T'], word: 'KONTAKT', startLetter: 'K' },
-                { letters: ['E', 'W', 'E', 'V', 'R', 'I', 'S'], word: 'VERWEIS', startLetter: 'V' },
-                { letters: ['U', 'D', 'N', 'S', 'E', 'R', 'S'], word: 'ERDNUSS', startLetter: 'E' },
-                { letters: ['A', 'N', 'E', 'L', 'T', 'T'], word: 'TALENT', startLetter: 'T' },
-                { letters: ['R', 'U', 'C', 'G', 'E', 'H'], word: 'GERUCH', startLetter: 'G' },
-                { letters: ['H', 'U', 'O', 'C', 'R', 'S'], word: 'CHORUS', startLetter: 'C' },
-                { letters: ['U', 'T', 'R', 'E', 'B', 'G'], word: 'BETRUG', startLetter: 'B' },
-                { letters: ['T', 'N', 'O', 'I', 'H', 'R', 'D'], word: 'HIRNTOD', startLetter: 'H' },
-                { letters: ['I', 'E', 'S', 'E', 'I', 'B', 'N'], word: 'BEISEIN', startLetter: 'B' },
-                { letters: ['W', 'H', 'I', 'C', 'G', 'E', 'T'], word: 'GEWICHT', startLetter: 'G' },
-                { letters: ['C', 'A', 'C', 'H', 'S', 'H'], word: 'SCHACH', startLetter: 'S' },
-                { letters: ['T', 'H', 'U', 'S', 'L'], word: 'STUHL', startLetter: 'S' },
-                { letters: ['A', 'A', 'S', 'R', 'P', 'I', 'T'], word: 'PARASIT', startLetter: 'P' },
-                { letters: ['A', 'E', 'M', 'H', 'R', 'M'], word: 'HAMMER', startLetter: 'H' },
-                { letters: ['E', 'N', 'E', 'T', 'D', 'N', 'Z'], word: 'TENDENZ', startLetter: 'T' },
-                { letters: ['N', 'D', 'A', 'M', 'E', 'L'], word: 'MANDEL', startLetter: 'M' },
-                { letters: ['E', 'H', 'A', 'M', 'C', 'R'], word: 'MACHER', startLetter: 'M' },
-                { letters: ['U', 'A', 'A', 'T', 'S', 'G', 'T'], word: 'SAATGUT', startLetter: 'S' },
-                { letters: ['U', 'T', 'F', 'S', 'K', 'A', 'R'], word: 'SAFTKUR', startLetter: 'S' },
-                { letters: ['N', 'E', 'U', 'Z', 'I', 'G', 'S'], word: 'ZEUGNIS', startLetter: 'Z' },
-                { letters: ['R', 'A', 'O', 'E', 'B', 'R', 'M'], word: 'OBERARM', startLetter: 'O' },
-                { letters: ['W', 'S', 'N', 'O', 'T', 'I', 'D'], word: 'OSTWIND', startLetter: 'O' },
-                { letters: ['S', 'U', 'E', 'T', 'N', 'H'], word: 'HUSTEN', startLetter: 'H' },
-                
-                // Aus ÖH Med Wien 2014 - kurze Wörter
-                { letters: ['E', 'I', 'D', 'Z', 'E', 'V', 'N'], word: 'EVIDENZ', startLetter: 'E' },
-                { letters: ['L', 'A', 'B', 'L'], word: 'BALL', startLetter: 'B' },
-                { letters: ['Y', 'D', 'A', 'N', 'H'], word: 'HANDY', startLetter: 'H' },
-                { letters: ['U', 'V', 'E', 'R', 'K'], word: 'KURVE', startLetter: 'K' },
-                { letters: ['O', 'A', 'M', 'N', 'T'], word: 'MONAT', startLetter: 'M' },
-                { letters: ['D', 'U', 'E', 'R', 'R'], word: 'RUDER', startLetter: 'R' },
-                { letters: ['K', 'C', 'K', 'L', 'S', 'E'], word: 'KLECKS', startLetter: 'K' },
-                { letters: ['L', 'R', 'O', 'L', 'B', 'D', 'E'], word: 'BORDELL', startLetter: 'B' },
-                { letters: ['H', 'T', 'C', 'R', 'E'], word: 'RECHT', startLetter: 'R' },
-                { letters: ['A', 'G', 'R', 'F', 'E'], word: 'FRAGE', startLetter: 'F' },
-                { letters: ['S', 'G', 'S', 'E', 'N', 'U'], word: 'GENUSS', startLetter: 'G' },
-                { letters: ['A', 'K', 'T', 'K', 'U', 'S'], word: 'KAKTUS', startLetter: 'K' },
-                { letters: ['Ü', 'M', 'S', 'L', 'I'], word: 'MÜSLI', startLetter: 'M' },
-                { letters: ['H', 'M', 'O', 'N'], word: 'MOHN', startLetter: 'M' },
-                { letters: ['V', 'U', 'T', 'K', 'R', 'E'], word: 'KUVERT', startLetter: 'K' },
-                { letters: ['L', 'T', 'A', 'N', 'M', 'E'], word: 'MANTEL', startLetter: 'M' },
-                { letters: ['E', 'I', 'E', 'R', 'K', 'D'], word: 'KREIDE', startLetter: 'K' }
-            ],
-            
-            // Mittel: 6-8 Buchstaben
-            medium: [
-                // Aus IB_WF_26.pdf
-                { letters: ['U', 'E', 'Z', 'G', 'L', 'U', 'F', 'G'], word: 'FLUGZEUG', startLetter: 'F' },
-                { letters: ['B', 'G', 'E', 'U', 'N', 'G', 'B', 'A'], word: 'BEGABUNG', startLetter: 'B' },
-                
-                // Aus ÖH Med Wien 2021 - Kategorie 2 (8-10 Buchstaben)
-                { letters: ['N', 'T', 'E', 'B', 'E', 'D', 'U', 'U', 'G'], word: 'BEDEUTUNG', startLetter: 'B' },
-                { letters: ['E', 'H', 'K', 'E', 'C', 'I', 'M', 'R'], word: 'CHEMIKER', startLetter: 'C' },
-                { letters: ['P', 'L', 'Z', 'T', 'T', 'M', 'I', 'U', 'E', 'T'], word: 'PUTZMITTEL', startLetter: 'P' },
-                { letters: ['O', 'A', 'H', 'R', 'S', 'E', 'U', 'E'], word: 'RUHEOASE', startLetter: 'R' },
-                { letters: ['R', 'A', 'E', 'L', 'H', 'N', 'G', 'G'], word: 'LEHRGANG', startLetter: 'L' },
-                { letters: ['A', 'P', 'L', 'R', 'E', 'S', 'E', 'I', 'N'], word: 'REISEPLAN', startLetter: 'R' },
-                { letters: ['G', 'T', 'N', 'U', 'B', 'E', 'E', 'L', 'I', 'G'], word: 'BEGLEITUNG', startLetter: 'B' },
-                { letters: ['B', 'O', 'E', 'H', 'E', 'H', 'C', 'T'], word: 'HOCHBEET', startLetter: 'H' },
-                { letters: ['I', 'C', 'R', 'G', 'U', 'I', 'R', 'E', 'H'], word: 'CHIRURGIE', startLetter: 'C' },
-                { letters: ['E', 'R', 'S', 'K', 'S', 'I', 'Z', 'E', 'U', 'R'], word: 'SEZIERKURS', startLetter: 'S' },
-                { letters: ['N', 'S', 'A', 'H', 'S', 'A', 'T', 'G', 'E'], word: 'ANGSTHASE', startLetter: 'A' },
-                { letters: ['D', 'W', 'T', 'L', 'Z', 'N', 'P', 'U', 'A', 'E'], word: 'PLATZWUNDE', startLetter: 'P' },
-                { letters: ['U', 'D', 'L', 'W', 'N', 'A', 'S', 'B', 'E'], word: 'WUNDSALBE', startLetter: 'W' },
-                { letters: ['S', 'I', 'E', 'S', 'G', 'W', 'E', 'N'], word: 'GEWISSEN', startLetter: 'G' },
-                { letters: ['E', 'E', 'W', 'S', 'E', 'G', 'R', 'I', 'W'], word: 'WEGWEISER', startLetter: 'W' },
-                { letters: ['N', 'E', 'N', 'E', 'T', 'A', 'K', 'E'], word: 'TEEKANNE', startLetter: 'T' },
-                { letters: ['L', 'A', 'R', 'P', 'E', 'T', 'A', 'I', 'P'], word: 'ALTPAPIER', startLetter: 'A' },
-                { letters: ['E', 'R', 'S', 'T', 'E', 'A', 'S', 'R'], word: 'TERRASSE', startLetter: 'T' },
-                { letters: ['S', 'N', 'M', 'E', 'A', 'N', 'E', 'A'], word: 'ANAMNESE', startLetter: 'A' },
-                { letters: ['U', 'N', 'A', 'N', 'B', 'E', 'G', 'I', 'G'], word: 'ABNEIGUNG', startLetter: 'A' },
-                { letters: ['T', 'L', 'A', 'I', 'O', 'H', 'P', 'O', 'G', 'E'], word: 'PATHOLOGIE', startLetter: 'P' },
-                { letters: ['X', 'E', 'I', 'T', 'E', 'D', 'T', 'L'], word: 'LIEDTEXT', startLetter: 'L' },
-                { letters: ['D', 'F', 'H', 'A', 'A', 'L', 'C', 'S', 'N', 'T'], word: 'LANDSCHAFT', startLetter: 'L' },
-                { letters: ['P', 'R', 'T', 'B', 'U', 'M', 'O', 'E'], word: 'MUTPROBE', startLetter: 'M' },
-                { letters: ['S', 'R', 'A', 'H', 'A', 'P', 'K', 'U'], word: 'PARKHAUS', startLetter: 'P' },
-                { letters: ['D', 'N', 'M', 'A', 'I', 'E', 'E', 'P'], word: 'PANDEMIE', startLetter: 'P' },
-                { letters: ['I', 'R', 'H', 'U', 'O', 'E', 'P', 'E'], word: 'EUPHORIE', startLetter: 'E' },
-                { letters: ['N', 'A', 'A', 'H', 'B', 'O', 'U', 'T'], word: 'AUTOBAHN', startLetter: 'A' },
-                
-                // Aus ÖH Med Wien 2014
-                { letters: ['O', 'S', 'U', 'U', 'T', 'B', 'A'], word: 'AUTOBUS', startLetter: 'A' },
-                { letters: ['L', 'Ü', 'S', 'S', 'S', 'H', 'L', 'E', 'C'], word: 'SCHLÜSSEL', startLetter: 'S' },
-                { letters: ['ß', 'C', 'H', 'S', 'I', 'W', 'E'], word: 'SCHWEISS', startLetter: 'S' },
-                { letters: ['L', 'Ü', 'L', 'M', 'R', 'E'], word: 'MÜLLER', startLetter: 'M' },
-                { letters: ['G', 'L', 'I', 'R', 'L', 'E'], word: 'GRILLE', startLetter: 'G' },
-                { letters: ['K', 'A', 'E', 'R', 'S', 'C', 'L'], word: 'SACKERL', startLetter: 'S' },
-                { letters: ['O', 'S', 'K', 'E', 'E', 'T', 'C', 'D', 'S'], word: 'STECKDOSE', startLetter: 'S' },
-                { letters: ['W', 'K', 'R', 'E', 'E', 'C'], word: 'WECKER', startLetter: 'W' },
-                { letters: ['T', 'Ü', 'K', 'Ü', 'H', 'S', 'R', 'F', 'C'], word: 'FRÜHSTÜCK', startLetter: 'F' },
-                { letters: ['Ö', 'L', 'E', 'V', 'E', 'I', 'R', 'L'], word: 'VÖLLEREI', startLetter: 'V' },
-                { letters: ['O', 'A', 'I', 'M', 'R', 'N'], word: 'MARONI', startLetter: 'M' },
-                { letters: ['F', 'A', 'L', 'T', 'E', 'V', 'S', 'I'], word: 'FESTIVAL', startLetter: 'F' },
-                { letters: ['H', 'S', 'A', 'R', 'C', 'U'], word: 'RAUSCH', startLetter: 'R' }
-            ],
-            
-            // Lang: über 8 Buchstaben
-            long: [
-                // Aus IB_WF_26.pdf
-                { letters: ['D', 'U', 'S', 'K', 'I', 'C', 'H', 'N', 'W', 'N'], word: 'WUNSCHKIND', startLetter: 'W' },
-                
-                // Aus ÖH Med Wien 2021 - Kategorie 3 (>10 Buchstaben)
-                { letters: ['S', 'N', 'E', 'U', 'E', 'V', 'I', 'C', 'H', 'D', 'R', 'B', 'A', 'G'], word: 'VERABSCHIEDUNG', startLetter: 'V' },
-                { letters: ['H', 'B', 'E', 'C', 'S', 'A', 'I', 'B', 'U', 'N', 'G'], word: 'ABSCHIEBUNG', startLetter: 'A' },
-                { letters: ['N', 'O', 'Z', 'S', 'W', 'U', 'H', 'K', 'N', 'E', 'R', 'C', 'T'], word: 'WUNSCHKONZERT', startLetter: 'W' },
-                { letters: ['Q', 'Z', 'F', 'U', 'E', 'H', 'R', 'N', 'R', 'E', 'E', 'Z'], word: 'HERZFREQUENZ', startLetter: 'H' },
-                { letters: ['I', 'M', 'E', 'E', 'H', 'C', 'R', 'A', 'O', 'T', 'H', 'P', 'E'], word: 'CHEMOTHERAPIE', startLetter: 'C' },
-                { letters: ['B', 'E', 'N', 'E', 'F', 'R', 'S', 'T', 'T', 'R', 'E', 'T'], word: 'FENSTERBRETT', startLetter: 'F' },
-                { letters: ['L', 'I', 'N', 'T', 'S', 'O', 'A', 'T', 'A', 'R', 'A', 'T', 'P', 'N', 'N'], word: 'TRANSPLANTATION', startLetter: 'T' },
-                { letters: ['C', 'R', 'U', 'E', 'G', 'E', 'B', 'H', 'I', 'T', 'N', 'G'], word: 'BERECHTIGUNG', startLetter: 'B' },
-                { letters: ['N', 'C', 'D', 'H', 'U', 'W', 'R', 'I', 'I', 'N', 'T', 'G'], word: 'WINDRICHTUNG', startLetter: 'W' },
-                { letters: ['D', 'H', 'I', 'T', 'N', 'T', 'E', 'S', 'E', 'N', 'E', 'U', 'M'], word: 'STUDENTENHEIM', startLetter: 'S' },
-                { letters: ['S', 'B', 'T', 'D', 'A', 'N', 'E', 'E', 'N', 'D'], word: 'ENDBESTAND', startLetter: 'E' },
-                { letters: ['N', 'N', 'F', 'N', 'U', 'E', 'T', 'E', 'R', 'G'], word: 'ENTFERNUNG', startLetter: 'E' },
-                { letters: ['W', 'E', 'B', 'S', 'E', 'E', 'L', 'E', 'I', 'I', 'B', 'S'], word: 'LIEBESBEWEIS', startLetter: 'L' },
-                { letters: ['T', 'H', 'A', 'H', 'N', 'I', 'L', 'E', 'W', 'S', 'C', 'C', 'H', 'I', 'T'], word: 'WEIHNACHTSLICHT', startLetter: 'W' },
-                { letters: ['R', 'U', 'T', 'Z', 'P', 'L', 'C', 'I', 'L', 'U', 'B', 'T', 'N', 'E', 'H'], word: 'BRILLENPUTZTUCH', startLetter: 'B' },
-                { letters: ['H', 'H', 'C', 'S', 'G', 'W', 'R', 'S', 'A', 'A', 'C', 'N', 'E', 'F', 'T'], word: 'SCHWANGERSCHAFT', startLetter: 'S' },
-                { letters: ['C', 'L', 'N', 'I', 'W', 'K', 'T', 'U', 'E', 'N', 'G'], word: 'ENTWICKLUNG', startLetter: 'E' },
-                { letters: ['O', 'A', 'F', 'R', 'P', 'A', 'T', 'O', 'A', 'P', 'T'], word: 'FOTOAPPARAT', startLetter: 'F' },
-                { letters: ['L', 'R', 'T', 'A', 'E', 'H', 'A', 'B', 'K', 'I', 'T'], word: 'HALTBARKEIT', startLetter: 'H' },
-                { letters: ['A', 'B', 'A', 'H', 'S', 'C', 'E', 'T', 'E', 'E', 'B', 'R', 'I', 'R'], word: 'SACHBEARBEITER', startLetter: 'S' },
-                { letters: ['E', 'I', 'G', 'A', 'N', 'R', 'L', 'L', 'L', 'S', 'B'], word: 'BRILLENGLAS', startLetter: 'B' },
-                { letters: ['U', 'G', 'T', 'E', 'G', 'E', 'Z', 'B', 'S', 'N', 'E', 'G'], word: 'GESETZGEBUNG', startLetter: 'G' },
-                { letters: ['E', 'I', 'T', 'H', 'L', 'E', 'K', 'G', 'I', 'C', 'I', 'T'], word: 'LEICHTIGKEIT', startLetter: 'L' },
-                { letters: ['T', 'U', 'D', 'E', 'R', 'K', 'E', 'L', 'S', 'I', 'C', 'A', 'H'], word: 'KLEIDERTAUSCH', startLetter: 'K' },
-                { letters: ['M', 'E', 'B', 'A', 'R', 'N', 'E', 'A', 'G', 'T', 'N', 'T'], word: 'MENGENRABATT', startLetter: 'M' },
-                
-                // Aus ÖH Med Wien 2014 - längere Wörter
-                { letters: ['W', 'B', 'C', 'T', 'Ö', 'R', 'R', 'E', 'U', 'H'], word: 'WÖRTERBUCH', startLetter: 'W' },
-                { letters: ['P', 'I', 'L', 'Z', 'M', 'M', 'A', 'F', 'N', 'R', 'E', 'E', 'Z'], word: 'ZIMMERPFLANZE', startLetter: 'Z' },
-                { letters: ['Z', 'S', 'F', 'U', 'T', 'G', 'S', 'F', 'L', 'E', 'U', 'E', 'U', 'K', 'R', 'N', 'I', 'A', 'H'], word: 'LUFTKISSENFAHRZEUG', startLetter: 'L' },
-                { letters: ['L', 'F', 'F', 'T', 'O', 'L', 'T', 'R', 'L', 'U', 'S', 'E', 'O', 'E', 'P', 'I'], word: 'LUFTPOLSTERFOLIE', startLetter: 'L' },
-                { letters: ['H', 'A', 'O', 'P', 'A', 'R', 'I', 'K', 'L', 'O', 'M', 'G', 'E'], word: 'PHARMAKOLOGIE', startLetter: 'P' },
-                { letters: ['H', 'P', 'O', 'O', 'L', 'Y', 'N', 'X'], word: 'XYLOPHON', startLetter: 'X' },
-                { letters: ['K', 'N', 'K', 'O', 'A', 'Z', 'T', 'L', 'E'], word: 'KATZENKLO', startLetter: 'K' },
-                { letters: ['H', 'D', 'Ü', 'M', 'N', 'M', 'S', 'E', 'R', 'U', 'T', 'R', 'L'], word: 'HUNDSTRÜMMERL', startLetter: 'H' },
-                { letters: ['Ü', 'E', 'R', 'T', 'K', 'K', 'N', 'I', 'L'], word: 'TÜRKLINKE', startLetter: 'T' },
-                { letters: ['R', 'Ä', 'E', 'A', 'E', 'M', 'H', 'S', 'N', 'R'], word: 'RASENMÄHER', startLetter: 'R' },
-                { letters: ['R', 'L', 'M', 'Ü', 'K', 'O', 'E', 'R', 'N', 'M', 'S', 'T', 'E'], word: 'KRÜMELMONSTER', startLetter: 'K' },
-                { letters: ['T', 'I', 'T', 'T', 'P', 'O', 'R', 'N', 'S', 'U', 'I', 'O'], word: 'PROSTITUTION', startLetter: 'P' },
-                { letters: ['Z', 'K', 'R', 'N', 'E', 'E', 'W', 'T'], word: 'NETZWERK', startLetter: 'N' },
-                { letters: ['D', 'I', 'N', 'U', 'S', 'E', 'T', 'E', 'E', 'R', 'D'], word: 'STUDIERENDE', startLetter: 'S' },
-                { letters: ['Ä', 'U', 'I', 'V', 'E', 'N', 'T', 'S', 'T', 'R', 'I'], word: 'UNIVERSITÄT', startLetter: 'U' },
-                { letters: ['D', 'A', 'E', 'N', 'S', 'D', 'U', 'T', 'C', 'H', 'L'], word: 'DEUTSCHLAND', startLetter: 'D' },
-                { letters: ['T', 'I', 'E', 'R', 'Ö', 'C', 'S', 'R', 'E', 'H'], word: 'ÖSTERREICH', startLetter: 'Ö' },
-                { letters: ['G', 'L', 'G', 'N', 'J', 'I', 'N', 'Ü'], word: 'JÜNGLING', startLetter: 'J' },
-                { letters: ['D', 'H', 'L', 'E', 'R', 'E', 'S', 'O', 'E'], word: 'LEDERHOSE', startLetter: 'L' },
-                { letters: ['L', 'I', 'L', 'O', 'N', 'B', 'E', 'R', 'N', 'E', 'N', 'S'], word: 'SONNENBRILLE', startLetter: 'S' },
-                { letters: ['C', 'H', 'E', 'L', 'A', 'S', 'F', 'W', 'S', 'S', 'R', 'E', 'A'], word: 'WASSERFLASCHE', startLetter: 'W' },
-                { letters: ['A', 'T', 'O', 'N', 'T', 'W', 'R'], word: 'ANTWORT', startLetter: 'A' },
-                { letters: ['D', 'R', 'T', 'F', 'I', 'U', 'E', 'Z', 'E', 'H', 'I', 'N', 'E'], word: 'ZUFRIEDENHEIT', startLetter: 'Z' },
-                { letters: ['F', 'T', 'W', 'K', 'R', 'A', 'K', 'E', 'R'], word: 'KRAFTWERK', startLetter: 'K' }
-            ]
-        };
+                // ── Daten extern geladen via data_*.js ──
 
-        const zahlenfolgenAufgaben = [
-            // ── Aus offiziellem IB_ZF_26.pdf ──────────────────────────────────
-            { sequence: [1,2,3,4,5,6,'?','?'],
-              rule: '+1', options:{A:[7,9],B:[1,3],C:[7,8],D:[1,2]}, correct:'C' },
-            { sequence: [11,15,30,26,30,60,56,'?','?'],
-              rule: '+4; ×2; −4; wiederholt', options:{A:[112,116],B:[60,120],C:[52,104],D:[112,108]}, correct:'B' },
-            { sequence: [2,4,7,5,10,13,11,'?','?'],
-              rule: '×2; +3; −2; wiederholt', options:{A:[14,12],B:[9,18],C:[22,20],D:[22,25]}, correct:'D' },
 
-            // ── Aus ÖH Med Wien 2014 – verifiziert ────────────────────────────
-            // 1. 789 774 258 243 81 66 ? ?   → −15; ÷3   → 66−15=51; 51÷3=17  → b) 22/7 lt. Lösung: b (-15; :3) → 66-15=51, 51/3=17 → b) 22/7? Nein: Lösung sagt b=22/7, aber Rechnung ergibt 51/17. Lösung-PDF sagt b. Antwort b) laut PDF ist 22/7 → stimmt nicht mit Rechnung überein. Nehme Aufgabe trotzdem mit Originaloptionen
-            { sequence: [789,774,258,243,81,66,'?','?'],
-              rule: '−15; ÷3; wiederholt',
-              options:{A:[51,17],B:[22,7],C:[22,8],D:[23,5]}, correct:'A' },
-            // 2. 3464 3481 3465 3480 3466 3479 ? ?  → +17;−16;+15 … → 3467/3478  → d
-            { sequence: [3464,3481,3465,3480,3466,3479,'?','?'],
-              rule: '+17; −16; +15; −14; …', options:{A:[3468,3478],B:[3491,3480],C:[3466,4377],D:[3467,3478]}, correct:'D' },
-            // 3. 96 24 48 12 24 6 ? ?  → ÷4; ×2 → 12/3  → a
-            { sequence: [96,24,48,12,24,6,'?','?'],
-              rule: '÷4; ×2; wiederholt', options:{A:[12,3],B:[24,12],C:[12,4],D:[10,5]}, correct:'A' },
-            // 4. 518 419 331 254 188 133 ? ?  → −99;−88;−77;−66;−55 → 89/56  → d
-            { sequence: [518,419,331,254,188,133,'?','?'],
-              rule: '−99; −88; −77; −66; −55; −44', options:{A:[100,78],B:[122,100],C:[89,67],D:[89,56]}, correct:'D' },
-            // 7. 84 89 83 78 84 89 ? ?  → +5;−6;−5;+6 → 83/78  → c
-            { sequence: [84,89,83,78,84,89,'?','?'],
-              rule: '+5; −6; −5; +6; wiederholt', options:{A:[95,100],B:[84,79],C:[83,78],D:[84,78]}, correct:'C' },
-            // 8. 8 8 4 4 2 2 ? ?  → ÷1;÷2 → 1/1  → d
-            { sequence: [8,8,4,4,2,2,'?','?'],
-              rule: '×1; ÷2; wiederholt', options:{A:[3,3],B:[0,0],C:[-1,-1],D:[1,1]}, correct:'D' },
-            // 9. 6 48 12 96 24 192 ? ?  → ×8;÷4 → 48/384  → c
-            { sequence: [6,48,12,96,24,192,'?','?'],
-              rule: '×8; ÷4; wiederholt', options:{A:[48,12],B:[24,96],C:[48,384],D:[96,24]}, correct:'C' },
-            // 10. 3 9 6 9 27 24 ? ?  → ×3;−3;+3;×3;−3;+3 → 27/81  → a
-            { sequence: [3,9,6,9,27,24,'?','?'],
-              rule: '×3; −3; +3; wiederholt', options:{A:[27,81],B:[27,30],C:[27,24],D:[72,69]}, correct:'A' },
-            // 12. 2 5 11 23 47 95 ? ?  → ×2+1; ×2+1 → 191/383  → a
-            { sequence: [2,5,11,23,47,95,'?','?'],
-              rule: '×2+1; wiederholt', options:{A:[191,383],B:[143,278],C:[194,283],D:[191,382]}, correct:'A' },
-            // 13. 2 12 6 30 25 100 ? ?  → ×6;−6;×5;−5;×4;−4 → 96/288? Nein: 100-4=96; 96×3=288 → a
-            { sequence: [2,12,6,30,25,100,'?','?'],
-              rule: '×6;−6;×5;−5;×4;−4;×3;−3', options:{A:[96,288],B:[95,285],C:[96,192],D:[94,288]}, correct:'A' },
-            // 14. 80 40 42 40 20 22 ? ?  → ÷2;+2;−2 → 20/10  → c
-            { sequence: [80,40,42,40,20,22,'?','?'],
-              rule: '÷2; +2; −2; wiederholt', options:{A:[20,40],B:[24,12],C:[20,10],D:[22,11]}, correct:'C' },
-            // 17. 17 19 21 23 27 29 ? ? → Lücke bei +4 statt +2 → kein einheitliches Muster → e
-            { sequence: [17,19,21,23,27,29,'?','?'],
-              rule: 'kein eindeutiges Muster → E', options:{A:[31,35],B:[31,39],C:[33,41],D:[33,36]}, correct:'E' },
-            // 18. 888 913 963 1038 1138 1263 ? ?  → +25;+50;+75;+100;+125 → +150=1413; +175=1588  → a
-            { sequence: [888,913,963,1038,1138,1263,'?','?'],
-              rule: '+25; +50; +75; +100; +125; +150; +175', options:{A:[1413,1588],B:[1413,1613],C:[1588,1613],D:[1613,1788]}, correct:'A' },
-            // 20. 5000 2500 7500 3750 11250 5625 ? ?  → ÷2;×3 → 16875/8437,5  → d
-            { sequence: [5000,2500,7500,3750,11250,5625,'?','?'],
-              rule: '÷2; ×3; wiederholt', options:{A:[16946,8357],B:[11250,5625],C:[16875,8347],D:[16875,8438]}, correct:'D' },
-            // 21. 70 77 91 112 140 175 ? ?  → +7;+14;+21;+28 → +35=210? Nein: +42=217  → a
-            { sequence: [70,77,91,112,140,175,'?','?'],
-              rule: '+7; +14; +21; +28; +35; +42', options:{A:[217,266],B:[211,266],C:[217,259],D:[280,321]}, correct:'A' },
-            // 22. 5 13 104 111 777 783 ? ?  → +8;×8;+7;×7;+6;×6 → 4698/4703  → c
-            { sequence: [5,13,104,111,777,783,'?','?'],
-              rule: '+8;×8;+7;×7;+6;×6', options:{A:[1111,1748],B:[523,1429],C:[4698,4703],D:[6924,6293]}, correct:'C' },
-            // 23. 7 20 34 47 61 74 ? ?  → +13;+14 alternierend → 88/101  → b
-            { sequence: [7,20,34,47,61,74,'?','?'],
-              rule: '+13; +14; alternierend', options:{A:[-4,-8],B:[88,101],C:[92,149],D:[3,80]}, correct:'B' },
-            // 24. 60 15 45 0 30 -15 ? ?  → −45;+30 → 15/−30  → a
-            { sequence: [60,15,45,0,30,-15,'?','?'],
-              rule: '−45; +30; wiederholt', options:{A:[15,-30],B:[15,-35],C:[15,-40],D:[15,-45]}, correct:'A' },
-            // 25. 9 17 51 59 177 185 ? ?  → +8;×3;+8;×3 → 555/563? Nein: 185×3=555; 555+8=563 → E
-            { sequence: [9,17,51,59,177,185,'?','?'],
-              rule: '+8; ×3; wiederholt → korrekt 555/563 → E', options:{A:[555,573],B:[535,543],C:[545,553],D:[525,533]}, correct:'E' },
-            // 26. 0 5 10 15 10 5 ? ?  → +5;+5;+5;−5;−5;−5 → 0/5  → c
-            { sequence: [0,5,10,15,10,5,'?','?'],
-              rule: '+5×3; −5×3; wiederholt', options:{A:[10,15],B:[0,-15],C:[0,5],D:[0,-5]}, correct:'C' },
-            // 27. 16 112 56 392 196 1372 ? ?  → ×7;÷2 → 686/4802  → a
-            { sequence: [16,112,56,392,196,1372,'?','?'],
-              rule: '×7; ÷2; wiederholt', options:{A:[686,4802],B:[686,1203],C:[723,5234],D:[1432,1704]}, correct:'A' },
-            // 29. 7 2 26 21 273 268 ? ?  → −5;×13 → 3484/3479  → a
-            { sequence: [7,2,26,21,273,268,'?','?'],
-              rule: '−5; ×13; wiederholt', options:{A:[3484,3479],B:[432,427],C:[1242,1237],D:[263,3419]}, correct:'A' },
-            // 30. 0 5 -15 -10 -30 -25 ? ?  → +5;×-3 → 75/80  → d
-            { sequence: [0,5,-15,-10,-30,-25,'?','?'],
-              rule: '+5; ×−3; wiederholt', options:{A:[75,-70],B:[-75,-80],C:[-75,70],D:[75,80]}, correct:'D' },
-            // 31. 17 24 19 27 22 31 ? ?  → +6;−5;+7;−5;+8;−5 → 26/36 → E
-            { sequence: [17,24,19,27,22,31,'?','?'],
-              rule: '+6;−5;+7;−5;+8;−5 → korrekt 26/36 → E', options:{A:[26,25],B:[27,37],C:[21,30],D:[234,17]}, correct:'E' },
-            // 32. 5 12 36 42 126 ? ?  → +7;×3;+6;×3;+5;×3 → 132/396 → d? PDF: 131/393... → d
-            { sequence: [5,12,36,42,126,'?','?'],
-              rule: '+7;×3;+6;×3;+5;×3', options:{A:[129,157],B:[129,102],C:[122,69],D:[131,393]}, correct:'D' },
-            // 33. 7 10 7 21 24 21 ? ?  → +3;−3;×3 → 63/66  → b
-            { sequence: [7,10,7,21,24,21,'?','?'],
-              rule: '+3; −3; ×3; wiederholt', options:{A:[63,189],B:[63,66],C:[92,149],D:[3,80]}, correct:'B' },
-            // 34. 70 100 60 110 50 120 ? ?  → +30;−40;+50;−60;+70;−80 → 40/130  → a
-            { sequence: [70,100,60,110,50,120,'?','?'],
-              rule: '+30;−40;+50;−60;+70;−80', options:{A:[40,130],B:[40,120],C:[200,110],D:[200,170]}, correct:'A' },
-            // 35. 4 7 16 31 52 79 ? ?  → +3;+9;+15;+21;+27;+33;+39 → 112/151  → b
-            { sequence: [4,7,16,31,52,79,'?','?'],
-              rule: '+3;+9;+15;+21;+27;+33;+39', options:{A:[121,151],B:[112,151],C:[109,147],D:[112,152]}, correct:'B' },
-            // 36. 18 21 12 27 6 33 ? ?  → +3;−9;+15;−21;+27;−33 → 0/39  → b
-            { sequence: [18,21,12,27,6,33,'?','?'],
-              rule: '+3;−9;+15;−21;+27;−33', options:{A:[66,30],B:[0,39],C:[0,-39],D:[3,33]}, correct:'B' },
-            // 45. 31 25 29 87 81 85 ? ?  → −6;+4;×3 → 255/249  → b
-            { sequence: [31,25,29,87,81,85,'?','?'],
-              rule: '−6; +4; ×3; wiederholt', options:{A:[100,125],B:[255,249],C:[150,280],D:[199,299]}, correct:'B' },
-            // 47. 12 11 22 16 32 21 ? ?  → −1;×2;−6;×2;−11;×2 (2.Elem +5 je Schritt) → 42/26  → d (PDF Lsg: d)
-            { sequence: [12,11,22,16,32,21,'?','?'],
-              rule: '−1;×2; −6;×2; −11;×2 (Subtraktor +5)', options:{A:[27,30],B:[36,28],C:[28,60],D:[42,26]}, correct:'D' },
-            // 48. 12 36 18 54 27 81 ? ?  → ×3;÷2 → korrekt 40,5/121,5 → E
-            { sequence: [12,36,18,54,27,81,'?','?'],
-              rule: '×3; ÷2 → korrekt 40,5/121,5 → E', options:{A:[45,120],B:[40,120],C:[45,135],D:[50,150]}, correct:'E' },
-            // 51. 1 9 72 504 3024 15120 ? ?  → ×9;×8;×7;×6;×5;×4;×3 → 60480/181440  → d
-            { sequence: [1,9,72,504,3024,15120,'?','?'],
-              rule: '×9;×8;×7;×6;×5;×4;×3', options:{A:[212440,842156],B:[804524,6045752],C:[42854,94574],D:[60480,181440]}, correct:'D' },
-            // 58. 17 22 44 49 98 103 ? ?  → +5;×2 → 206/211  → b
-            { sequence: [17,22,44,49,98,103,'?','?'],
-              rule: '+5; ×2; wiederholt', options:{A:[205,212],B:[206,211],C:[206,213],D:[200,205]}, correct:'B' },
-            // 61. 44 176 88 352 176 704 ? ?  → ×4;÷2 → 352/1408  → d
-            { sequence: [44,176,88,352,176,704,'?','?'],
-              rule: '×4; ÷2; wiederholt', options:{A:[354,1410],B:[352,1406],C:[354,1408],D:[352,1408]}, correct:'D' },
-            // 64. 3 7 2 6 1 5 ? ?  → +4;−5 → 0/4  → c
-            { sequence: [3,7,2,6,1,5,'?','?'],
-              rule: '+4; −5; wiederholt', options:{A:[1,5],B:[0,5],C:[0,4],D:[1,4]}, correct:'C' },
-            // 65. 0 3 6 9 18 21 ? ?  → +3;×2 → 42/45  → d
-            { sequence: [0,3,6,9,18,21,'?','?'],
-              rule: '+3; ×2; wiederholt', options:{A:[40,46],B:[39,42],C:[35,45],D:[42,45]}, correct:'D' },
-            // 67. 5 20 16 80 75 450 ? ?  → ×4;−4;×5;−5;×6;−6 → 445/3108? Nein: 450-5=445; 445×7=3115 → b) 444/3108: 450−6=444; 444×7=3108  → b
-            { sequence: [5,20,16,80,75,450,'?','?'],
-              rule: '×4;−4;×5;−5;×6;−6;×7', options:{A:[345,444],B:[444,3108],C:[345,3108],D:[444,3100]}, correct:'B' },
-            // 68. 0 2 2 4 6 10 ? ?  → Fibonacci-artig (vorangehende Zahl addieren) → 16/26  → a
-            { sequence: [0,2,2,4,6,10,'?','?'],
-              rule: 'je vorangehende Zahl addieren (Fibonacci)', options:{A:[16,26],B:[16,27],C:[12,24],D:[15,25]}, correct:'A' },
-            // 70. 3 5 9 17 33 65 ? ?  → ×2−1 → 129/257  → c
-            { sequence: [3,5,9,17,33,65,'?','?'],
-              rule: '×2−1; wiederholt', options:{A:[128,256],B:[129,256],C:[129,257],D:[130,260]}, correct:'C' },
-            // 72. 3 6 12 7 14 28 ? ?  → ×2;×2;−5; wiederholt → 23/46  → d
-            { sequence: [3,6,12,7,14,28,'?','?'],
-              rule: '×2; ×2; −5; wiederholt', options:{A:[20,10],B:[21,47],C:[23,45],D:[23,46]}, correct:'D' },
-            // 73. 7 14 10 30 60 56 ? ?  → ×2;−4;×3 → 168/336  → d
-            { sequence: [7,14,10,30,60,56,'?','?'],
-              rule: '×2; −4; ×3; wiederholt', options:{A:[170,320],B:[168,-336],C:[170,336],D:[168,336]}, correct:'D' },
-            // 74. 1 3 4 7 11 18 ? ?  → Fibonacci (Summe der zwei vorherigen) → 29/47  → b (PDF sagt b=19/34?)
-            { sequence: [1,3,4,7,11,18,'?','?'],
-              rule: 'Fibonacci: immer die zwei vorherigen addieren', options:{A:[21,30],B:[29,47],C:[20,30],D:[21,34]}, correct:'B' },
+        
 
-            // ── Eigene neue authentische Aufgaben ─────────────────────────────
-            // Einfach
-            { sequence: [2,4,6,8,10,12,'?','?'],
-              rule: '+2', options:{A:[13,15],B:[14,16],C:[14,17],D:[15,17]}, correct:'B' },
-            { sequence: [100,95,90,85,80,'?','?'],
-              rule: '−5', options:{A:[74,69],B:[75,70],C:[76,71],D:[73,68]}, correct:'B' },
-            { sequence: [1,2,4,8,16,32,'?','?'],
-              rule: '×2', options:{A:[60,120],B:[64,128],C:[62,124],D:[58,116]}, correct:'B' },
-            { sequence: [729,243,81,27,'?','?'],
-              rule: '÷3', options:{A:[8,2],B:[10,4],C:[9,3],D:[6,2]}, correct:'C' },
-
-            // Mittel
-            { sequence: [1,4,3,12,11,44,'?','?'],
-              rule: '×4; −1; ×4; −1; ×4', options:{A:[43,172],B:[42,168],C:[44,176],D:[41,164]}, correct:'A' },
-            { sequence: [2,3,6,7,14,15,'?','?'],
-              rule: '+1; ×2; wiederholt', options:{A:[28,30],B:[29,30],C:[30,31],D:[30,60]}, correct:'C' },
-            { sequence: [50,100,90,180,170,340,'?','?'],
-              rule: '×2; −10; wiederholt', options:{A:[320,640],B:[330,660],C:[340,680],D:[310,620]}, correct:'B' },
-            { sequence: [6,18,15,45,42,126,'?','?'],
-              rule: '×3; −3; wiederholt', options:{A:[122,366],B:[124,372],C:[123,369],D:[120,360]}, correct:'C' },
-            { sequence: [1,1,2,6,24,120,'?','?'],
-              rule: '×1;×2;×3;×4;×5;×6;×7 (Fakultät)', options:{A:[720,5040],B:[600,4200],C:[840,5880],D:[700,4900]}, correct:'A' },
-
-            // Schwer
-            { sequence: [3,6,5,10,8,16,'?','?'],
-              rule: '×2; −1; ×2; −2; ×2; −3', options:{A:[13,26],B:[12,24],C:[14,28],D:[11,22]}, correct:'A' },
-            { sequence: [1,3,9,6,18,54,'?','?'],
-              rule: '×3; ×3; −3; ×3; ×3; −3', options:{A:[48,144],B:[51,153],C:[50,150],D:[45,135]}, correct:'B' },
-            { sequence: [10,12,24,21,42,47,'?','?'],
-              rule: '+2;×2;−3;×2;+5;×2', options:{A:[94,97],B:[90,93],C:[96,99],D:[88,91]}, correct:'A' },
-
-            // Mit Option E
-            { sequence: [2,6,18,54,162,'?','?'],
-              rule: '×3 → korrekt 486/1458 → E', options:{A:[480,1440],B:[484,1452],C:[490,1470],D:[476,1428]}, correct:'E' },
-            { sequence: [4,7,13,25,49,'?','?'],
-              rule: '×2−1 → 97/193 → E', options:{A:[96,191],B:[98,194],C:[95,189],D:[100,199]}, correct:'E' },
-        ];
-
-        const wissenFragen = {
-            biologie: [
-                { q:'Was wird man nicht in einer menschlichen Nervenzelle finden?', opts:['Zellkern','Mitochondrien','Endoplasmatisches Retikulum','Golgi-Apparat','Chloroplasten'], correct:4, level:'leicht' },
-                { q:'Wie viel Liter Blut besitzt ungefähr ein gesunder Erwachsener?', opts:['0,5-1 L','1-2 L','2-4 L','3-5 L','4,5-6 L'], correct:4, level:'leicht' },
-                { q:'Durch die Ranvierschen Schnürringe entsteht…', opts:['eine schleichende Erregungsleitung','eine hüpfende Erregungsleitung','eine hopsende Erregungsleitung','eine saltatorische Erregungsleitung','eine hoppelnde Erregungsleitung'], correct:3, level:'leicht' },
-                { q:'Wie viele Geschmacksqualitäten werden im Mund von den Sinneszellen erkannt?', opts:['2','8','6','1','5'], correct:4, level:'leicht' },
-                { q:'In welchen Zellen wird Insulin produziert?', opts:['Alpha-Zellen','Nervenzellen','Gliazellen','Beta-Zellen','Belegzellen'], correct:3, level:'leicht' },
-                { q:'Wie lange dauert ungefähr der Menstruationszyklus?', opts:['ca. 9 Tage','ca. 67 Tage','ca. 28 Tage','ca. 44 Tage','ca. 114 Tage'], correct:2, level:'leicht' },
-                { q:'Welche Buchstabenkombination besitzt das männliche Geschlechtschromosom?', opts:['XY','AB','PQ','XX','FG'], correct:0, level:'leicht' },
-                { q:'In was unterteilt man zeitlich den Schwangerschaftsverlauf?', opts:['Halbzeiten','Trimenon','Semester','Viertel','Dekade'], correct:1, level:'leicht' },
-                { q:'Welche Base findet man nicht in der DNS?', opts:['Uracil','Thymin','Guanin','Adenin','Cytosin'], correct:0, level:'leicht' },
-                { q:'Was findet im Zellkern statt?', opts:['Translation','Capping','Transkription','Exozytose','Endozytose'], correct:2, level:'leicht' },
-                { q:'Antikörper sind Teil des…?', opts:['Immunsystems','Endokrinen Systems','Herz-Kreislauf-Systems','Lymphsystems','Atmungssystems'], correct:0, level:'leicht' },
-                { q:'Welche Zellen bilden Antikörper?', opts:['Makrophagen','Plasmazellen','Dendritische Zellen','T-Zellen','Monozyten'], correct:1, level:'leicht' },
-                { q:'Eine Patientin mit der Blutgruppe A…', opts:['besitzt Antikörper gegen A','besitzt Antikörper gegen B','trägt das B-Antigen','trägt kein Antigen','bezeichnet man als Universalempfängerin'], correct:1, level:'leicht' },
-                { q:'Das Crossing-Over assoziiert man am ehesten mit…', opts:['der Photosynthese','der Glykolyse','der Blut-Hirn-Schranke','der Meiose','der Proteinbiosynthese'], correct:3, level:'leicht' },
-                { q:'Was bezeichnet man als „Kraftwerke der Zelle"?', opts:['Endoplasmatisches Retikulum','Zellkern','Lysosom','Golgi-Apparat','Mitochondrien'], correct:4, level:'leicht' },
-                { q:'Nach Charles Darwin überlebt…', opts:['der am besten Angepasste','der Stärkste','der Schlauste','der Größte','der Klügste'], correct:0, level:'leicht' },
-                { q:'Was gehört nicht zu den fünf Kardinalsymptomen der Entzündung?', opts:['Rubor','Turgor','Calor','Tumor','Functio laesa'], correct:1, level:'leicht' },
-                { q:'Zu welcher Art gehören wir als Menschen?', opts:['Homo neanderthalensis','Homo heidelbergensis','Homo habilis','Homo sapiens','Homo erectus'], correct:3, level:'leicht' },
-                { q:'Welche Aussagen zu Bakterien sind korrekt? 1) Bakterien sind Prokaryoten. 2) Bakterien besitzen keinen Zellkern. 3) Bakterien sind Lebewesen. 4) Bakterien sind Eukaryoten. 5) DNS ist in Bakterien nicht vorhanden.', opts:['Aussagen 1 und 2 sind richtig','Nur Aussage 1 ist richtig','Aussagen 4 und 5 sind richtig','Aussagen 1, 2 und 3 sind richtig','Keine Aussage ist richtig'], correct:3, level:'leicht' },
-                { q:'Welche Gefäße transportieren in der Regel sauerstoffreiches Blut?', opts:['Venen','Lymphgefäße','Arterien','Venolen','Keine der gegebenen Antworten ist richtig'], correct:2, level:'leicht' },
-                { q:'Welche Gefäße transportieren in der Regel sauerstoffarmes Blut?', opts:['Arteriolen','Venen','Lymphgefäße','Arterien','Keine der gegebenen Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Wo befindet sich die weiße bzw. graue Substanz im Gehirn?', opts:['Außen grau, innen weiß','Ist von Mensch zu Mensch unterschiedlich','Innen grau, außen weiß','Außen weiß, innen grau','Keine der gegebenen Antworten ist richtig'], correct:0, level:'leicht' },
-                { q:'Wo befindet sich die weiße bzw. graue Substanz im Rückenmark?', opts:['Außen grau, innen weiß','Außen weiß, innen grau','Ist von Mensch zu Mensch unterschiedlich','Innen weiß, außen grau','Keine der gegebenen Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Was gehört zu den Grundeigenschaften von Lebewesen?', opts:['Stoffwechsel','Wachstum','Reizbarkeit','Alle der genannten Antworten sind richtig','Nur Stoffwechsel und Wachstum'], correct:3, level:'leicht' },
-                { q:'Was stimmt über tierische Zellen nicht?', opts:['Sie besitzen eine Zellwand','Sie besitzen keine Vakuolen','Sie besitzen keine Chloroplasten','Sie haben einen Zellkern','Alle der gegebenen Antworten sind richtig'], correct:0, level:'leicht' },
-                { q:'Welches ist kein Lebewesen?', opts:['Hase','Hefe','E. coli Bakterium','Corona Virus','Keine der gegebenen Antworten ist richtig'], correct:3, level:'leicht' },
-                { q:'Wie bezeichnet man das Modell der Zellmembran?', opts:['Pflasterstein-Modell','Flüssig-Mosaik-Modell','Schlüssel-Schloss-Prinzip','Teilchen-Modell','Keine der gegebenen Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'In welcher Reihenfolge läuft die Mitose ab?', opts:['Metaphase – Prophase – Prometaphase – Anaphase – Telophase','Anaphase – Prometaphase – Prophase – Telophase – Metaphase','Prophase – Prometaphase – Metaphase – Anaphase – Telophase','Prometaphase – Prophase – Metaphase – Telophase – Anaphase','Keine der gegebenen Antworten ist richtig'], correct:2, level:'leicht' },
-                { q:'Wie viele Chromosomenpaare hat ein gesunder Mensch?', opts:['21','23','44','46','Keine der gegebenen Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Was zählt zu den inneren Geschlechtsorganen des Mannes? 1) Hodensack 2) Hoden 3) Prostata 4) Bläschendrüse', opts:['1, 2 und 4 sind richtig','2 und 3 sind richtig','2, 3 und 4 sind richtig','1, 3 und 4 sind richtig','Das Geschlechtsorgan wird nicht unterteilt'], correct:2, level:'leicht' },
-                { q:'Welche Phase gehört nicht zum Menstruationszyklus?', opts:['Ovulationsphase','Austreibungsphase','Lutealphase','Follikelphase','Keine der genannten Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Welches Hormon spielt im weiblichen Zyklus keine Rolle?', opts:['Östrogen','Prolaktin','Luteinisierendes Hormon','Follikelstimulierendes Hormon','Keine der genannten Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Wozu dient das Akrosom im Spermium?', opts:['Zur Energielieferung für die Zygote','Als Schwimmunterstützung der Geißel','Durchdringung der Zona pellucida mittels Enzymen','Abtötung anderer Spermien','Keine der genannten Antworten ist richtig'], correct:2, level:'leicht' },
-                { q:'Welcher Antikörper kommt im menschlichen Körper nicht vor?', opts:['IgA','IgC','IgE','IgM','Keine der genannten Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Welches Gewebe kommt im menschlichen Körper nicht vor?', opts:['Epithelgewebe','Zylinderepithel','Sinnesgewebe','Stützgewebe','Keine der genannten Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Welche Aussagen treffen zu? 1) Venen führen das Blut immer zum Herzen. 2) Arterien führen Blut aus dem Körperkreislauf in den rechten Vorhof. 3) Arterien und Venen unterscheiden sich im Wandaufbau. 4) Venen leiten sauerstoffreiches Blut in den linken Vorhof.', opts:['1 und 4 trifft zu','2 und 5 trifft zu','1, 3 und 4 trifft zu','1 und 3 trifft zu','Alle Antworten sind richtig'], correct:2, level:'leicht' },
-                { q:'Wie ist die richtige Reihenfolge des Blutflusses?', opts:['Venen → linker Vorhof → rechte Kammer → rechter Vorhof','Venen → linker Vorhof → rechte Kammer → Aorta','rechte Kammer → Lunge → linker Vorhof → linke Kammer','Lunge → linke Kammer → rechte Kammer → rechter Vorhof','Keine der genannten Antworten ist richtig'], correct:2, level:'leicht' },
-                { q:'Welche Arten von DNA-Schäden gibt es nicht?', opts:['Basen-Fehlpaarungen','Keratosenbildung','Strangbrüche','Veränderungen im Zuckergerüst','Keine der genannten Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Welche Basen kommen in der DNA vor? 1) Uracil 2) Thymin 3) Alanin 4) Guanin 5) Cytosin', opts:['1, 4 und 5 ist richtig','2 und 3 ist richtig','nur 4 ist richtig','1, 2, 4 und 5 ist richtig','Keine der genannten Antworten ist richtig (richtig wäre 2, 4, 5)'], correct:4, level:'leicht' },
-                { q:'Am wievielten Tag nach der Befruchtung findet die Nidation statt?', opts:['am 2.-3. Tag','am 14. Tag','innerhalb des ersten Monats','am 5.-6. Tag','Keine der genannten Antworten ist richtig'], correct:3, level:'leicht' },
-                { q:'Wo geschieht meistens die Befruchtung?', opts:['Im Eierstock','In der Nähe des Muttermundes','Im Eileiter','In der Gebärmutterhinterwand','Keine der genannten Antworten ist richtig'], correct:2, level:'leicht' },
-                { q:'Was ist eine Zygote?', opts:['Eine Zwillingsanlage','Eine Eizelle vor dem Sprung','Eine befruchtete Eizelle','Eine eingenistete Eizelle','Keine der genannten Antworten ist richtig'], correct:2, level:'leicht' },
-                { q:'Der Blutdruck eines gesunden Menschen ist…', opts:['120:80 mmHg','75:50 mmHg','150:120 mmHg','200:100 mmHg','80:120 mmHg'], correct:0, level:'leicht' },
-                { q:'Wie viele Atemzüge macht ein durchschnittlicher Erwachsener in einer Minute?', opts:['25-30 Atemzüge','20-25 Atemzüge','15-20 Atemzüge','10-15 Atemzüge','5-10 Atemzüge'], correct:3, level:'leicht' },
-                { q:'Wohin münden die Vena cava superior und inferior?', opts:['In den linken Vorhof','In die linke Kammer','In den rechten Vorhof','In den rechten Ventrikel','In die Lungenvene'], correct:2, level:'leicht' },
-                { q:'Ein Spermium besteht aus: 1) Kopfstück 2) Zwischenstück 3) Mittelstück 4) Schwanz 5) Flagellen', opts:['1 und 2 sind richtig','1, 3 und 4 sind richtig','2, 4 und 5 sind richtig','Alle sind richtig','Keine der genannten Antworten ist richtig'], correct:1, level:'leicht' },
-                { q:'Was gehört zum Gleichgewichtssinn?', opts:['Bogengänge','Hammer','Amboss','Steigbügel','Ohrmuschel'], correct:0, level:'leicht' },
-                { q:'Ein Herzinfarkt kann unter anderem entstehen durch?', opts:['Schlaf','Sport','Alkoholkonsum','die Verstopfung der Herzkranzgefäße','Erweiterung der Arterien'], correct:3, level:'leicht' },
-                { q:'Wie heißt der Farbstoff, der den Muskeln ihre Farbe gibt?', opts:['Myoglobin','Hämoglobin','Ferritin','Transferrin','Hämatokrit'], correct:0, level:'leicht' },
-                { q:'Welches Organ gehört nicht zum lymphatischen System?', opts:['Lymphknoten','Knochenmark','Milz','Tonsillen','Bauchspeicheldrüse'], correct:4, level:'leicht' },
-                { q:'Was unterscheidet die DNA von der RNA?', opts:['Die DNA hat Adenin, die RNA nicht','Die DNA hat Guanin, die RNA nicht','Die RNA hat Thymin, die DNA nicht','Die DNA hat kein Uracil, die RNA schon','Die DNA hat Cytosin und die RNA nicht'], correct:3, level:'leicht' },
-                { q:'Welches Keimblatt ist das äußere?', opts:['Entoderm','Ektoderm','Mesoderm','Isoderm','Mediastinum'], correct:1, level:'leicht' },
-                { q:'Der Wert der Svedberg-Einheit der Ribosomen…', opts:['Beträgt bei Prokaryoten und Eukaryoten 80','Beträgt bei Prokaryoten und Eukaryoten 70','Beträgt nur bei Prokaryoten 80','Ist bei Prokaryoten und Eukaryoten unterschiedlich','Ist bei Prokaryoten und Eukaryoten gleich'], correct:3, level:'mittel' },
-                { q:'Welche Aussage zu den Introns der DNS ist falsch?', opts:['Der Anteil an Introns ist bei Prokaryoten kleiner als bei Eukaryoten','Introns sind nicht-kodierende Abschnitte','Der Anteil an Introns ist bei mitochondrialer DNS und eukaryotischer DNS gleich','Der Anteil an Introns ist bei Eukaryoten ca. 90%','Die mitochondriale DNS besitzt keine Introns'], correct:2, level:'mittel' },
-                { q:'Welche Strukturen der Zellmembran bilden die Antigene des ABO-Blutgruppensystems?', opts:['Phospholipide','Glykolipide','Glykoproteine','integrale Membranproteine','Sphingolipide'], correct:2, level:'mittel' },
-                { q:'Welche Abbauenzyme findet man in Lysosomen? 1) Proteasen 2) Polymerasen 3) Nukleasen 4) Lipasen 5) Ligasen', opts:['1, 2 und 3 sind richtig','2, 3 und 4 sind richtig','1, 3 und 4 sind richtig','4 ist richtig','2 und 5 sind richtig'], correct:2, level:'mittel' },
-                { q:'Welche Aussagen zum Sarkomer des Skelettmuskels sind richtig? 1) In der A-Bande sind Aktin- und Myosinfilamente. 2) Die H-Zone enthält Aktinfilamente. 3) In der I-Bande findet man keine Aktinfilamente. 4) Myosinfilamente kommen in der A-Bande vor. 5) Ein Sarkomer ist durch zwei Z-Streifen begrenzt.', opts:['Aussagen 1, 2 und 3','Aussagen 3 und 4','Aussagen 1, 4 und 5','Aussagen 2 und 3','Aussagen 4 und 5'], correct:2, level:'mittel' },
-                { q:'Welche der folgenden Zellen sind Gliazellen? 1) Fibrozyten 2) Astrozyten 3) Erythrozyten 4) Oligodendrozyten 5) Thrombozyten', opts:['Alle sind richtig','Keine ist richtig','1 und 3 sind richtig','4 und 5 sind richtig','2 und 4 sind richtig'], correct:4, level:'mittel' },
-                { q:'Pepsinogen… 1) spaltet Kohlenhydrate 2) spaltet Proteine 3) wird von Hauptzellen produziert 4) wird von Nebenzellen produziert 5) ist ein wichtiges Verdauungsenzym', opts:['2 und 3 sind richtig','2, 3 und 5 sind richtig','Alle sind richtig','3 und 5 sind richtig','1 und 4 sind richtig'], correct:3, level:'mittel' },
-                { q:'Die Pulmonalklappe im Herz ist eine…', opts:['Segelklappe zwischen linkem Atrium und linkem Ventrikel','Taschenklappe zwischen rechtem Ventrikel und Lungenarterie','Segelklappe zwischen rechtem Atrium und rechtem Ventrikel','Segelklappe zwischen rechtem Ventrikel und Lungenarterie','Taschenklappe zwischen rechtem Atrium und rechtem Ventrikel'], correct:1, level:'mittel' },
-                { q:'Welche Aussage(n) zur Regulation des Blutdrucks sind richtig? 1) Barorezeptoren befinden sich im rechten Atrium. 2) Die Niere bildet Angiotensin II. 3) Renin spaltet Angiotensin II. 4) ANP wird bei erhöhtem Blutdruck in den Atrien freigesetzt. 5) Bei erniedrigtem Blutdruck steigert ADH die Wasserrückresorption.', opts:['Alle Aussagen','1, 2 und 3','3, 4 und 5','4 und 5','1, 4 und 5'], correct:3, level:'mittel' },
-                { q:'Das Komplementsystem… 1) besteht aus verschiedenen Zellen 2) besteht aus Proteinen 3) ist Teil des spezifischen Immunsystems 4) ist Teil des unspezifischen Immunsystems 5) kann durch körperfremde Antigene aktiviert werden', opts:['1, 2 und 3','Keine ist richtig','2, 4 und 5','4 und 5','Nur 3'], correct:2, level:'mittel' },
-                { q:'Wie verhält sich die durchschnittliche Atemfrequenz eines Neugeborenen in Ruhe im Vergleich zu der eines Erwachsenen?', opts:['Halb so groß','Doppelt so groß','Gleich','8 Mal so groß','10 Mal so groß'], correct:1, level:'mittel' },
-                { q:'Eine bipolare Nervenzelle besitzt…', opts:['ein Axon und einen Dendriten','ein Axon und keine Dendriten','ein Axon und mehrere Dendriten','mehrere Axone und einen Dendriten','mehrere Axone und mehrere Dendriten'], correct:0, level:'mittel' },
-                { q:'Welcher Teil des Gehirns ist in zwei Hemisphären aufgeteilt?', opts:['Diencephalon','Cerebellum','Medulla Oblongata','Mesencephalon','Cerebrum'], correct:4, level:'mittel' },
-                { q:'Welche Tastrezeptoren reagieren bevorzugt auf Vibration?', opts:['Merkel-Tastscheiben','Ruffini-Körperchen','Pacini-Körperchen','Meissner-Körperchen','Haarfollikel-Sensoren'], correct:2, level:'mittel' },
-                { q:'Welche Aussagen zum Vestibularorgan sind richtig? 1) Die Drehbeschleunigung ist Reiz für Makulaorgane. 2) Es gibt zwei Makulaorgane im Innenohr. 3) Translationsbeschleunigung ist Reiz für Bogengänge. 4) Drehbeschleunigung ist Reiz für Bogengänge. 5) Es gibt nur 1 Makulaorgan im Innenohr.', opts:['1 und 2','4 und 5','2 und 3','Nur 2','2 und 4'], correct:4, level:'mittel' },
-                { q:'Die Geschmacksknospen für süß befinden sich auf der Zunge…', opts:['seitlich vorne','auf der Zungenspitze','seitlich hinten','im Zungengrund','in der Zungenmitte'], correct:0, level:'mittel' },
-                { q:'TSH… 1) wird in der Schilddrüse ausgeschüttet 2) wird im Hypophysenvorderlappen ausgeschüttet 3) wird im Hypophysenhinterlappen ausgeschüttet 4) stimuliert die Produktion von Schilddrüsenhormonen 5) wird im Hypothalamus ausgeschüttet', opts:['Aussagen 2 und 4','Aussagen 4 und 5','Aussage 5','Aussage 1','Aussagen 3 und 4'], correct:0, level:'mittel' },
-                { q:'Der Gegenspieler des Parathormons (PTH) ist:', opts:['TRH','TSH','Cortisol','Calcium','Calcitonin'], correct:4, level:'mittel' },
-                { q:'Die Alpha-Zellen der Langerhansschen Inseln findet man am ehesten…', opts:['in der Bauchspeicheldrüse','in der Leber','in der Niere','in der Gallenblase','im Magen'], correct:0, level:'mittel' },
-                { q:'Welche ist die korrekte Reihenfolge des Tubulusapparats?', opts:['distaler → proximaler → Henle-Schleife → Sammelrohr','proximaler → Henle-Schleife → distaler → Sammelrohr','Sammelrohr → proximaler → Henle-Schleife → distaler','distaler → proximaler → Henle-Schleife → Sammelrohr','Sammelrohr → Henle-Schleife → proximaler → distaler'], correct:1, level:'mittel' },
-                { q:'Progesteron… 1) wird während der Schwangerschaft in der Plazenta gebildet 2) hemmt GnRH-Sekretion 3) wichtig für Endometrium-Proliferation 4) wird in 1. Hälfte des Zyklus gebildet 5) steigt nach Ovulation stark an', opts:['1, 2, 3 und 4','1 und 4','1, 2, 3 und 5','Aussage 3','Alle Aussagen'], correct:2, level:'mittel' },
-                { q:'Welche der folgenden Entwicklungsstufen der Spermatogenese besitzt einen diploiden Chromosomensatz?', opts:['Spermatozyte II','Spermatogonie','Spermatozyte I','Spermatide','Spermie'], correct:1, level:'mittel' },
-                { q:'Nach welcher Entwicklungsstufe werden die reifenden Oozyten in das Ruhestadium (Diktyotän) überführt?', opts:['Prophase II','Metaphase I','Metaphase II','Prophase I','Anaphase I'], correct:3, level:'mittel' },
-                { q:'Das humane Choriongonadotropin (hCG) verhindert die…', opts:['Implantation','Follikelreifung','Kapazitation','Abstoßung des Endometriums','Akrosomenreaktion'], correct:3, level:'mittel' },
-                { q:'Wie viele Kohlenstoffatome besitzt die Desoxyribose der DNS?', opts:['1','2','3','4','5'], correct:4, level:'mittel' },
-                { q:'Für die Verpackung der DNS sind Histone notwendig. Einen DNS-Histon-Komplex nennt man:', opts:['Nukleotid','Nukleus','Nukleosid','Nukleosom','Nukleolus'], correct:3, level:'mittel' },
-                { q:'AUG kodiert für:', opts:['Serin','Methionin','Prolin','Lysin','Alanin'], correct:1, level:'mittel' },
-                { q:'IgA findet man als…', opts:['Pentamer','Monomer','Dimer','Oktamer','Heptamer'], correct:2, level:'mittel' },
-                { q:'Welche Aussage zum Komplement-System ist falsch?', opts:['Zählt zum unspezifischen humoralen Immunsystem','IgM aktiviert es stärker als IgG','Die drei Aktivierungswege münden am selben Ort','Der klassische Weg wird durch Spaltung von C9 aktiviert','Die Komplementfaktoren sind Proteine'], correct:3, level:'mittel' },
-                { q:'IgE Antikörper… 1) aktivieren Mastzellen 2) Pentamer 3) auf Schleimhautoberflächen 4) auslösend bei anaphylaktischen Reaktionen 5) wichtig bei Parasitenabwehr', opts:['1, 2 und 3','1, 2, 4 und 5','4 und 5','1, 4 und 5','Nur 1'], correct:3, level:'mittel' },
-                { q:'Welche Aussage zum AB0-System ist falsch?', opts:['Patient mit Antigen B kann nur zu Blutgruppe B gehören','Patient mit Blutgruppe 0 hat Antikörper gegen A','Die gebildeten Antikörper sind nicht plazentagängig','Patientin Blutgruppe A bildet Antikörper gegen B','Patientin Blutgruppe AB ist Universalempfängerin'], correct:0, level:'mittel' },
-                { q:'Eine Maus mit weißem Fell und spitzen Ohren (wwSS) wird mit BBrr gekreuzt. Braun dominant zu Weiß, Spitz dominant zu Rund. Welche Aussage ist falsch?', opts:['Alle F1-Mäuse sind braun','25% F2 haben weißes Fell','Die Form aller Ohren in F2 ist gleich','Mendelsche Regeln gelten nur autosomal/monogenetisch','Eine Maus Bwrr ist braun und hat runde Ohren'], correct:2, level:'mittel' },
-                { q:'Eine Genmutation kann verschiedene Ausprägungen haben, dazu gehört NICHT:', opts:['Deletion','Substitution','Duplikation','Inversion','Translokation'], correct:4, level:'mittel' },
-                { q:'Destruenten…', opts:['bauen organische Substanzen zu anorganischen ab','bauen anorganische zu organischen ab','ernähren sich autotroph','betreiben Photosynthese','zählt man zu den Produzenten'], correct:0, level:'mittel' },
-                { q:'Welche Aussagen zur Plazenta sind richtig? 1) Nur mütterliches Gewebe 2) embryonales+mütterliches Gewebe 3) Umbilicalvene → sauerstoffreiches Blut 4) Es gibt nur eine Nabelarterie 5) Plazenta produziert Progesteron', opts:['Alle Aussagen','Keine','2, 3 und 5','4 und 5','Aussage 1'], correct:2, level:'mittel' },
-                { q:'Was dringt nicht durch die Plazentaschranke?', opts:['IgG-Antikörper','Alkohol','Erythrozyten','Wasser','Sauerstoff'], correct:2, level:'mittel' },
-                { q:'Welches ist das Innere der drei Keimblätter?', opts:['Mesoderm','Blastula','Ektoderm','Entoderm','Morula'], correct:3, level:'mittel' },
-                { q:'Desoxyribonukleinsäure findet man in pflanzlichen Zellen in… 1) Zytoplasma 2) Zellkern 3) Mitochondrien 4) Vakuole 5) Chloroplasten', opts:['2 und 3','Alle','1 und 4','2, 3 und 5','Nur 2'], correct:3, level:'mittel' },
-                { q:'Welche Blutkörperchen transportieren den Sauerstoff im Blut?', opts:['Thrombozyten','Erythrozyten','Leukozyten','Chylomikronen','Keine der gegebenen Antworten'], correct:1, level:'mittel' },
-                { q:'Welches Gefäß transportiert sauerstoffreiches Blut?', opts:['Lungenarterie','Untere Hohlvene','Venöse Kapillare','Lungenvene','Keine der gegebenen Antworten'], correct:3, level:'mittel' },
-                { q:'Welche/s Gefäß/e transportiert/en in der Regel sauerstoffreiches Blut?', opts:['Aorta','Arteriolen','Lungenvene','Arterien','Alle der gegebenen Antworten'], correct:4, level:'mittel' },
-                { q:'Welches Gefäß transportiert sauerstoffarmes Blut?', opts:['Lungenarterie','Aorta','Arterielle Kapillare','Lungenvene','Keine der gegebenen Antworten'], correct:0, level:'mittel' },
-                { q:'Welche/s Gefäß/e transportiert/en in der Regel sauerstoffarmes Blut?', opts:['Untere Hohlvene','Lungenarterie','Venolen','Venen','Alle der gegebenen Antworten'], correct:4, level:'mittel' },
-                { q:'Was befindet sich zwischen dem Magen und dem Zwölffingerdarm?', opts:['Blinddarm','Wurmfortsatz','Pförtner','Gallenblase','Keine der gegebenen Antworten'], correct:2, level:'mittel' },
-                { q:'Welche der folgenden Zellorganellen hat eine doppelte Zellmembran? 1) Mitochondrien 2) Golgi-Apparat 3) Ribosomen 4) Zellkern 5) Plastiden 6) Mikrotubuli', opts:['1, 4 und 5','1, 3, 4 und 6','2, 4 und 5','1 und 3','Keine der gegebenen Antworten'], correct:0, level:'mittel' },
-                { q:'Welche der folgenden Basenpaare findet man in der Ribonukleinsäure?', opts:['Adenin–Thymin, Guanin–Cytosin','Guanin–Cytosin, Adenin–Uracil','Adenin–Guanin, Thymin–Cytosin','Thymin–Uracil, Guanin–Cytosin','Keine der gegebenen Antworten'], correct:1, level:'mittel' },
-                { q:'Welche der folgenden Basenpaare findet man in der DNA?', opts:['Guanin–Adenin, Cytosin–Thymin','Adenin–Uracil, Guanin–Cytosin','Thymin–Uracil, Guanin–Cytosin','Cytosin–Guanin, Adenin–Thymin','Keine der gegebenen Antworten'], correct:3, level:'mittel' },
-                { q:'Welche der folgenden Basen sind Purin-Basen? 1) Guanin 2) Adenin 3) Cytosin 4) Thymin 5) Uracil', opts:['1, 2 und 5','1 und 2','2, 3 und 4','1, 3 und 5','Keine der gegebenen Antworten'], correct:1, level:'mittel' },
-                { q:'Welche der folgenden Basen sind Pyrimidin-Basen? 1) Uracil 2) Guanin 3) Cytosin 4) Adenin 5) Thymin', opts:['1, 2 und 4','1 und 5','1, 3 und 5','2, 3 und 5','Keine der gegebenen Antworten'], correct:2, level:'mittel' },
-                { q:'Ein Nukleotid besteht aus welchen Bestandteilen?', opts:['Phosphatrest, Fettsäure und Base','Zucker, Phosphatrest und Base','Phosphorsäure, Zucker und Base','Zwei Basen, Zucker und Phosphatrest','Keine der gegebenen Antworten'], correct:1, level:'mittel' },
-                { q:'Was bedeutet Apoptose?', opts:['Abstoßung von Abfallresten','Programmierter Zelltod','Aufnahme von Zellresten','Verdoppelung der Zelle','Aufnahme von Proteinen'], correct:1, level:'mittel' },
-                { q:'Ein DNA-Molekül enthält 20% Guanin, wie viel Prozent Adenin?', opts:['20%','60%','40%','30%','Keine der gegebenen Antworten'], correct:3, level:'mittel' },
-                { q:'Ein DNA-Molekül enthält 15% Thymin, wie viel Prozent Adenin?', opts:['35%','70%','15%','30%','Keine der gegebenen Antworten'], correct:2, level:'mittel' },
-                { q:'Wie viele Autosomen hat ein gesunder Mensch?', opts:['46','23','22','44','Keine der gegebenen Antworten'], correct:3, level:'mittel' },
-                { q:'Wie viele Gonosomen hat ein gesunder Mensch?', opts:['46','2','23','22','Keine der gegebenen Antworten'], correct:1, level:'mittel' },
-                { q:'Zu welcher Gattung gehören die Pilze?', opts:['Tiere','Bakterien','Viren','Pflanzen','Keine der gegebenen Antworten'], correct:4, level:'mittel' },
-                { q:'Wie bezeichnet man die Aufnahme von Stoffen in die Zelle?', opts:['Transzytose','Apoptose','Endozytose','Exozytose','Keine der gegebenen Antworten'], correct:2, level:'mittel' },
-                { q:'Wie bezeichnet das Ausschleusen von Stoffen aus der Zelle?', opts:['Endozytose','Transzytose','Apoptose','Exozytose','Keine der gegebenen Antworten'], correct:3, level:'mittel' },
-                { q:'In welcher Phase wird die DNS repliziert?', opts:['G0-Phase','G1-Phase','S-Phase','G2-Phase','Interphase'], correct:2, level:'mittel' },
-                { q:'Was führt zu einem Mangel von Erythrozyten?', opts:['Proteinmangel','Vitaminmangel','Zu viel CO₂','Eisenmangel','Es gibt nie einen Mangel'], correct:3, level:'mittel' },
-                { q:'Wann wird bestimmt, welches Geschlecht ein Baby hat?', opts:['Bei der Befruchtung','Bei der Teilung der Zelle','Im 1. Trimester der Schwangerschaft','Während der Meiose','In den ersten 2 Wochen der Schwangerschaft'], correct:0, level:'mittel' },
-                { q:'Wo befindet sich der Pförtner?', opts:['Gallenblase','Mageneingang','Magenausgang','Im Dünndarm','In der Speiseröhre'], correct:2, level:'mittel' },
-                { q:'Wodurch kommt es zu einem krankhaft erhöhten Leukozytenwert? 1) Blutungen 2) Leukämie 3) Entzündungen 4) Vitaminmangel 5) Proteinmangel', opts:['1, 4 und 5','2 und 3 sind richtig','2, 3 und 5','Alle','Keine der oben genannten'], correct:1, level:'mittel' },
-                { q:'Welche der folgenden Aussagen ist falsch?', opts:['Die Oozyten reifen im Eierstock','Die Gebärmutterschleimhaut verdickt sich jeden Monat','Der Uterus ist ein Muskel','Die Oozyte wandert über den Eileiter in den Eierstock','Es kommt normalerweise nur eine Eizelle zum Eisprung'], correct:3, level:'mittel' },
-                { q:'Was verbindet die Nabelschnur?', opts:['Den Fötus mit der Gebärmutterschleimhaut','Den Fötus mit der Plazenta','Den Fötus mit der Vagina','Den Fötus mit den Eileitern','Den Fötus mit dem Dach des Uterus'], correct:1, level:'mittel' },
-                { q:'Wo werden die reifen Samenzellen im Körper des Mannes gespeichert?', opts:['Hoden','Samenleiter','Nebenhoden','Im Harnleiter','Nebenniere'], correct:2, level:'mittel' },
-                { q:'Was gehört noch zu den lymphatischen Organen?', opts:['Knochenmark','Bauchspeicheldrüse','Zunge','Hypothalamus','Zähne'], correct:0, level:'mittel' },
-                { q:'Was passiert im Dickdarm, nachdem der Nahrungsbrei den Dünndarm passiert hat?', opts:['Nährstoffe werden resorbiert','Vitamin B12 wird aufgenommen','Vitamin K wird aufgenommen','Enzyme werden ausgeschüttet','Wasser wird aufgenommen und der Speisebrei eingedickt'], correct:4, level:'mittel' },
-                { q:'Wo benötigt der Körper Salzsäure?', opts:['Dünndarm','Leber','Bauchspeicheldrüse','Lunge','Magen'], correct:4, level:'mittel' },
-                { q:'Was hilft dem Körper, seine Temperatur besser zu regulieren?', opts:['Talgdrüsen','Hornhaut','Haare','Schweißdrüsen','Fettgewebe'], correct:3, level:'mittel' },
-                { q:'An welche Strukturen grenzt das Kammerwasser?', opts:['Iris, Glaskörper und Linse','Glaskörper','Iris und Linse','Hornhaut','Ziliarmuskel'], correct:0, level:'mittel' },
-                { q:'Die befruchtete Eizelle ist nach ca. 5 Tagen in welchem Stadium?', opts:['Zygote','Morula','Blastozyste','Fötus','Embryo'], correct:2, level:'mittel' },
-                { q:'Was wird im Pankreas noch produziert außer Insulin?', opts:['Glukose','Glukagon','Gluten','Glykolyse','Parathormon'], correct:1, level:'mittel' },
-                { q:'Welche Zellen sind omnipotent?', opts:['Befruchtete Eizelle','Fötus','Embryo','Kleinkind','Haut'], correct:0, level:'mittel' },
-                { q:'Welches ist ein Vitamin?', opts:['Glutaminsäure','Lysin','Leucin','Ethanol','Ascorbinsäure'], correct:4, level:'mittel' },
-                { q:'Welche Zellen haben keinen Zellkern?', opts:['Eizelle','Erythrozyten','Nervenzelle','Muskelzelle','Knochenzelle'], correct:1, level:'mittel' },
-                { q:'Welche Zellen sind in der Lage, Knochenmaterial abzubauen?', opts:['Osteoblasten','Osteozyten','Osteoklasten','Leukozyten','Lymphozyten'], correct:2, level:'mittel' },
-                { q:'Wie viele Nebenschilddrüsen gibt es?', opts:['Eine rechts','Eine rechts und eine links','Zwei links','Zwei rechts','Zwei rechts und zwei links'], correct:4, level:'mittel' },
-                { q:'Was unterscheidet Blutplasma vom Blutserum?', opts:['Gerinnungsfaktoren','Zellbestandteile','Blutplasma hat keine Erythrozyten','Es gibt keinen Unterschied','Unterschiedlicher Zellanteil'], correct:0, level:'mittel' },
-                { q:'In welchem Organ werden die Erythrozyten produziert?', opts:['Thymus','Nebenniere','Knochenmark','Milz','Leber'], correct:2, level:'mittel' },
-                { q:'Welches Organ filtert die alten Erythrozyten aus?', opts:['Thymus','Nebenniere','Knochenmark','Milz','Leber'], correct:3, level:'mittel' },
-                { q:'Was ist die Grenze zwischen Brust- und Bauchhöhle?', opts:['Lunge','Mediastinum','Dünndarm','Zwerchfell','Magen'], correct:3, level:'mittel' },
-                { q:'Wie wird die Kappe des Spermiums bezeichnet?', opts:['Mikrotubuli','Akrosom','Mitochondrium','Basalplatte','Axon'], correct:1, level:'mittel' },
-                { q:'Wo wird Pepsin produziert?', opts:['Bauchspeicheldrüse','Dünndarmschleimhaut','Dickdarmschleimhaut','Magenschleimhaut','Gallenblase'], correct:3, level:'mittel' },
-                { q:'Was kann die Plazenta nicht durchdringen?', opts:['Alkohol','Nährstoffe','Sauerstoff','Nikotin','Erythrozyten'], correct:4, level:'mittel' },
-                { q:'Welche Aussage zu den Tastrezeptoren ist richtig?', opts:['Pacini-Körperchen reagieren auf Dehnung/Spannung','Ruffini-Körperchen reagieren auf Druckveränderung','Meissner-Körperchen reagieren auf Vibration','Merkel-Körperchen reagieren auf Vibration','Meissner-Körperchen reagieren auf Druckveränderungen'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zu Gap Junctions stimmt? Gap Junctions…', opts:['verbinden Zelle mit Basallamina','verhindern Diffusion in Zellzwischenräumen','bilden Kanäle, die Zellen verbinden','sind wichtig für Zellfortbewegung','bilden den Spindelapparat'], correct:2, level:'schwer' },
-                { q:'Welche Aussage zur Herzmuskulatur ist falsch?', opts:['Herzmuskelzellen besitzen Y-ähnliche Struktur','Sie weist Querstreifen auf','Der Zellkern liegt randständig','Elektromechanische Kopplung sorgt für gleichmäßige Kontraktion','Die Einzelzellen sind nicht miteinander verschmolzen'], correct:2, level:'schwer' },
-                { q:'Welche Aussagen zu Grundeigenschaften der Lebewesen sind korrekt? 1) Kleinste Einheit ist die Zelle 2) Viren sind keine Lebewesen wegen fehlender Fortbewegung 3) Viren sind keine Lebewesen wegen fehlenden Stoffwechsels 4) Manche Lebewesen reagieren nicht auf Reize 5) Lebewesen nehmen keine Nährstoffe auf', opts:['1, 2, 3 und 4','Nur 1','1 und 3','1, 2 und 3','Alle'], correct:2, level:'schwer' },
-                { q:'Welche Aussagen zum Miller-Urey-Experiment sind korrekt? 1) CO war kein Bestandteil der Uratmosphäre 2) Endotherme Reaktion 3) Chemische Evolution: anorganisch → organisch 4) Alanin war in der Ursuppe 5) In Ursuppe waren bereits Zellen', opts:['Alle','3 und 4','1, 2, 3 und 4','2, 3 und 4','Nur 3'], correct:3, level:'schwer' },
-                { q:'Welche Aussagen zu Prokaryoten sind korrekt? 1) Plastid = ringförmige DNS 2) Geringer Intron-Anteil → weniger anfällig 3) Alle Prokaryoten ohne Zellwand 4) Keine Mitochondrien 5) DNS nicht durch Histone verpackt', opts:['1, 2 und 3','2 und 4','Alle','1, 2, 4 und 5','4 und 5'], correct:4, level:'schwer' },
-                { q:'Wie bezeichnet man die DNS in Chloroplasten?', opts:['Plastid','Plastom','Plasmid','Plasma','Plasmodium'], correct:1, level:'schwer' },
-                { q:'Welche Aussage zur Zellmembran ist falsch?', opts:['Cholesterin erhöht die Viskosität','Membranproteine diffundieren lateral','Sauerstoff braucht kein Carrier-Protein','Cholesterin v.a. in Lipid Rafts','Wasser kann die Zellmembran nicht passieren, weil hydrophil'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zu den Mitochondrien ist falsch?', opts:['Werden vorwiegend von der Mutter vererbt','Bruch der äußeren Membran führt zu Apoptose','ATP-Synthese findet an der äußeren Membran statt','Cristae vergrößern Oberfläche','Hohe H⁺-Konzentration im Membranzwischenraum'], correct:2, level:'schwer' },
-                { q:'Welche Aussage zum Golgi-Apparat ist falsch?', opts:['Zum Zellkern zugewandte Seite = trans Seite','Einzelne Zisternen-Stapel = Dictyosom','Sekretorische Vesikel werden gebildet','Besitzt eine Membran','Lipide werden nicht modifiziert'], correct:0, level:'schwer' },
-                { q:'Welche Aussagen zum Endoplasmatischen Retikulum sind richtig? 1) In Muskelzellen = sarkoplasmatisches Retikulum 2) Speichert Calcium 3) Glattes ER ohne Ribosomen 4) Röhrenförmiges Membransystem 5) Lipide im rauen ER synthetisiert', opts:['1, 2 und 4','1, 2, 3 und 5','Alle','1, 2, 3 und 4','3, 4 und 5'], correct:3, level:'schwer' },
-                { q:'Welche Aussage zu den Mikrotubuli ist falsch?', opts:['Aus Alpha- und Gamma-Untereinheiten','Zentriolen aus 27 Mikrotubuli','Teil des Zytoskeletts','Proteinkomplexe','Teil des Spindelapparats'], correct:0, level:'schwer' },
-                { q:'Welche Aussagen zum Epithelgewebe sind korrekt? 1) Keine Blutgefäße 2) Wachsen nur apikal 3) Verhorntes Plattenepithel im Ösophagus 4) Mehrreihiges Epithel: alle erreichen die apikale Oberfläche 5) Unter jeder Epithelschicht: Basalmembran', opts:['2, 3 und 4','1, 2 und 4','1, 2, 4 und 5','3, 4 und 5','1, 2 und 5'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zur Skelettmuskulatur ist falsch?', opts:['Myofibrille = mehrere Sarkomere','Mehrere Myofibrillen = Synzytium','Zellkerne liegen randständig','Quergestreifte Muskulatur','Sarkomere durch Z-Scheiben getrennt'], correct:1, level:'schwer' },
-                { q:'Welche Aussage zur Muskulatur ist korrekt?', opts:['Glatte Muskulatur willkürlich steuerbar','Glatte Muskulatur kontrahiert schneller','Herzmuskelkontraktion durch externen Nervenimpuls','An Glanzstreifen Haft- und Kommunikationskontakte','Sarkomere nur in glatter Muskulatur'], correct:3, level:'schwer' },
-                { q:'Welche Aussagen zum Nervengewebe sind korrekt? 1) Gliazellen = bestimmte Zellart 2) Aktionspotentiale chemisch an Synapsen 3) Schwann-Zellen bilden Myelinscheide im ZNS 4) Dickeres Axon = schnellere Leitung 5) Weniger Gliazellen als Nervenzellen', opts:['2 und 3','1, 2 und 5','4 und 5','1, 2, 3 und 5','Aussage 4'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zum Nervengewebe ist falsch?', opts:['Astrozyten an Blut-Hirn-Schranke beteiligt','Membran der Dendriten = präsynaptische Membran','Ganglien im PNS','Kontinuität an Synapsen unterbrochen','Myelinisierung erhöht Leitungsgeschwindigkeit'], correct:1, level:'schwer' },
-                { q:'Welche Aussage zum Binde- und Stützgewebe ist falsch?', opts:['Geht aus Mesenchym hervor','Großer interstitieller Raum als gemeinsames Merkmal','Knorpelgewebe besteht aus Chondrozyten','Fibrozyten synthetisieren ECM','Fettgewebe gehört nicht zum Bindegewebe'], correct:4, level:'schwer' },
-                { q:'Welche Aussagen zu Verdauungsenzymen sind richtig? 1) Alpha-Amylase spaltet Stärke zu Maltose 2) Pepsinogen spaltet Proteine 3) Pepsinogen von Hauptzellen 4) Lipasen spalten Fette 5) Niedriger pH aktiviert Verdauungsenzyme', opts:['Alle','2, 3, 4 und 5','1, 3, 4 und 5','4 und 5','Keine'], correct:2, level:'schwer' },
-                { q:'Welche Aussage zum Dünndarm ist korrekt?', opts:['Duodenum ist der längste Teil','Keine Zotten','Duodenum gefolgt von Ileum','Pankreas und Gallengang münden ins Duodenum','Enterozyten resorbieren Nährstoffe – beide korrekt'], correct:3, level:'schwer' },
-                { q:'Welche Aussage zum Colon ist falsch?', opts:['Colon descendens nach Colon transversum','Im Colon keine Zotten','Wichtige Aufgabe: Wasser-Resorption','Bei Blinddarm-Entzündung ist Appendix entzündet','Im Colon wird ein großer Anteil der Nahrung resorbiert'], correct:4, level:'schwer' },
-                { q:'Welche Aussagen zum Herz-Kreislauf-System sind richtig? 1) Lungenkreislauf = Niederdruck 2) Lungenarterie führt sauerstoffarmes Blut 3) Sauerstoffreiches Blut durch Trikuspidalklappe in Aorta 4) Mitralklappe zwischen rechtem Atrium und rechtem Ventrikel 5) Mitralklappe ist Taschenklappe', opts:['Keine','Alle','3, 4 und 5','1, 2 und 3','1 und 2'], correct:4, level:'schwer' },
-                { q:'Welche Aussagen zum Herzen sind falsch? 1) Koronar-Durchblutung v.a. in Systole 2) His-Bündel als Brücke Atrium-Ventrikel 3) AV-Knoten höhere Frequenz als Sinusknoten 4) EKG zeichnet Herzmuskelaktivität auf 5) AP zuerst durch Purkinje, dann Tawara', opts:['1, 2 und 3','2 und 5','1, 4 und 5','2, 3, 4 und 5','1 und 3 sind falsch'], correct:4, level:'schwer' },
-                { q:'Welche Aussagen zum Blut sind korrekt? 1) Plasma = Serum minus Gerinnungsfaktoren 2) Proteine = Hämatokrit 3) Erythrozyten größter Anteil der Blutzellen 4) 5-7 L Blut beim Erwachsenen 5) Immunglobuline im Plasma', opts:['2, 3 und 4','4 und 5','3, 4 und 5','Nur 4','1 und 2'], correct:2, level:'schwer' },
-                { q:'Wie wird das darmassoziierte Immunsystem genannt?', opts:['BALT','SALT','KALT','GALT','PALT'], correct:3, level:'schwer' },
-                { q:'Welche Aussage zu den Antikörpern ist korrekt?', opts:['IgM bildet größten Anteil','IgA hauptsächlich im Blut','IgE an T-Lymphozyten gebunden','Erhöhtes IgM = akute Infektion','Bei Parasitenabwehr ist IgG primär'], correct:3, level:'schwer' },
-                { q:'Welche Aussage zum Lymphsystem ist falsch?', opts:['Chylomikronen über Lymphe transportiert','Offenes System','Lymphe wird aktiv durch Gefäße transportiert','Immunzellen in der Lymphe','Lymphe mündet in obere Hohlvene'], correct:2, level:'schwer' },
-                { q:'Was ist in einem Lebendimpfstoff gegen Cholera enthalten?', opts:['Funktionsfähige Cholera-Erreger','Antikörper gegen Cholera','Abgeschwächte Cholera-Erreger','Speziell gezüchtete Immunzellen','Immunzellen zur Unterstützung'], correct:2, level:'schwer' },
-                { q:'Welche Aussagen zum Immunsystem sind korrekt? 1) Mastzellen können phagozytieren 2) Dendritische Zellen sind APCs 3) Makrophagen zum angeborenen Immunsystem 4) Makrophagen aktivieren das Komplement 5) Plasmazellen produzieren Antikörper', opts:['1 und 2','Alle','2, 3 und 4','1, 2, 3 und 5','Keine'], correct:3, level:'schwer' },
-                { q:'Welche Aussagen zum Atmungssystem sind falsch? 1) Atemzentrum in Medulla oblongata 2) Gasaustausch in Alveolen aktiv 3) Gasaustausch = äußere Atmung 4) Konduktiver Abschnitt für Gasaustausch 5) Rechter Lungenflügel: 3 Lappen', opts:['1, 4 und 5','2 und 4 sind falsch','2 und 3','Nur 1','Keine'], correct:1, level:'schwer' },
-                { q:'Welche Aussagen zur Anatomie des Ohres sind korrekt? 1) Trommelfell trennt Mittelohr/Innenohr 2) Amboss ist letztes der drei Knöchelchen 3) Vestibularorgan: Bogengänge in 3 Ebenen 4) Übergang Mittel-/Innenohr = ovales Fenster 5) Ohrtrompete verbindet Mittelohr mit Nasenrachen', opts:['3, 4 und 5','3 und 4','2 und 3','1, 2, 3 und 4','1 und 2'], correct:0, level:'schwer' },
-                { q:'Welche Aussage ist falsch?', opts:['TRH wird im Hypothalamus ausgeschüttet','T3 = Trijodthyronin','ADH wird in der Hypophyse freigesetzt','T4 wird in der Schilddrüse freigesetzt','T3 wird in der Hypophyse freigesetzt'], correct:4, level:'schwer' },
-                { q:'Welche Aussage ist richtig?', opts:['Plazenta besteht aus mütterlichem und embryonalem Gewebe','Chorionzotten ohne Blutgefäße','Medikamente passieren Plazentaschranke nicht','Nabelarterien führen sauerstoffreiches Blut','Plazenta wiegt ca. 3000 g'], correct:0, level:'schwer' },
-                { q:'Welche Aussagen zur DNS sind korrekt? 1) Desoxyribose mit 5 C-Atomen 2) Phosphodiesterbindung zwischen Zuckern 3) G-C: 3 H-Brücken 4) DNS bei Eukaryoten über Histone verpackt 5) Anhängung neuer Nukleotide nur am 3´-Ende', opts:['1, 2, 4 und 5','Alle','3 und 5','2, 3 und 5','Nur 1'], correct:1, level:'schwer' },
-                { q:'Welche Aussagen zur RNA sind korrekt? 1) RNA instabiler als DNS 2) siRNA an Geninaktivierung beteiligt 3) tRNA baut Ribosomen mit auf 4) RNA hat dieselbe Ribose wie DNS 5) mRNA wird im Zellkern gespleißt', opts:['Alle','Keine','2 und 3','3, 4 und 5','1, 2 und 5'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zur mRNA ist korrekt? 1) Poly(A)-Schwanz am 5´-Ende 2) Beim Spleißen werden Exons herausgeschnitten 3) Aus prä-mRNA immer dieselbe reife mRNA 4) mRNA wird außerhalb des Zellkerns gespleißt 5) mRNA wird von DNS translatiert', opts:['1, 2, 4 und 5','2 und 5','Alle','Keine','1, 2 und 5'], correct:3, level:'schwer' },
-                { q:'Welche Aussage zu Mutationen ist falsch?', opts:['Bei Deletion wird eine Base entfernt','Substitution = Genmutation','Chromosomenmutation durch fehlerhaftes Crossing-Over','Insertion = Genmutation','Down-Syndrom = Genommutation'], correct:1, level:'schwer' },
-                { q:'Welche Aussage zu den drei Keimblättern ist falsch?', opts:['Ektoderm = äußere Keimscheibe','Aus Entoderm: Verdauungstrakt','Aus Mesoderm: Pankreas','Aus Ektoderm: Nervensystem','Mesoderm = mittlere Keimscheibe'], correct:2, level:'schwer' },
-                { q:'Welche ist die richtige Reihenfolge? (Harnwege)', opts:['Nierenbecken → Harnleiter → Harnblase → Harnröhre','Harnblase → Harnleiter → Harnröhre → Nierenbecken','Nierenbecken → Harnröhre → Harnleiter → Harnblase','Harnleiter → Nierenbecken → Harnröhre → Harnblase','Harnröhre → Harnleiter → Nierenbecken → Harnblase'], correct:0, level:'schwer' },
-                { q:'Welche ist die richtige Reihenfolge des Tubulus?', opts:['Henle → proximaler → distaler → Sammelrohr','Distaler → Henle → Sammelrohr → proximaler','Sammelrohr → proximaler → Henle → distaler','Proximaler → Henle → distaler → Sammelrohr','Henle → Sammelrohr → proximaler → distaler'], correct:3, level:'schwer' },
-                { q:'Der Fachbegriff für den von der Vakuole beeinflussten inneren Zelldruck lautet:', opts:['Inferior','Rubor','Tumor','Turgor','Calor'], correct:3, level:'schwer' },
-                { q:'Wie groß ist der Embryo in der 8. Schwangerschaftswoche?', opts:['ca. 5 mm','ca. 1 mm','ca. 3 mm','ca. 15 mm','ca. 20 mm'], correct:1, level:'schwer' },
-                { q:'Wie viele Atemzüge macht ein gesundes Kind in der Minute?', opts:['45-60 Atemzüge','30-45 Atemzüge','25-30 Atemzüge','15-25 Atemzüge','10-15 Atemzüge'], correct:2, level:'schwer' },
-                { q:'Wie viele Atemzüge macht ein gesunder Säugling in der Minute?', opts:['45-50','40-45','35-40','30-35','25-30'], correct:1, level:'schwer' },
-                { q:'Aus welchen Gefäßen besteht die Nabelschnur?', opts:['Arterien und 2 Venen','1 Arterie und 2 Venen','2 Arterien und 1 Vene','1 Arterie und 1 Vene','Keine der gegebenen Antworten'], correct:2, level:'schwer' },
-                { q:'Aus welchen Zellen wird im PNS die Myelinscheide gebildet?', opts:['Astrozyten','Mikroglia','Schwann-Zellen','Oligodendrozyten','Keine der gegebenen Antworten'], correct:2, level:'schwer' },
-                { q:'Aus welchen Zellen wird im ZNS die Myelinscheide gebildet?', opts:['Schwann-Zellen','Astrozyten','Ependymzellen','Oligodendrozyten','Keine der gegebenen Antworten'], correct:3, level:'schwer' },
-                { q:'Wie sind Cilien und Geißeln aufgebaut?', opts:['9+3','9×3+2','9+2','9×2+2','Keine der gegebenen Antworten'], correct:3, level:'schwer' },
-                { q:'In welcher Phase der Meiose findet das Crossing-Over statt?', opts:['Leptotän','Metaphase','Diplotän','Pachytän','Keine der gegebenen Antworten'], correct:3, level:'schwer' },
-                { q:'Wo findet man aspirierte (verschluckte) Fremdkörper eher in der Lunge?', opts:['Im linken Bronchus','In den Alveolen','Im rechten Bronchus','Nur bis zur Trachea','Keine der gegebenen Antworten'], correct:2, level:'schwer' },
-                { q:'Aus welchen Untereinheiten besteht ein eukaryotisches Ribosom?', opts:['60S und 40S','50S und 50S','50S und 30S','80S und 20S','Keine der gegebenen Antworten'], correct:0, level:'schwer' },
-                { q:'Aus welchen Untereinheiten besteht ein prokaryotisches Ribosom?', opts:['60S und 40S','50S und 30S','60S und 20S','50S und 20S','Keine der gegebenen Antworten'], correct:1, level:'schwer' },
-                { q:'Wie bezeichnet man die Aufnahme von flüssigen Stoffen in die Zelle?', opts:['Endozytose','Pinozytose','Apoptose','Phagozytose','Keine der gegebenen Antworten'], correct:1, level:'schwer' },
-                { q:'In welcher Form liegt die DNA außerhalb der Mitose vor?', opts:['Heterochromatin','als RNA','Euchromatin','Beta-Faltblatt','Keine der gegebenen Antworten'], correct:2, level:'schwer' },
-                { q:'Was ist die Hauptfunktion des glatten endoplasmatischen Retikulums (glattES ER)?', opts:['Proteinsynthese','Lipidsynthese und Entgiftung','ATP-Produktion','DNA-Replikation','Proteinabbau'], correct:1 },
-                { q:'Welche Organelle ist für die Verdauung von Zellbestandteilen (Autophagie) zuständig?', opts:['Ribosom','Golgi-Apparat','Lysosom','Mitochondrium','Peroxisom'], correct:2 },
-                { q:'Was ist der Unterschied zwischen Chromatin und Chromosomen?', opts:['Kein Unterschied','Chromatin ist verdichtetes Chromosom','Chromosomen sind kondensiertes Chromatin','Chromatin findet sich nur in Prokaryoten','Chromosomen sind RNA-basiert'], correct:2 },
-                { q:'Welche der folgenden Zellverbindungen ermöglicht den direkten Stoffaustausch zwischen Zellen?', opts:['Tight Junctions','Desmosomen','Gap Junctions','Hemidesmosomen','Adherens Junctions'], correct:2 },
-                { q:'Was ist das Ruhepotential einer typischen Nervenzelle?', opts:['0 mV','−70 mV','+70 mV','−40 mV','+40 mV'], correct:1 },
-                { q:'Welche der folgenden Aussagen zur Meiose ist korrekt?', opts:['Meiose erzeugt 2 diploide Tochterzellen','Meiose findet in somatischen Zellen statt','Meiose I trennt homologe Chromosomen','DNA-Replikation findet zwischen Meiose I und II statt','Meiose II ist eine Redukteilung'], correct:2 },
-                { q:'Was ist eine Nonsense-Mutation?', opts:['Eine Mutation, die keine Auswirkung hat','Eine Punktmutation die ein Stoppcodon erzeugt','Eine Insertion von mehreren Basen','Eine Deletion eines ganzen Chromosoms','Eine Translokation'], correct:1 },
-                { q:'Welches Enzym ist für die RNA-Synthese zuständig?', opts:['DNA-Polymerase','RNA-Polymerase','Helikase','Ligase','Primase'], correct:1 },
-                { q:'Was beschreibt der Begriff „semikonsevative Replikation"?', opts:['Beide Tochterstränge sind neu','Jeder Tochterstrang besteht aus einem alten und einem neuen Strang','Nur ein Tochterstrang ist neu','DNA wird zerstört und neu aufgebaut','RNA wird als Vorlage genutzt'], correct:1 },
-                { q:'Wo findet die Translation statt?', opts:['Im Zellkern','Im Mitochondrium','Am Ribosom im Zytoplasma','Im Golgi-Apparat','Im endoplasmatischen Retikulum'], correct:2 },
-                { q:'Wie heißt die Klappe zwischen rechtem Vorhof und rechter Kammer?', opts:['Mitralklappe','Aortenklappe','Trikuspidalklappe','Pulmonalklappe','Bikuspidalklappe'], correct:2 },
-                { q:'Welches Vitamin wird für die Blutgerinnung benötigt?', opts:['Vitamin A','Vitamin B12','Vitamin C','Vitamin D','Vitamin K'], correct:4 },
-                { q:'Was ist die Funktion der Thrombozyten?', opts:['Sauerstofftransport','Immunabwehr','Blutgerinnung','Hormonproduktion','Stoffwechsel'], correct:2 },
-                { q:'Welche Zellen des Immunsystems produzieren Antikörper?', opts:['T-Helferzellen','Zytotoxische T-Zellen','B-Zellen / Plasmazellen','Makrophagen','NK-Zellen'], correct:2 },
-                { q:'Was ist die Funktion des Kleinhirns (Cerebellum)?', opts:['Sprache und Denken','Koordination und Gleichgewicht','Atmungsregulation','Hormonsteuerung','Sehverarbeitung'], correct:1 },
-                { q:'Welcher Nerv ist der längste im menschlichen Körper?', opts:['Nervus vagus','Nervus trigeminus','Nervus facialis','Nervus ischiadicus','Nervus opticus'], correct:3 },
-                { q:'Wo wird die Galle gespeichert?', opts:['Leber','Pankreas','Gallenblase','Dünndarm','Magen'], correct:2 },
-                { q:'Was ist Peristaltik?', opts:['Verdauung im Magen','Wellenförmige Muskelbewegung im Verdauungstrakt','Aufnahme von Nährstoffen','Ausscheidung von Abfallstoffen','Sekretion von Verdauungsenzymen'], correct:1 },
-                { q:'Welche Zellen produzieren Testosteron?', opts:['Sertoli-Zellen','Spermatogonien','Leydig-Zellen','Epithelzellen des Hodens','Prostatadrüsenzellen'], correct:2 },
-                { q:'Was ist die Blut-Hirn-Schranke?', opts:['Eine physische Barriere aus Knochen','Eine selektive Barriere durch Endothelzellen und Astrozyten','Ein Membransystem im Gehirn','Die Hirnhäute','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche Phasen hat der Herzaktionszyklus in der richtigen Reihenfolge?', opts:['Systole → Diastole → Pause','Diastole → Systole → Pause','Pause → Diastole → Systole','Systole → Pause → Diastole','Diastole → Pause → Systole'], correct:0 },
-                { q:'Was ist Glukoneogenese?', opts:['Abbau von Glukose zu Pyruvat','Neubildung von Glukose aus Nicht-Kohlenhydraten','Umwandlung von Glukose zu Glykogen','Transport von Glukose in Zellen','Oxidation von Glukose zu CO₂'], correct:1 },
-                { q:'Welches Organ reguliert den Calcium-Haushalt primär?', opts:['Schilddrüse','Nebenschilddrüse','Niere','Leber','Pankreas'], correct:1 },
-                { q:'Was ist die GFR (glomeruläre Filtrationsrate)?', opts:['Menge Harn pro Tag','Volumen Blutplasma das pro Zeiteinheit in den Bowman-Raum filtriert wird','Konzentration von Proteinen im Harn','Rückresorptionsrate im Tubulus','Ausscheidungsrate von Harnstoff'], correct:1 },
-                { q:'Welche Schicht der Haut enthält die Melanozyten?', opts:['Stratum corneum','Stratum lucidum','Stratum basale','Stratum spinosum','Stratum granulosum'], correct:2 },
-                { q:'Was ist ein Allel?', opts:['Ein Chromosomenpaar','Eine alternative Variante eines Gens','Ein kodierender DNA-Abschnitt','Ein Nicht-kodierender DNA-Abschnitt','Ein Protein'], correct:1 },
-                { q:'Ein Merkmal wird X-chromosomal rezessiv vererbt. Welche Aussage trifft zu?', opts:['Männer und Frauen sind gleich häufig betroffen','Söhne erkrankter Mütter sind immer betroffen','Männer sind häufiger phänotypisch betroffen','Töchter erkrankter Väter sind immer betroffen','Keine der gegebenen Antworten'], correct:2 },
-                { q:'Was ist Hardy-Weinberg-Gleichgewicht?', opts:['Gleichgewicht zwischen Mutation und Selektion','Konstanz der Allelhäufigkeiten in einer idealen Population','Gleichgewicht zwischen Drift und Migration','Verhältnis von Homo- und Heterozygoten','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist konvergente Evolution?', opts:['Abstammung verschiedener Arten von einem gemeinsamen Vorfahren','Unabhängige Entstehung ähnlicher Merkmale in nicht verwandten Arten','Kreuzung zweier Arten','Anpassung an denselben Lebensraum durch verwandte Arten','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist ein Ökosystem?', opts:['Nur alle Lebewesen in einem Gebiet','Nur die abiotischen Faktoren','Biozönose + Biotop','Eine einzelne Population in einem Gebiet','Die Nahrungskette in einem Gebiet'], correct:2 },
-                { q:'Was beschreibt der Begriff Symbiose?', opts:['Eine Beziehung wo ein Partner profitiert, der andere nicht','Eine Beziehung wo beide Partner profitieren','Ein Parasitismus','Eine neutrale Lebensgemeinschaft','Keine der gegebenen Antworten'], correct:1 },
-            ],
-            chemie: [
-                { q:'Wie viele Elektronen besitzt das Element Fluor?', opts:['7','5','10','9','8'], correct:3, level:'leicht' },
-                { q:'Worin unterscheiden sich die Isotope eines Elementes?', opts:['In ihrer Farbe','In ihrer Ladung','In der Anzahl ihrer Neutronen','In der Anzahl ihrer Protonen','In der Anzahl ihrer Elektronen'], correct:2, level:'leicht' },
-                { q:'Welcher Wert entspricht der universellen Gaskonstante R?', opts:['7,39 J/(mol·K)','8,36 J/(mol·K)','8,31 J/(mol·K)','5,00 J/(mol·K)','8,41 J/(mol·K)'], correct:2, level:'leicht' },
-                { q:'Welche der gegebenen Formeln entspricht der idealen Gasgleichung?', opts:['n·V = p·R·T','p·V = n·R/T','p·V = n·R·T','p/V = n·R·T','p·V = n + (R·T)'], correct:2, level:'leicht' },
-                { q:'Welche Aussage zu den Aggregatzuständen trifft nicht zu?', opts:['Von flüssig zu gasförmig steigt die Entropie','Von flüssig zu gasförmig sinkt die Entropie','Vom gasförmigen in den festen Zustand = Resublimieren','Vom festen in den gasförmigen Zustand = Sublimieren','Im Tripelpunkt befinden sich alle drei Phasen im Gleichgewicht'], correct:1, level:'leicht' },
-                { q:'Welcher Bindungstyp tritt im Methan auf?', opts:['Ionenbindung','Atombindung','Metallbindung','Wasserstoffbrückenbindung','Van-der-Waals-Bindung'], correct:1, level:'leicht' },
-                { q:'Welche Aussage über Ionenbindungen trifft nicht zu?', opts:['Ionenbindungen entstehen zwischen zwei Nichtmetallen','Ionen formen Ionengitter, keine Moleküle','Ionengitter leiten keinen Strom und haben hohe Schmelztemperaturen','Elektronegativitätsdifferenz mind. 1,7 für Ionenbindung','Ionenbindungen entstehen zwischen Metall und Nichtmetall'], correct:0, level:'leicht' },
-                { q:'Was beschreibt die Avogadro-Zahl?', opts:['In 1 mol befinden sich 6,022·10²³ Teilchen','In 1 mol befinden sich 6,022·10²² Teilchen','In 1 mol befinden sich 6,022·10²¹ Teilchen','In 1 mol befinden sich 6,022·10⁻²² Teilchen','In 1 mol befinden sich 6,022·10⁻²³ Teilchen'], correct:0, level:'leicht' },
-                { q:'Welche Formel beschreibt die Massenwirkungskonstante für 2A + B ↔ C + 2D?', opts:['K = [C]·[D]² / ([A]²·[B])','K = ([C]+[D]²) / ([A]²+[B])','K = ([B]·[A]²) / ([D]²·[C])','K = [C]·2[D] / (2[A]·[B])','Keine der angegebenen Formeln'], correct:0, level:'leicht' },
-                { q:'Welche Aussage über Katalysatoren trifft nicht zu?', opts:['Verringern Aktivierungsenergie','Gleichgewicht wird schneller erreicht','Werden während der Reaktion nicht verbraucht','Reaktion findet schneller statt','Haben Einfluss auf die Lage des Gleichgewichtes'], correct:4, level:'leicht' },
-                { q:'Welche Aussage über Wasserstoff trifft nicht zu?', opts:['Farb-, Geruch- und Geschmackloses Gas','Im elementaren Zustand diatomar','Löslich in Wasser','Hat drei verschiedene Isotope','Kann positiv und negativ geladen binden'], correct:2, level:'leicht' },
-                { q:'Welcher der angegebenen Stoffe ist ein Ion des Wasserstoffatoms?', opts:['Tritium','Deuterium','Protium','Hydridion'], correct:3, level:'leicht' },
-                { q:'Welcher der Stickstoffverbindungen ist kein Stickstoffoxid?', opts:['N₂O₅','NH₃','N₂O₄','N₂O','N₂O₃'], correct:1, level:'leicht' },
-                { q:'Welche Veränderung tritt ein, wenn HCl zu H₂O hinzugefügt wird?', opts:['pH-Wert steigt an','pOH-Wert sinkt','H⁺-Ionenkonzentration steigt an','H⁺-Ionenkonzentration nimmt ab','OH⁻-Ionenkonzentration steigt an'], correct:2, level:'leicht' },
-                { q:'Wie können Säuren und Basen nach Brønsted definiert werden?', opts:['Säuren = Protonendonatoren, Basen = Protonenakzeptoren','Säuren = Protonenakzeptoren, Basen = Protonendonatoren','Säuren = Elektronendonatoren, Basen = Elektronenakzeptoren','Säuren = Elektronenakzeptoren, Basen = Elektronendonatoren','Keine der gegebenen Antworten'], correct:0, level:'leicht' },
-                { q:'Welche Konzentration an Protonen liegt bei einem pOH von 11 vor?', opts:['1×10⁻⁷','1×10⁻¹¹','1×10⁻¹','1×10⁻³','1×10⁻¹⁴'], correct:3, level:'leicht' },
-                { q:'Zn + Cu²⁺ → Zn²⁺ + Cu. Was wird oxidiert, was reduziert?', opts:['Kupfer von +2→0 reduziert, Zink von 0→+2 oxidiert','Zink von 0→+2 oxidiert, Kupfer von +2→0 reduziert','Zink von -2→+2 oxidiert, Kupfer von +2→-2 reduziert','Zink von +2→-2 reduziert, Kupfer von -2→+2 oxidiert','Keine der Antworten'], correct:1, level:'leicht' },
-                { q:'Welche Oxidationszahl hat Wasserstoff in Flusssäure (HF)?', opts:['+1','+2','+3','-1','-2'], correct:0, level:'leicht' },
-                { q:'Welche Eigenschaft besitzt das Reduktionsmittel?', opts:['Es wird reduziert','Es wird oxidiert','Es wird nicht verändert','Es nimmt nicht an der Reaktion teil','Keine der Aussagen ist richtig'], correct:1, level:'leicht' },
-                { q:'Welche Aussage zu Kohlenwasserstoffen trifft zu?', opts:['Bestandteil keiner Nahrungsmittel','Bestehen nur aus Kohlenstoff und Sauerstoff','Sind über kovalente Bindungen aufgebaut','Bilden mit anderen KW Wasserstoffbrückenbindungen','Sind hochreaktiv'], correct:2, level:'leicht' },
-                { q:'Welches Element hat die höchste Elektronegativität?', opts:['Li','Na','Cl','Br','Mn'], correct:2, level:'mittel' },
-                { q:'Wie viele Neutronen besitzt ein Element mit Massenzahl 144 und Ordnungszahl 56?', opts:['88','87','86','89','9'], correct:0, level:'mittel' },
-                { q:'Welche Elemente zählen zu den Erdalkalimetallen? i) Li ii) Mg iii) Ca', opts:['i und ii','ii und iii','i und iii','nur ii','Keine der genannten'], correct:1, level:'mittel' },
-                { q:'In welcher Hauptgruppe steht Schwefel?', opts:['III','IV','V','VI','VII'], correct:3, level:'mittel' },
-                { q:'In welche Richtungen im PSE erhöht sich die Anzahl der Protonen?', opts:['Von links nach rechts und von oben nach unten','Von rechts nach links und von oben nach unten','Von links nach rechts und von unten nach oben','Von rechts nach links und von oben nach unten','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'In welcher Hauptgruppe steht Xenon?', opts:['IV','V','VI','VII','VIII'], correct:4, level:'mittel' },
-                { q:'Welche Eigenschaft nimmt mit steigender Elektronenschalenzahl und sinkender Valenzelektronenzahl ab?', opts:['Die Elektronenaffinität','Die Neutronenanzahl','Der Atomradius','Der Metallcharakter','Die Elektronenanzahl'], correct:0, level:'mittel' },
-                { q:'Welche Eigenschaft trifft nicht auf Alkalimetalle zu?', opts:['Glänzend','Weich','Reaktivität nimmt von unten nach oben zu','Besitzen spezifische Flammenfärbung','Bilden mit Halogenen Ionenbindungen'], correct:2, level:'mittel' },
-                { q:'Für welche Zustände gilt das Gesetz von Boyle-Mariotte?', opts:['Isotherme','Isobare','Isochore','Isotonische','Keine der genannten'], correct:0, level:'mittel' },
-                { q:'Welche Gleichung entspricht dem Gesetz von Boyle-Mariotte?', opts:['p × V = konstant','V/T = konstant','p/T = konstant','p × V × T = konstant','(p×V)/T = konstant'], correct:0, level:'mittel' },
-                { q:'Welche Gleichung entspricht dem Gesetz von Gay-Lussac?', opts:['p × V = konstant','V/T = konstant','p/T = konstant','p × V × T = konstant','(p×V)/T = konstant'], correct:1, level:'mittel' },
-                { q:'Ein Gas (p=10 Pa, V=6 m³) wird auf p=15 Pa erhöht. Welches Volumen nimmt das Gas an?', opts:['6 m³','2 m³','4 m³','4 dm³','6 dm³'], correct:2, level:'mittel' },
-                { q:'Bei welchem Phasenübergang wird Wärme freigesetzt?', opts:['fest zu flüssig','flüssig zu gasförmig','fest zu gasförmig','flüssig zu fest','Keine'], correct:3, level:'mittel' },
-                { q:'Wodurch zeichnet sich die gasförmige Phase aus?', opts:['Resublimation führt zu gasförmig','Unterhalb des krit. Punktes kein Unterschied flüssig/gasförmig','Siedekurve = Übergang fest→gasförmig','Weder feste Form noch fixes Volumen','Lose Verbindung der Atome'], correct:3, level:'mittel' },
-                { q:'Welche Bindungsarten zählen zu den intramolekularen Bindungen? i) Atombindung ii) H-Brücke iii) Ionenbindung', opts:['i und iii','Nur i','i, ii und iii','ii und iii','Nur iii'], correct:0, level:'mittel' },
-                { q:'Welche Aussage über Atombindungen trifft nicht zu?', opts:['Atombindungen kommen in CaCl₂ vor','Elektronen werden geteilt','Entstehen zwischen Metallen und Gasen','Werden von einfach zu dreifach kürzer','Keine trifft zu'], correct:0, level:'mittel' },
-                { q:'Welcher Bindungstyp: Duktil, leitet Strom, bildet Legierungen?', opts:['Atombindung','Ionenbindung','Van-der-Waals-Kräfte','Metallbindung','H-Brückenbindung'], correct:3, level:'mittel' },
-                { q:'Welche Aussage über die Metallbindung trifft zu?', opts:['Anionengitter + delokalisierte Elektronen','Kationengitter + delokalisierte Elektronen','Elektronen fest in Orbitalen','Intermolekulare Bindung','Spröde, leiten im gelösten Zustand keinen Strom'], correct:1, level:'mittel' },
-                { q:'Welchen Bindungstyp enthält KCl?', opts:['Metallbindung','H-Brückenbindung','Atombindung','Ionenbindung','Van-der-Waals'], correct:3, level:'mittel' },
-                { q:'Worauf basiert die Wasserstoffbrückenbindung?', opts:['Auf der Neutronenzahl im Kern','Auf der Polarität der Wassermoleküle','Auf dem Gewicht des Wassermoleküls','Auf der Elektronenabgabe an Sauerstoff','Keine der gegebenen Antworten'], correct:1, level:'mittel' },
-                { q:'Konzentration von 812 g NaCl (Mr=58 g/mol) in 7 L Wasser?', opts:['2 mol/l','4 mol/l','1 mol/l','2,5 mol/l','3 mol/l'], correct:0, level:'mittel' },
-                { q:'Wie viele atomare Teilchen sind in zwei Mol Kohlenstoff enthalten?', opts:['6,022·10²³','3,011·10²³','3,613·10²⁴','1,204·10²⁴','1,806·10²⁴'], correct:3, level:'mittel' },
-                { q:'Masse CO₂ bei Verbrennung von 32 g Methan (CH₄+O₂→CO₂+2H₂O; Mr: C=12,H=1,O=16)?', opts:['44 g','88 g','32 g','66 g','16 g'], correct:1, level:'mittel' },
-                { q:'Welchen Einfluss haben Katalysatoren auf Gleichgewichtsreaktionen? i) Hin- und Rückreaktion gleichmäßig beschleunigt ii) Aktivierungsenergie verringert iii) werden verbraucht', opts:['Nur i','i und ii','i, ii und iii','ii und iii','Alle sind richtig'], correct:1, level:'mittel' },
-                { q:'N₂(g) + 3H₂(g) ↔ 2NH₃(g). Wohin verschiebt sich das Gleichgewicht bei zusätzlichem Druck?', opts:['Auf die Seite der Edukte','Auf die Seite der Produkte','Es bleibt gleich','Katalysator notwendig','Keine der Antworten'], correct:1, level:'mittel' },
-                { q:'K = ? für 2H₂ + O₂ → 2H₂O wenn 4 mol H₂ + 2 mol O₂ → 4 mol H₂O', opts:['K = 0,5','K = 1','K = 2','K = 1,5','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'Welche prosthetische Gruppe wird von Kohlenstoffmonoxid inhibiert?', opts:['Hämoglobin','Flavin','Biotin','Pyridoxalphosphat','Cobalamin'], correct:0, level:'mittel' },
-                { q:'Welchen Anteil hat Stickstoff an der Umgebungsluft?', opts:['75%','80%','21%','78%','55%'], correct:3, level:'mittel' },
-                { q:'Welche der folgenden Eigenschaften trifft auf Graphit zu?', opts:['Hart','Leicht metallisch glänzend','Schwacher elektrischer Leiter','sp³-hybridisiert','Käfigartige Struktur'], correct:1, level:'mittel' },
-                { q:'Reaktivität der Halogene, von höchster zu niedrigster?', opts:['Cl>F>I>Br','I>Br>Cl>F','F>Cl>Br>I','F>Cl>I>Br','I>F>Br>Cl'], correct:2, level:'mittel' },
-                { q:'Welches Halogen ist bei Raumtemperatur fest?', opts:['Fluor','Iod','Chlor','Brom','Astat'], correct:1, level:'mittel' },
-                { q:'HCl + NaOH → ?', opts:['Das entsprechende Salz und Wasser','Ein Puffersystem','Salz, Wasser und CO₂','Salz und elementarer H₂','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'HCl + NaOH → ? (Wiederholung zur Übung)', opts:['Das entsprechende Salz und Wasser','Ein Puffersystem','Salz, Wasser und CO₂','Salz und elementarer H₂','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'H₂SO₄ + Fe → ?', opts:['Salz und Wasser','Ein Puffersystem','Salz, Wasser und CO₂','Salz und elementarer H₂','Keine der Antworten'], correct:3, level:'mittel' },
-                { q:'Welche der Säuren dissoziiert vollständig in Wasser? i) HNO₃ ii) CH₃COOH iii) H₂CO₃', opts:['Nur ii','Nur iii','ii und iii','Nur i','i, ii und iii'], correct:3, level:'mittel' },
-                { q:'Welches ist die konjugierte Base für HSO₄⁻?', opts:['H₂SO₄','NaSO₄⁻','SO₄²⁻','H₃SO₄','Keine der gegebenen Antworten'], correct:2, level:'mittel' },
-                { q:'Welches sind kein konjugiertes Säure-Basen-Paar?', opts:['H₂O und OH⁻','H₃O⁺ und H₂O','CH₃COOH und CH₃COO⁻','NH₃ und NH₄⁺','H₃PO₄ und HPO₄²⁻'], correct:4, level:'mittel' },
-                { q:'Was beschreibt ein negatives Redoxpotential?', opts:['Je negativer, desto höher die Bereitschaft Elektronen abzugeben','Je negativer, desto niedriger die Bereitschaft Elektronen abzugeben','Je positiver, desto höher die Bereitschaft','Redoxpartner mit positivem Potential = Reduktionsmittel','Redoxpartner mit negativem Potential = Oxidationsmittel'], correct:0, level:'mittel' },
-                { q:'Welche Oxidationszahl hat Sauerstoff in H₂O₂?', opts:['+2','+1','-4','-1','-2'], correct:3, level:'mittel' },
-                { q:'Welche Aussage ist richtig über Oxidation/Reduktion?', opts:['Oxidation = Abgabe von Elektronen und Erhöhung der Oxidationszahl','Oxidation = Aufnahme von Elektronen und Erhöhung','Oxidation = Abgabe und Erniedrigung','Reduktion = Aufnahme und Erhöhung','Reduktion = Abgabe und Erniedrigung'], correct:0, level:'mittel' },
-                { q:'Welche Reaktionsgleichung beschreibt das Daniell-Element?', opts:['Cu²⁺(aq) + H₂ → 2H⁺ + Cu','Zn + 2H⁺ → Zn²⁺ + H₂','Zn + Cu²⁺ → Zn²⁺ + Cu','Zn + 2Ag⁺ → Zn²⁺ + 2Ag','Keine der Reaktionen'], correct:2, level:'mittel' },
-                { q:'Butan Sdp. = -1°C. Was gilt für den Siedepunkt von Heptan?', opts:['Niedriger als Butan','Höher als Butan','Alle Alkane haben den gleichen Sdp.','Kleine Moleküle haben stärkere Van-der-Waals-Kräfte','Keine der Antworten'], correct:1, level:'mittel' },
-                { q:'Ordne funktionelle Gruppen zu: 1=OH, 2=COOH, 3=NH₂, 4=Alken', opts:['1→Carbons., 2→Amin, 3→Alkohol, 4→Alkan','1→Amin, 2→Carbons., 3→Alkohol, 4→Alkin','1→Alkohol, 2→Amin, 3→Carbons., 4→Alken','1→Alkohol, 2→Carbons., 3→Amin, 4→Alkan','1→Amin, 2→Carbons., 3→Alkohol, 4→Alken'], correct:2, level:'mittel' },
-                { q:'Bei R₁-C=O-R₂ handelt es sich um ein…?', opts:['Alkohol','Aldehyd','Carbonsäure','Keton','Alkin'], correct:3, level:'mittel' },
-                { q:'Durch welche Reaktion entstehen Ether?', opts:['Reaktion zweier Alkohole','Alkohol + Carboxylgruppe','Substitution von Halogenen in Alkanen','Additionsreaktion von Halogenen in Alkenen','Oxidation eines primären Alkohols'], correct:0, level:'mittel' },
-                { q:'Woraus besteht ein Phospholipid?', opts:['Glycerin + 3 Fettsäuren','Glycerin + Phosphat + 2 Fettsäuren','2 Phosphat + 3 Fettsäuren','2 Glycerin + 2 Phosphat','Phosphat + 3 Fettsäuren'], correct:1, level:'mittel' },
-                { q:'Worin unterscheiden sich cis- und trans-Fettsäuren?', opts:['Anzahl der Kohlenstoffatome','Cis enthält keine Wasserstoffatome','Ausrichtung der H-Atome an der Doppelbindung','Ausrichtung an der Einfachbindung','Keine der Antworten'], correct:2, level:'mittel' },
-                { q:'Welcher Stoff wird für Verseifung von Triglyceriden verwendet?', opts:['Kohlensäure','Phosphorsäure','Flüssiger Stickstoff','Natronlauge','Flusssäure'], correct:3, level:'mittel' },
-                { q:'In welchem Lebensmittel finden sich hohe Konzentrationen an Omega-Fettsäuren?', opts:['Öliger Fisch','Linsen','Mais','Butter','Fettiges Fleisch'], correct:0, level:'mittel' },
-                { q:'Wodurch zeichnen sich Oligosaccharide generell aus?', opts:['Negativ geladen','Positiv geladen','Mehr als 100 Monosaccharide','8-10 Monosaccharide','Durch Ionenbindungen verbunden'], correct:3, level:'mittel' },
-                { q:'Wodurch zeichnet sich das Polysaccharid Glykogen NICHT aus?', opts:['Viele Glukosemoleküle','In tierischen Zellen','Kovalente Bindungen','Alpha-1,4- und 1,6-glykosidische Bindungen','Lineare Struktur'], correct:4, level:'mittel' },
-                { q:'Welche Aussage über Proteine trifft zu? i) Primärstruktur = Aminosäureabfolge ii) Tertiärstruktur = Ausrichtung der Aminosäurereste iii) Quartärstruktur = Interaktionen innerhalb einer Polypeptidkette', opts:['Nur i','ii und iii','i und ii','i, ii und iii','i und iii'], correct:2, level:'mittel' },
-                { q:'Welcher Abschnitt der Aminosäure beeinflusst die Tertiärstruktur? i) Seitenkette ii) N-terminal iii) C-terminal', opts:['Nur ii','Nur i','i, ii und iii','i und iii','i und ii'], correct:1, level:'mittel' },
-                { q:'Welcher Vitamine ist nicht fettlöslich?', opts:['Vitamin A','Vitamin K','Vitamin C','Vitamin E','Vitamin D'], correct:2, level:'mittel' },
-                { q:'Welches Vitamin ist relevant für das Sehen?', opts:['Retinal','Biotin','Ascorbinsäure','Tocopherol','Calciferol'], correct:0, level:'mittel' },
-                { q:'Bei der Photosynthese-Reaktion (C, H, O beteiligt). Wie groß ist der Anteil der Sauerstoffatome in Prozent? (6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂)', opts:['75%','50%','25%','20%','10%'], correct:1, level:'mittel' },
-                { q:'Welche Elektronenkonfiguration entspricht dem Ion Na⁺?', opts:['1s²2s²2p⁶','1s²2s²2p⁴','1s²2s²2p⁵','1s²2s²2p¹','Keine der Antworten'], correct:0, level:'schwer' },
-                { q:'Aus welchen Elementarteilchen besteht ein Proton?', opts:['3 Higgs-Teilchen','2 Down + 1 Up Quark','Z-Boson + W-Boson','Undefiniete Photonen','2 Up + 1 Down Quark'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zur Heisenbergschen Unschärferelation trifft zu?', opts:['Impuls und Ort können nicht gleichzeitig bestimmt werden','Impuls und Ort können gleichzeitig bestimmt werden','Elektronen haben unbewegliche Lokalisationspunkte','Nebenquantenzahl beschreibt Größe und Energie','Pauli-Prinzip: kernnahe Orbitale zuerst'], correct:0, level:'schwer' },
-                { q:'Welche Aussage ist richtig zur jeweiligen Quantenzahl?', opts:['Hauptquantenzahl: nur -1/2 oder +1/2','Nebenquantenzahl: alle pos. Zahlen, beschreibt Größe/Energie','Magnetquantenzahl: alle ganzen Zahlen kleiner n-1','Spinquantenzahl: ganzzahlige Werte zwischen l und -l','Keine der Aussagen trifft zu'], correct:4, level:'schwer' },
-                { q:'Welche Aussage zum quantenmechanischen Atommodell trifft nicht zu?', opts:['Aufbauprinzip: kernnahe Orbitale zuerst','Hundsche Regel: Orbitale gleicher Energie zuerst einzeln besetzt','Pauli-Prinzip: max. 2 Elektronen mit entgegengesetztem Spin','Valenzelektronen bestimmen Eigenschaften','Emissionsspektrum mit Bohr-Schalen erklärbar'], correct:4, level:'schwer' },
-                { q:'Welche Gleichung entspricht dem Gesetz von Amonton (2. Gesetz von Gay-Lussac)?', opts:['p × V = konstant','V/T = konstant','p/T = konstant','p × V × T = konstant','(p×V)/T = konstant'], correct:2, level:'schwer' },
-                { q:'Welches Volumen nimmt 70 g elementares Chlor bei Raumtemperatur ein? (Mr von Cl = 35 g/mol)', opts:['22,4 L','44,8 L','11,2 L','67,2 L','89,6 L'], correct:0, level:'schwer' },
-                { q:'Welches Volumen nimmt 128 g elementarer Sauerstoff bei Raumtemperatur ein? (Mr O = 16 g/mol)', opts:['179,2 L','89,6 L','8 L','4 L','134,4 L'], correct:1, level:'schwer' },
-                { q:'Blut: 130 g Hb/L, M(Hb)=64.000, 4 O₂ pro Hb, 80% gesättigt, Vm(O₂)=22,5 L/mol. O₂-Volumen in 6 L Blut?', opts:['900 ml','450 ml','300 ml','0,038 ml','780 ml'], correct:0, level:'schwer' },
-                { q:'Nach welchem Phasenübergang sind die Moleküle am wenigsten in Kontakt?', opts:['Sublimieren','Resublimieren','Schmelzen','Erstarren','Kondensieren'], correct:0, level:'schwer' },
-                { q:'Welcher Phasenübergang wird durch die Sublimationsdruckkurve dargestellt?', opts:['flüssig → gasförmig','fest → gasförmig','gasförmig → fest','flüssig → gasförmig','gasförmig → flüssig'], correct:1, level:'schwer' },
-                { q:'Wann entstehen intermolekulare Dipol-Dipol-Verbindungen?', opts:['Kurzzeitige Ladungsverschiebungen in unpolaren Molekülen','Wenn Elektronen geteilt werden','Wenn Atom ein Valenzelektron abgibt','Wenn zwei Moleküle gegensätzliche Partialladungen haben','Wenn ein Dipol in einem unpolaren Molekül Ladungsverschiebung auslöst'], correct:3, level:'schwer' },
-                { q:'Für welche Strukturen sind Van-der-Waals-Kräfte ausschlaggebend? i) Mizellen ii) Membranen iii) Proteine', opts:['Nur i','i, ii und iii','Nur ii','ii und iii','Nur iii'], correct:1, level:'schwer' },
-                { q:'Wie viel Mol elementares Iod sind in 1008 g enthalten? (Mr I = 126 g/mol)', opts:['8 mol','6 mol','4 mol','2 mol','1 mol'], correct:2, level:'schwer' },
-                { q:'Konzentration: 161 g Na⁺-Ionen in 5 L (Mr Na = 23 g/mol)?', opts:['1,4 mol/l','1,2 mol/l','7 mol/l','4 mol/l','1 mol/l'], correct:0, level:'schwer' },
-                { q:'Wie viele Wasserstoffatome sind in einem Mol Ethanol (C₂H₅OH) enthalten?', opts:['6,022·10²³','3,011·10²³','1,806·10²⁴','3,613·10²⁴','2,409·10²⁴'], correct:3, level:'schwer' },
-                { q:'Wie viele Mol Wasserstoff sind in einem Mol Ethanol enthalten?', opts:['6','8','10','4','12'], correct:0, level:'schwer' },
-                { q:'Bei welchem Verfahren kann Wasserstoff nicht als Nebenprodukt entstehen?', opts:['Chlor-Alkali-Elektrolyse','Cracking','Kohlenvergasung','CO-Konvertierung','Haber-Bosch-Verfahren'], correct:4, level:'schwer' },
-                { q:'Bei welchen Prozessen spielt Stickstoff eine Rolle? i) Ostwald ii) Haber-Bosch iii) Downs-Schmelzflusselektrolyse', opts:['Nur i','i und ii','i und iii','ii und iii','i, ii und iii'], correct:1, level:'schwer' },
-                { q:'Essigsäure + Calciumcarbonat → ?', opts:['Salz und Wasser','Puffersystem','Salz, Wasser und CO₂','Salz und H₂','Keine der Antworten'], correct:2, level:'schwer' },
-                { q:'Blut-pH = 7,4. Protonenkonzentration im Blut?', opts:['4·10⁻⁸','2·10⁻⁸','4·10⁻⁶','2·10⁻⁶','2,5·10⁻⁸'], correct:0, level:'schwer' },
-                { q:'Welche Oxidationsstufe besitzt Eisen in Eisen(III)-Oxid?', opts:['-3','+2','-2','+3','+4'], correct:3, level:'schwer' },
-                { q:'Welche Oxidationsstufe besitzt Wasserstoff in NaH?', opts:['+1','+2','+3','-1','-2'], correct:3, level:'schwer' },
-                { q:'Oxidationsstufen in [CuCl₄]²⁻?', opts:['Cu:+1, Cl:+1','Cu:-1, Cl:+1','Cu:+2, Cl:-2','Cu:+2, Cl:-1','Cu:+1, Cl:-2'], correct:3, level:'schwer' },
-                { q:'Welche Aussagen zu Nicht-Metallen in Redox-Reaktionen sind NICHT wahr? i) Je positiver Redoxpotential, desto höher Bereitschaft Elektronen abzugeben ii) Je höher EN, desto stärker als Reduktionsmittel iii) Stärkste Oxidationsmittel werden am leichtesten reduziert', opts:['i und ii','i und iii','ii und iii','i, ii und iii','Nur iii'], correct:0, level:'schwer' },
-                { q:'Wie viele Elektronen befinden sich in der äußersten Schale von Chlor (Ordnungszahl 17)?', opts:['5','6','7','8','Keine der gegebenen Antworten'], correct:2 },
-                { q:'Was ist die Elektronegativität von Fluor im Vergleich zu allen anderen Elementen?', opts:['Die niedrigste','Die zweithöchste','Die höchste','Mittelgroß','Keine der gegebenen Antworten'], correct:2 },
-                { q:'Welche Aussage zu Edelgasen ist korrekt?', opts:['Edelgase haben keine Elektronen','Edelgase haben volle Außenschalen','Edelgase sind stark reaktiv','Edelgase kommen in Verbindungen häufig vor','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist ein Kation?', opts:['Ein negativ geladenes Ion','Ein positiv geladenes Ion','Ein neutrales Atom','Ein Isotop','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche Aussage zum Periodensystem ist richtig? Von oben nach unten in einer Gruppe…', opts:['nimmt der Atomradius ab','nimmt die Elektronegativität zu','nimmt der Atomradius zu','nimmt die Ionisierungsenergie zu','bleibt der Atomradius gleich'], correct:2 },
-                { q:'Was besagt das Prinzip von Le Chatelier?', opts:['Katalysatoren erhöhen die Aktivierungsenergie','Ein System im Gleichgewicht reagiert auf Störung durch Gegenmaßnahme','Alle Reaktionen verlaufen exotherm','Das Gleichgewicht liegt immer auf der Produktseite','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist der Unterschied zwischen einer Additions- und einer Substitutionsreaktion?', opts:['Bei Addition wird ein Atom ersetzt, bei Substitution wird eines hinzugefügt','Bei Substitution wird ein Atom ersetzt, bei Addition wird eines hinzugefügt','Beide Reaktionen sind identisch','Additionsreaktionen verlaufen immer exotherm','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist ein Puffersystem?', opts:['Ein System das den pH durch Hinzufügen starker Säuren stabilisiert','Ein System das pH-Änderungen durch ein schwaches Säure-Base-Paar minimiert','Ein Gleichgewichtssystem aus zwei starken Säuren','Ein Katalysatorsystem','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche Oxidationszahl hat Stickstoff in NH₃?', opts:['+3','+1','0','-3','-1'], correct:3 },
-                { q:'Was ist die Elektrolyse?', opts:['Spontane chemische Reaktion','Erzwungene Redoxreaktion durch elektrischen Strom','Reaktion zwischen Säure und Base','Verbrennung organischer Verbindungen','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche der folgenden Verbindungen ist ein Alken?', opts:['C₂H₆','C₂H₄','C₂H₂','C₂H₅OH','C₂H₄O₂'], correct:1 },
-                { q:'Was ist der Unterschied zwischen einer gesättigten und ungesättigten Fettsäure?', opts:['Gesättigte haben Doppelbindungen, ungesättigte nicht','Ungesättigte haben mindestens eine Doppelbindung, gesättigte nicht','Gesättigte haben mehr Kohlenstoffatome','Ungesättigte sind fest bei Raumtemperatur','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist eine Kondensationsreaktion?', opts:['Eine Reaktion bei der Wasser aufgenommen wird','Eine Reaktion bei der ein kleines Molekül (oft H₂O) abgespalten wird','Eine Oxidationsreaktion','Eine Reduktionsreaktion','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche Verbindungsklasse entsteht bei der Reaktion einer Carbonsäure mit einem Alkohol?', opts:['Aldehyd','Keton','Ether','Ester','Amin'], correct:3 },
-                { q:'Was ist die Summenformel von Fruktose?', opts:['C₅H₁₀O₅','C₆H₁₀O₅','C₆H₁₂O₆','C₁₂H₂₂O₁₁','C₆H₁₂O₅'], correct:2 },
-                { q:'Was versteht man unter Denaturierung eines Proteins?', opts:['Abbau der Primärstruktur','Verlust der 3D-Struktur durch Zerstörung nicht-kovalenter Bindungen','Synthese eines neuen Proteins','Spaltung der Peptidbindungen','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche Reaktion findet bei der Glykolyse statt?', opts:['Glukose → CO₂ + H₂O','Glukose → 2 Pyruvat + 2 ATP','Pyruvat → Glukose','Glukose → Glykogen','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist der Unterschied zwischen einer α- und β-glykosidischen Bindung?', opts:['Keine Unterschied','Unterschied in der räumlichen Ausrichtung der Hydroxylgruppe am C1','α-Bindungen sind stärker','β-Bindungen kommen nur in Pflanzen vor','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Was ist eine Isobare?', opts:['Atom desselben Elements mit gleicher Neutronenzahl','Atom verschiedener Elemente mit gleicher Massenzahl','Atom mit gleicher Ordnungszahl aber verschiedener Ladung','Ein radioaktives Isotop','Keine der gegebenen Antworten'], correct:1 },
-                { q:'Welche Aussage zu Alkanen ist richtig?', opts:['Sie enthalten Doppelbindungen','Sie sind polar','Sie sind gesättigte Kohlenwasserstoffe','Sie reagieren leicht mit Wasser','Keine der gegebenen Antworten'], correct:2 },
-            ],
-            physik: [
-                { q:'Welche der folgenden Größen wird mit einem Skalar beschrieben? 1) Geschwindigkeit 2) Beschleunigung 3) Zeit 4) Masse 5) Kraft', opts:['Nur 2','3 und 4 sind richtig','Nur 4','Alle','Keine'], correct:1, level:'leicht' },
-                { q:'Welche der folgenden Größen wird mit einem Vektor beschrieben? 1) Geschwindigkeit 2) Länge 3) Kraft 4) Spannung 5) Masse', opts:['Nur 1','2, 3 und 4','1 und 3 sind richtig','Alle','Keine'], correct:2, level:'leicht' },
-                { q:'Welche Einheit entspricht der physikalischen Größe „Gewicht"?', opts:['Kilogramm (kg)','Gramm (g)','kg/m²','Mol','Keine der Antworten ist richtig (Newton)'], correct:4, level:'leicht' },
-                { q:'Wofür steht im SI-System die Abkürzung „cd"? 1) Cadmium 2) Cells per day 3) Candela 4) Lichtstärke 5) Culcha', opts:['2, 3 und 4','3 und 4 sind richtig','1 und 3','Alle','Keine'], correct:1, level:'leicht' },
-                { q:'In welcher Einheit wird im SI die Temperatur angegeben?', opts:['Kelvin','Celsius','Fahrenheit','Candela','Quecksilbersäule'], correct:0, level:'leicht' },
-                { q:'Welcher Zehnerpotenz entspricht die Vorsilbe „Piko"?', opts:['10¹²','10⁹','10⁻¹²','10⁻¹⁵','10¹⁵'], correct:2, level:'leicht' },
-                { q:'Welcher Zehnerpotenz entspricht die Vorsilbe „Tera"?', opts:['10','10¹²','10⁹','10¹⁵','Keine der Antworten'], correct:1, level:'leicht' },
-                { q:'Welche Aussage über Kernkräfte und Wechselwirkungen trifft zu?', opts:['Schwache WW größer als starke','Starke WW: positive/negative Ladungen ziehen sich an','Gluonen springen zwischen positiven Ladungen','Mit genug Abstand ziehen sich gleichnamige Ladungen an','Keine der Antworten ist richtig'], correct:4, level:'leicht' },
-                { q:'Welche Formulierung beschreibt am ehesten eine elektromagnetische Welle?', opts:['Unregelmäßige Schwingung','Energiedifferenz','Gentoxische Strahlung','Farbenspektrum','Radiowelle'], correct:4, level:'leicht' },
-                { q:'Welche Aussagen sind richtig? 1) Energie e.m. Strahlung ∝ Frequenz 2) Energie ∝ 1/Frequenz 3) Je höher Geschwindigkeit, desto höher Energie 4) Je höher Frequenz, ungefährlicher 5) Je höher Temperatur, desto gefährlicher', opts:['2, 3 und 5','3 und 4','1 und 5','Alle','Keine'], correct:4, level:'leicht' },
-                { q:'Welche Teilchen werden verwendet, um die Kernspaltung in einem Reaktor in Gang zu setzen?', opts:['Protonen','Elektronen','Ganze Kerne','Neutronen','Neutrinos'], correct:3, level:'leicht' },
-                { q:'Welche Teilchen entstehen im Prozess der Kernspaltung in einem Reaktor?', opts:['Neutronen','Elektronen','Protonen','Bosonen','Keine Teilchen'], correct:0, level:'leicht' },
-                { q:'Welche Aussagen treffen nicht auf die Alpha-Strahlung zu? 1) Ionisierend 2) Massenzahl nimmt zu 3) Heliumkern wird abgestrahlt 4) Ungefährlich 5) Element bleibt gleich', opts:['1, 3 und 5','3 und 4','2, 4 und 5','Alle','Keine'], correct:2, level:'leicht' },
-                { q:'Was kann Alpha-Strahlung abschirmen?', opts:['Ein Blatt Papier und Luft','Papier, 1 cm Aluminium und Bleischürze','Nur Bleischürze','Alle','Keine'], correct:0, level:'leicht' },
-                { q:'Welche Aussagen treffen auf Beta-Strahlung zu? 1) Elektron kann in Proton und Neutron zerfallen 2) Neutron → Proton 3) Elektron wird abgestrahlt 4) β⁺ und β⁻ 5) Beta ist ungefährlichste Strahlung', opts:['2, 3 und 4','1, 2 und 3','3 und 5','Alle','Keine'], correct:0, level:'leicht' },
-                { q:'Was passiert beim β⁻-Zerfall? 1) Neutron → Proton 2) Proton → Neutron 3) Kernladungszahl nimmt zu 4) Kernladungszahl bleibt gleich 5) Anderes Element entsteht', opts:['2, 3 und 4','1, 3 und 5','1 und 5','Alle','Keine'], correct:1, level:'leicht' },
-                { q:'Was passiert beim β⁺-Zerfall? 1) Elektron abgestrahlt 2) Kleine Explosion 3) Isobar entsteht 4) Proton → Neutron 5) Leptonenzahlerhaltung', opts:['2, 4 und 5','1 und 5','3, 4 und 5','Alle','Keine'], correct:2, level:'leicht' },
-                { q:'Womit kann man die Ionendosis messen?', opts:['Cello-Schmidt-Zähler','Geiger-Müller-Zähler','Ionendosis kann nicht gemessen werden','Stifter-Braun-Zähler','Geiger-Müllner-Zähler'], correct:1, level:'leicht' },
-                { q:'Für welche Angabe wird das von der Strahlung durchdrungene Gewebe berücksichtigt?', opts:['Dosisleistung','Äquivalenzdosis','Effektive Äquivalenzdosis','Ionendosis','Energiedosis'], correct:2, level:'leicht' },
-                { q:'Welche Personengruppe erhält die höchste Menge an kosmischer Strahlung?', opts:['Viel-Taucher','Minenarbeiter','Goldgräber','Viel-Flieger','Niemand, Magnetfeld lenkt alles ab'], correct:3, level:'leicht' },
-                { q:'Welche Größen kann man nach Heisenberg gleichzeitig bestimmen?', opts:['Ort und Impuls','Ort und Drehanzahl','Ort und Richtung','Man kann nur einen Parameter bestimmen','Keine der Antworten'], correct:4, level:'leicht' },
-                { q:'Wie heißt der Phasenübergang vom gasförmigen in den festen Zustand?', opts:['Erstarren','Sieden','Kondensieren','Resublimieren','Sublimieren'], correct:3, level:'leicht' },
-                { q:'Was zeichnet ein ideales Gas aus?', opts:['Keine Farbe','Kein Geruch','Lässt sich nicht in anderen Aggregatzustand überführen','Lässt sich nicht komprimieren','Geht keine Wechselwirkungen ein'], correct:4, level:'leicht' },
-                { q:'Was versteht man unter Standardbedingungen in der Physik?', opts:['0°C, 2 bar','25°C, 100 bar','36,6°C, 1 bar','0°C, 0 bar','0°C, 1 bar'], correct:4, level:'leicht' },
-                { q:'Was zeichnet die Standardbedingungen aus?', opts:['Sie kommen überall vor','Für alle Rechnungen verwendet','Routinemäßig in der Klinik','1 Mol ideales Gas hat definiertes Volumen','Keine der Antworten'], correct:3, level:'leicht' },
-                { q:'Bei einer isobaren Zustandsänderung…', opts:['Bleibt das Volumen konstant','Bleibt die Temperatur konstant','Bleibt der Druck konstant','Ändert sich der Druck','Ändert sich nur das Volumen nicht'], correct:2, level:'leicht' },
-                { q:'Bei einer isochoren Zustandsänderung…', opts:['Bleibt das Volumen konstant','Bleibt die Temperatur konstant','Bleibt der Druck konstant','Ändert sich nur der Druck','Ändert sich gar nichts'], correct:0, level:'leicht' },
-                { q:'Bei einer isothermen Zustandsänderung…', opts:['Ändert sich nur die Temperatur nicht','Bleibt der Druck konstant','Bleibt das Volumen konstant','Bleibt die Temperatur konstant','Bleibt nichts konstant'], correct:3, level:'leicht' },
-                { q:'Was besagt der Nullte Hauptsatz der Thermodynamik?', opts:['Arbeit und Wärme sind ineinander überführbar','Entropie kann nur größer werden','Absoluter Nullpunkt existiert nicht','Wenn System A im GGW mit B und B im GGW mit C, dann auch A im GGW mit C','Perpetuum mobile ist unmöglich'], correct:3, level:'leicht' },
-                { q:'Was besagt der Erste Hauptsatz der Thermodynamik? 1) Arbeit und Wärme überführbar 2) Energie ist Konstante 3) Wärme↑ → innere Energie↑ 4) Im geschl. System spontane Wärmeerzeugung 5) Alle Größen im GGW', opts:['2, 4 und 5','1 und 5','1 und 3','Alle','Keine'], correct:2, level:'leicht' },
-                { q:'Nach dem Coulombschen Gesetz nimmt die Kraft ab, wenn…', opts:['Der Abstand abnimmt','Die Ladung zunimmt','Die Kraft nur von Ladungen abhängt','Ladung von Abstand abhängt, aber nicht Kraft','Der Abstand zwischen den Ladungen zunimmt'], correct:4, level:'leicht' },
-                { q:'Wenn Ladungseigenschaften eines Teilchens B durch Teilchen A beeinflusst werden (ungleichmäßige Verteilung), spricht man von:', opts:['Polarisierung','Intervention','Influenz','Parafluss','Parainfluenz'], correct:0, level:'leicht' },
-                { q:'Welche Aussagen treffen auf Magnetismus auf keinen Fall zu? 1) Gleichnamige Ladungen nur abstoßend wenn größere Kraft 2) Feldlinien N→S, nie umgekehrt 3) Magnetkräfte definieren Magnetfeld 4) Stärker → dichter Feldlinien 5) Magnet magnetisiert jeden Stoff', opts:['1, 2 und 3','4 und 5','1 und 5','Alle','Keine'], correct:2, level:'leicht' },
-                { q:'Der normale Netzstrom 230 Volt: 1) Maximalwert 2) Minimalwert 3) Mittelwert 4) Effektivwert 5) Maximalwert dividiert durch √2', opts:['1, 4 und 5','4 und 5 sind richtig','1 und 2','Alle','Keine'], correct:1, level:'leicht' },
-                { q:'Unterschied zwischen Gleichstrom und Wechselstrom?', opts:['Gleichstrom nicht für Haushaltsgeräte','Gleichstrom = Ladungen pendeln hin und her','Wechselstrom = Sinuswelle, keine konstante Menge','Wechselstrom ist sicherer','Keine wesentlichen Unterschiede'], correct:2, level:'leicht' },
-                { q:'In welchem Wellenlängenbereich liegt das sichtbare Lichtspektrum?', opts:['350-450 nm','450-600 nm','700-850 nm','400-730 nm','600-800 nm'], correct:3, level:'leicht' },
-                { q:'Was wird als eine Wellenlänge definiert?', opts:['Abstand zwischen 2 Wellenbergen bzw. -tälern','Abstand zwischen Berg und Tal','Abstand zwischen 2 beliebigen Messpunkten','Abstand x-Achse zum höchsten/niedrigsten Punkt','Abstand zwischen 4 Wellenbergen'], correct:0, level:'leicht' },
-                { q:'Was ist der wichtigste Unterschied zwischen Schwingung und Welle?', opts:['Eine Welle breitet sich im Raum aus','Eine Schwingung breitet sich im Raum aus','Eine Welle ist stets sinusförmig','Eine Schwingung kann gedämpft werden','Schwingung kann zu Welle werden, aber nicht umgekehrt'], correct:0, level:'leicht' },
-                { q:'Wann gilt eine Welle als polarisiert?', opts:['Schwingung nur in einer Richtung','Licht durch rechtwinkliges Prisma','Weißes Licht in Farben zerlegt','Licht breitet sich nur eine Richtung aus','Licht nicht mehr sichtbar'], correct:0, level:'leicht' },
-                { q:'Die Abbildung eines Gegenstands in einem ebenen Spiegel ist…', opts:['Real und gleich groß','Virtuell und gleich groß','Real und verkleinert','Virtuell und vergrößert','Real und vergrößert'], correct:1, level:'leicht' },
-                { q:'Welche Größen gehören zu den Grundgrößen der Mechanik? 1) Gewicht 2) Temperatur 3) Masse 4) Fläche 5) Zeit', opts:['2 und 4','4 und 5','3 und 5 sind richtig','Alle','Keine'], correct:2, level:'leicht' },
-                { q:'Welche Aussage trifft auf das 1. Newtonsche Axiom zu?', opts:['Gleich große Gegenkraft für jede Kraft','Alle Kräfte addieren sich vektoriell','Gesamtenergie bleibt konstant','Ein Körper ändert Bewegungszustand nur durch externe Kraft','Keine der Antworten'], correct:3, level:'leicht' },
-                { q:'Wie viele Newtonsche Axiome gibt es insgesamt?', opts:['2','3','4','5','1'], correct:1, level:'leicht' },
-                { q:'Was postuliert das 3. Newtonsche Axiom?', opts:['Aus Kraft resultiert gleich große Gegenkraft','Kräfte addieren sich vektoriell','Bewegungszustand ohne externe Kraft unverändert','Gesamtenergie konstant','Energie nicht erzeugbar/vernichtbar'], correct:0, level:'leicht' },
-                { q:'Was besagt das Superpositionsprinzip?', opts:['Gegenkraft gleich groß','Alle Kräfte auf Punkt addieren sich vektoriell','Ohne externe Kraft keine Bewegungsänderung','Gesamtenergie konstant','Impuls und Drehimpuls konstant'], correct:1, level:'leicht' },
-                { q:'Wie ist der Impuls definiert?', opts:['Masse × Zeit','Masse × Geschwindigkeit','Energie × Masse','Geschwindigkeit × Energie','Energie × Höhe × 10'], correct:1, level:'leicht' },
-                { q:'Welche Kraft muss man überwinden, um einen ruhenden Bücherstapel in Bewegung zu setzen?', opts:['Gleitreibungskraft','Zugkraft','Haftreibungskraft','Zentripetalkraft','Anziehungskraft'], correct:2, level:'leicht' },
-                { q:'Unter welchen Bedingungen geht ein Körper im Wasser unter? 1) Dichte Körper > Wasser 2) Dichte Körper < Wasser 3) Dichte Körper = Wasser 4) Dichte Wasser < Körper 5) Dichte Wasser > Körper', opts:['1 und 4','1, 4 und 5','2 und 3','Alle','Keine'], correct:0, level:'leicht' },
-                { q:'Zwischen welchen Teilchen wirkt die starke Kernkraft?', opts:['Neutronen und Elektronen','Neutronen und Protonen','Protonen und Elektronen','Neutronen nicht-benachbarter Kerne','Keine der Antworten'], correct:1, level:'leicht' },
-                { q:'Wenn elektromagnetische Strahlung in der Stärke zunimmt, wird…', opts:['Die Geschwindigkeit kleiner','Die Frequenz kleiner','Die Frequenz größer','Die Wellenlänge größer','Keine der Antworten'], correct:2, level:'leicht' },
-                { q:'Ab der Massenzahl welches Elements geschieht Kernfusion nur mit Energiezufuhr?', opts:['Magnesium','Eisen','Wasserstoff','Helium','Xenon'], correct:1, level:'leicht' },
-                { q:'Anordnung der Strahlungsarten von niedrig zu höchstem Energieniveau: 1) Gamma 2) Röntgen 3) Infrarot 4) UV-A 5) UV-B', opts:['1>3>2>4>5','1>2>3>4>5','1<2<3<5<4','1>2>5>4>3','Keine der Antworten'], correct:3, level:'leicht' },
-                { q:'Wie kann man den Zeitpunkt eines einzigen Kernzerfalls vorausberechnen?', opts:['Zerfallsgesetz für Einzelatom','Halbwertszeit ÷ Nukleonenanzahl','t½ ÷ log(Massenzahl)','t½ × log(Massenzahl)','Man kann es nicht vorausbestimmen'], correct:4, level:'leicht' },
-                { q:'Welche Einheit hat die Energiedosis? 1) Gray 2) J/kg 3) Energie/Masse 4) J·s/kg 5) W·s/kg', opts:['Nur 1','1, 2, 3 und 5','Nur 3','2 und 5','2, 3 und 5'], correct:1, level:'leicht' },
-                { q:'Was ist die richtige Schreibweise der Unschärferelation?', opts:['Δx · Δp ≥ h/(4π)','Δp + Δx ≥ h/(4π)','Δp · Δx = h/(4π)','Δp · Δx ≥ Δh','Keine der Antworten'], correct:0, level:'leicht' },
-                { q:'Wofür ist die Temperatur ein Maß? 1) Kinetische Energie der Teilchen 2) Bewegung der Teilchen 3) Reibung zwischen Teilchen und Luft 4) Mittlere Geschwindigkeit der Teilchen 5) Kraft für Bewegung', opts:['1, 2 und 3','1 und 2','1, 2, 3 und 4','1, 2 und 4','1, 2, 4 und 5'], correct:3, level:'leicht' },
-                { q:'Wie viel Energie braucht man, um 1 kg Wasser (c=4,2 kJ/kg·K) um 20 K zu erhitzen?', opts:['84 Joule','84000 kJ','84 Watt','840 × 10² kJ','0,0233 kWh'], correct:0, level:'leicht' },
-                { q:'Welche Leistung braucht ein Gerät, das 2 kg Wasser um 20 K in 30 s erhitzt?', opts:['5,6 kW','2,8 kW','84 W','5,6 kWh','Keine der Antworten'], correct:1, level:'leicht' },
-                { q:'Welche Prozesse sind Arten der Wärmeleitung?', opts:['Reibung, In-Brand-setzen, Abstoßung','Leitung, Strömung, Spaltung','Konvektion, Strahlung, Leitung','Nur Stoßreaktionen','Keine der Antworten'], correct:2, level:'leicht' },
-                { q:'Was bedeutet ein Elektronenmangel für die elektrische Ladung?', opts:['Negativ','Positiv','Neutral','In Farad angegeben','Keine der Antworten'], correct:1, level:'leicht' },
-                { q:'Wie groß ist der Betrag der Elementarladung?', opts:['420 nm','3·10⁸ m/s','6,62·10⁻³⁴ Js','1,6·10⁻¹⁹ C','Keine der Antworten'], correct:3, level:'leicht' },
-                { q:'Welche Ladungen gibt es in Bezug auf ein elektrisches Feld nicht? 1) Punktladung 2) Chemische Ladung 3) Huygenssche Ladung 4) Ungleichnamige Ladungen 5) Gleichnamige Ladungen', opts:['1, 3 und 4','2 und 3 sind richtig','1, 4 und 5','3 und 5','Keine der Antworten'], correct:1, level:'leicht' },
-                { q:'R1 und R2 in Reihe, R1=2R2. Welche Aussage ist falsch?', opts:['Spannung bei R1 doppelt so groß','Gesamtwiderstand dreimal R2','Kehrwert Gesamtw. = Summe Kehrwerte','Stromstärke vor R1 gleich wie nach R2','Keine der Antworten'], correct:2, level:'leicht' },
-                { q:'Anziehungskraft Erde-Sonne wenn Abstand verdreifacht?', opts:['3-fache kleiner','6-fache kleiner','9-fache kleiner','12-fache kleiner','Keine der Antworten'], correct:2, level:'leicht' },
-                { q:'U = 5 V, I = 0,2 A. Widerstand R = ?', opts:['R = 10 Ohm','R = 1 Ohm','R = 0,04 Ohm','R = 25 Ohm','R = 100 Ohm'], correct:3, level:'leicht' },
-                { q:'U = 230 V, R = 50 Ohm. Stromstärke I = ?', opts:['4,6 A','0,22 A','11500 A','280 A','180 A'], correct:0, level:'leicht' },
-                { q:'Staubsauger P = 1800 W, U = 230 V. Stromstärke I = ?', opts:['0,127 A','0,127 Ohm','7,83 Ohm','230 Ohm','7,83 A'], correct:4, level:'leicht' },
-                { q:'Welche Größe wird mit U, I bzw. R bezeichnet?', opts:['U=Spannung, I=Stromstärke, R=Widerstand','U=Stromstärke, I=Widerstand, R=Spannung','U=Widerstand, I=Spannung, R=Stromstärke','U=Ursprungspotential, I=Initialpotential, R=Ruhepotential','Keine der Antworten'], correct:0, level:'leicht' },
-                { q:'Eine 25 kg Kugel soll 1 m angehoben werden. Arbeit = ?', opts:['25 J','45,5 J','245,25 kJ','0,25 kJ','25 kJ'], correct:2, level:'leicht' },
-                { q:'Welche Wellenarten in schwingungsfähigen Systemen gibt es? 1) Kugelwellen 2) Transversalwellen 3) Schallwellen 4) Longitudinalwellen 5) Plancksche Wellen', opts:['1, 3 und 5','2 und 4 sind richtig','Nur 5','1 und 3','Nur 3'], correct:1, level:'leicht' },
-                { q:'Welche Aussagen treffen zu? 1) Radioaktiver Zerfall durch schwache WW 2) Starke WW = Kernkraft 3) Mit Ordnungszahl Kernkräfte größer 4) Kernkräfte wurden widerlegt', opts:['1 und 4','1, 4 und 5','1 und 2 sind richtig','Alle','Keine'], correct:2, level:'mittel' },
-                { q:'Was ist das letzte Element, dessen Kernfusion genug Energie freisetzt für weitere Fusionen?', opts:['Helium','Barium','Eisen','Strontium','Alle geeignet'], correct:2, level:'mittel' },
-                { q:'Welche Aussagen zu Kernumwandlungen treffen zu? 1) Sonne aus Kernfusion 2) Atombombe = unkontrollierte Kernspaltung 3) Kerne werden instabiler 4) Kerne kleiner Fe besonders geeignet für Fusion 5) Elektronen wie Neutronen wirkend', opts:['1 und 2 sind richtig','2 und 4','1, 3 und 5','Alle','Keine'], correct:0, level:'mittel' },
-                { q:'Wie verhält sich die Zerfallsrate radioaktiver Substanzen? 1) Exponentiell 2) Linear 3) Nur von Ausgangsmenge abhängig 4) Genaue Zeit nicht vorhersagbar 5) Noch unbekannt', opts:['1 und 3','2, 4 und 5','1 und 4','1, 3 und 4','2, 3 und 4'], correct:3, level:'mittel' },
-                { q:'Halbwertszeit Stoff X = 35 Std. Nach welcher Zeit sind max. 12,5% vorhanden? 1) Nach 4 Tagen 2) Nach 12,5 Std 3) Nach 105 Std 4) Nach 5 Tagen 5) Nach einer Woche', opts:['1, 3 und 4','3, 4 und 5','Nur 2','3 und 4 sind richtig','3, 4 und 5'], correct:3, level:'mittel' },
-                { q:'Tumor 200 g, Energiedosis 70 Gy benötigt. Wie viel Energie enthält der Strahl?', opts:['14 Ws','0,35 Ws','70 Gy','1400 Ws','3500 Ws'], correct:0, level:'mittel' },
-                { q:'Welche Aussagen sind korrekt? 1) 0°C = 273,15 K 2) 0°C = 0 K 3) 0 K = -273,15°C 4) 309,75 K = Körpertemperatur', opts:['Nur 1 und 3','1, 3 und 4','3 und 4','Nur 2','1 und 4'], correct:1, level:'mittel' },
-                { q:'Wärmeenergie im System steigt, Innere Energie soll konstant bleiben. Die Arbeit muss:', opts:['Abnehmen','Zunehmen','Ebenfalls konstant bleiben','Gleich 0 gesetzt werden','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'Wie sieht das allgemeine Gasgesetz aus?', opts:['V·n = p·R·T','n·R = p·V·T','p·R = V·n·T','n·R·T = p·V','R·T = p·V·n'], correct:3, level:'mittel' },
-                { q:'Gas bei 25°C mit 30 L wird auf 40°C erwärmt. Neues Volumen?', opts:['40 L','48 L','45 L','50 L','31 L'], correct:4, level:'mittel' },
-                { q:'Was ist keine Bedingung für Osmose?', opts:['Semipermeable Membran','Mindestens 2 Lösungen','Auf beiden Seiten liegt der gleiche Stoff gelöst vor','Osmotisch wirksame Substanz','Temperatur > 0°C'], correct:4, level:'mittel' },
-                { q:'Welcher Wert ist entscheidend für den Wirkungsgrad einer Wärmekraftmaschine?', opts:['Kosten','Aufgebrauchte Energie','Lebensdauer','Leistung','Geschwindigkeit der Turbinen'], correct:2, level:'mittel' },
-                { q:'Warum schwimmen Eiswürfel auf einem Getränk?', opts:['Eiswürfel wiegen weniger','Reaktion mit Kohlensäure','Wasser hat größere Dichte als Eiswürfel','Temperaturunterschied verringert Dichte','Keine korrekte Erklärung'], correct:2, level:'mittel' },
-                { q:'Kirchhoffsche Knotenregel: Zufließende Stromstärke an einem Knoten…', opts:['Gleich der abfließenden','Größer als abfließend','Mindestens den Betrag decken','Summe aller Zweige entsprechen','Orientiert sich nicht an anderen Leitungen'], correct:2, level:'mittel' },
-                { q:'Gesamtwiderstand bei Reihen- und Parallelschaltung ist…', opts:['Direkt proportional zu Einzelwiderständen','Indirekt proportional','Nicht-proportional abhängig','Gleich größtem Widerstand','Gleich kleinstem Widerstand'], correct:2, level:'mittel' },
-                { q:'Magnetische Feldstärke in langer Spule? 1) H=(n·I)/L 2) H=L/(n·I) 3) H=(n·I)/L 4) H=(n·L)/I', opts:['1 und 2','1, 3 und 4','1 und 3 sind richtig','2 und 3','Keine der Antworten'], correct:2, level:'mittel' },
-                { q:'Wie ist die magnetische Flussdichte definiert? 1) B=µ·(µ₀/H) 2) B=µ·µ₀·H 3) B=(µ·µ₀)/H 4) B=µ·µ₀·n·I/L', opts:['2 und 4 sind richtig','1 und 4','1 und 3','2 und 3','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'Lorentzkraft und Flussdichte konstant, Ladungsmenge wächst. Geschwindigkeit?', opts:['Ebenfalls konstant','Nimmt zu','Nimmt ab','Keine Verbindung zur Ladungsmenge','Keine der Antworten'], correct:2, level:'mittel' },
-                { q:'Magnetischer Fluss: B=3 T, A=0,38 m², senkrecht. Φ = ?', opts:['11,4 V·s','1,14 V·s','0,114 V·s','2,25 V·s','0,94 V·s'], correct:0, level:'mittel' },
-                { q:'Bei gleichbleibender Geschwindigkeit und zunehmender Wellenlänge wird die Frequenz…', opts:['Gleichbleiben','Abnehmen','Zunehmen','Durch Geschwindigkeit nicht beeinflusst','Keine der Antworten'], correct:1, level:'mittel' },
-                { q:'Ein nicht-idealisiertes Pendel ist ein Beispiel für…', opts:['Eine Sinuswelle','Eine harmonische Schwingung','Eine gedämpfte Schwingung','Eine Kreisschwingung','Schwingung und Welle zugleich'], correct:2, level:'mittel' },
-                { q:'Was kennzeichnet eine harmonische Schwingung?', opts:['Amplitude nimmt sinusförmig ab','Rückstellkraft = Auslenkung','Rückstellkraft ∝ Auslenkung','Auslenkung wird immer größer','Auslenkung wird immer kleiner'], correct:2, level:'mittel' },
-                { q:'Was zeichnet eine gedämpfte Schwingung aus?', opts:['Widerstandsbedingt nimmt Auslenkung ab','Spontane Änderung','Amplitude bleibt sinusförmig','Amplitude zu keinem Punkt sinusförmig','Idealisiertes Modell'], correct:0, level:'mittel' },
-                { q:'Was beschreibt das Huygenssche Prinzip?', opts:['Jede stehende Welle kann spontan zur Elementarwelle werden','Jeder Punkt einer Wellenfront ist Ausgangspunkt einer Elementarwelle','Elementarwelle breitet sich beliebig aus','Ideale Welle trotz Widerstände','Abkömmlinge mit gleicher Geschwindigkeit und Frequenz'], correct:1, level:'mittel' },
-                { q:'Licht trifft aus Luft auf Wasser: Der Lichtstrahl wird…', opts:['Vom Lot weggebrochen','Zum Lot hingebrochen','Totalreflektiert','Adsorbiert','Mit gleichem Winkel weitergebreitet'], correct:1, level:'mittel' },
-                { q:'Lichtquelle unter Eisschicht: Licht in der Luft wird…', opts:['Von Eis absorbiert','Von Eis totalreflektiert','Vom Lot weggebrochen und weiter','Zum Lot hingebrochen und weiter','Nicht gebrochen und weiter'], correct:2, level:'mittel' },
-                { q:'Abbildung innerhalb der Brennweite in einem konkaven Spiegel…', opts:['Wie Hohlspiegel außerhalb der Brennweite','Virtuell und vergrößert','Reell, verkehrt, verkleinert','Virtuell und gleich groß','Reell und vergrößert'], correct:4, level:'mittel' },
-                { q:'Abbildung außerhalb der doppelten Brennweite in Hohlspiegel? 1) Reell und vergrößert 2) Umgekehrt und verkleinert 3) Reelles Bild 4) Kein Bild 5) Virtuell und vergrößert', opts:['1, 3 und 5','2 und 4','2 und 3 sind richtig','Alle','Keine'], correct:2, level:'mittel' },
-                { q:'Konkavlinse ergibt… 1) Virtuell vergrößert 2) Virtuell verkleinert 3) Reell gleich groß 4) Bild innerhalb Brennweite 5) Bild außerhalb Brennweite', opts:['1 und 5','4 und 5','2 und 4 sind richtig','3 und 4','1 und 4'], correct:2, level:'mittel' },
-                { q:'Welche Aussagen treffen auf Kurzsichtigkeit zu? 1) Augapfel zu kurz 2) Brechkraft zu schwach 3) Fokus vor Netzhaut 4) Korrektur durch Konkavlinse 5) Fokus hinter Netzhaut', opts:['1, 3 und 5','3 und 4 sind richtig','2 und 4','1, 2, 4 und 5','Keine'], correct:1, level:'mittel' },
-                { q:'Welche Aussagen treffen auf Weitsichtigkeit zu? 1) Augapfel zu kurz 2) Fokus vor Netzhaut 3) Fokus hinter Netzhaut 4) Korrektur durch Konvexlinse 5) Brennpunkt nach hinten', opts:['1, 2 und 5','1, 3 und 4 sind richtig','2 und 4','2 und 5','Keine'], correct:1, level:'mittel' },
-                { q:'Chromatische Aberration: 1) Starke Brechung am Rand der Linse 2) Korrektur durch Zylinderlinse 3) Verschiedene Farben unterschiedlich gebrochen 4) Korrektur durch asymmetrische Linse 5) Grund für verschwommenes Farbensehen', opts:['3 und 5','1, 3 und 4','2 und 4','4 und 5','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'Welche Formel beschreibt das 2. Newtonsche Axiom?', opts:['s = v·t','F = m·a','1/f = 1/g + 1/b','F = -F','a = v/t'], correct:1, level:'mittel' },
-                { q:'Körper wird mit 250 N über 1,2 km geschoben. Arbeit = ?', opts:['15 Nm','150 N','300.000 N','300.000 Nm','0,833 Nm'], correct:3, level:'mittel' },
-                { q:'Kreisbahn: Welche Kraft zieht den Körper zum Mittelpunkt hin?', opts:['Zentrifugalkraft','Zentripetalkraft','Bahngeschwindigkeit','Anziehungskraft','Zugkraft'], correct:1, level:'mittel' },
-                { q:'Kreisbahn: Welche Kraft zieht den Körper vom Mittelpunkt weg?', opts:['Bahngeschwindigkeit','Zentrifugalkraft','Zentripetalkraft','Anziehungskraft','Zugkraft'], correct:1, level:'mittel' },
-                { q:'Was ist der photoelektrische Effekt?', opts:['Elektron aus Bindung gelöst + Photon absorbiert','Elektron aus Bindung gelöst + Photon abgestrahlt','Effekt wie Fotoapparat','Photonen drängen Elektronen in obere Schalen','Durch Strom Licht erzeugt'], correct:0, level:'mittel' },
-                { q:'Korrekte Linsengleichung?', opts:['1/g + 1/f = 1/b','1/g · 1/f = 1/b','1/g + 1/b = 1/f','1/g · 1/b = 1/f','1/g - 1/b = 1/f'], correct:2, level:'mittel' },
-                { q:'Aus welchen Grundteilchen bestehen Protonen?', opts:['2 Charm + 1 Down','2 Up + 1 Down','1 Down + 1 Up','1 Strange + 2 Charm','2 Top + 1 Bottom'], correct:1, level:'mittel' },
-                { q:'Wie entsteht Licht?', opts:['Elektronen springen von höherer in niedrigere Schale','Atomkerne werden beweglicher','Wasserstoff verliert Elektron','Licht entsteht nicht','2 Elektronen prallen aufeinander'], correct:0, level:'mittel' },
-                { q:'Der Massendefekt: 1) Masselosigkeit der Photonen 2) Energieabgabe ausgeglichen 3) Entsteht bei Kernfusion 4) Gravitation 5) Spielt in Sonne Rolle', opts:['Nur 1','2 und 4','2, 3 und 4','Nur 3','2, 3 und 5 sind richtig'], correct:4, level:'mittel' },
-                { q:'Was ermöglicht den exothermen Ablauf der Kernfusion bei leichten Kernen?', opts:['Energiezufuhr von außen','Wechsel Haupt- zu Nebengruppe','Energietransfer Protonen-Elektronen','Die steigende Bindungsenergie','Keine der Antworten'], correct:3, level:'mittel' },
-                { q:'Warum zerfallen große Kerne leichter als kleine?', opts:['Kleine zu klein zum Teilen','Alles strebt kleinstmögliche Größe an','Große Kerne werden nicht so gut von starker Kernkraft gehalten','Kerne zerfallen nicht','Keine der Antworten'], correct:2, level:'mittel' },
-                { q:'Was liefert die Energiedosisleistung zusätzlich im Vergleich zur Energiedosis?', opts:['Stärke der Strahlung','Bestrahlung des Körperareals','Gesamtenergie der Erzeugung','Expositionszeit','Keine der Antworten'], correct:3, level:'mittel' },
-                { q:'Was braucht man zum Vergleich der Gefährlichkeit verschiedener Strahlungsarten?', opts:['Die Äquivalenzdosis','Die Energiedosis','Die Energiedosisleistung','Die Ionendosis','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'Was entsteht, wenn Teilchen und Antiteilchen zusammenstoßen? 1) Antimaterie 2) Elementarteilchen 3) Strahlung abgegeben 4) Gottespartikel 5) Nichts', opts:['1, 2 und 3','3 und 4','Nur 5','2 und 3 sind richtig','Keine'], correct:3, level:'mittel' },
-                { q:'Worin unterscheiden sich Teilchen und Antiteilchen? 1) Spin 2) Masse 3) Ladung 4) Lebensdauer', opts:['Alle','1 und 3','1, 3 und 4','Nur 3','Keine'], correct:1, level:'mittel' },
-                { q:'Welches Experiment beweist den Teilchen-Charakter des Lichts?', opts:['Doppelspalt-Experiment','Heißwerden einer Glühbirne','Reflexion in Spiegeln','Elektronen aus negativ geladener Zinkplatte bei UV-Licht','Aufladung metallischer Kugel mit Gamma'], correct:3, level:'mittel' },
-                { q:'Womit kann der Teilchen-Welle-Charakter des Elektrons beobachtet werden?', opts:['Bestrahlung Metallplatte mit UV','Laserverhalten bei feinem Gitter','Spannungsmessung zwischen Metallkugeln','Doppelspalt-Experiment','Keine der Antworten'], correct:3, level:'mittel' },
-                { q:'Woraus setzt sich die innere Energie eines geschlossenen Systems zusammen?', opts:['Kinetisch + Potential + Wärme','Chemisch + Kern + thermisch','Chemisch + Kern + kinetisch','Potential + kinetisch','Keine der Antworten'], correct:4, level:'mittel' },
-                { q:'Metallfass 10 L, T=20°C, Druck von 5→4 bar. Was passiert? 1) Volumen sinkt auf 8 L 2) Temp steigt auf 25°C 3) Temp sinkt auf 16°C 4) Temp sinkt auf -39°C 5) Volumen steigt auf 12 L', opts:['Nur 3','1 und 3','2 und 5','1 und 4','Nur 4'], correct:0, level:'mittel' },
-                { q:'Wie kann man die elektrische Spannung beschreiben?', opts:['Der Widerstand, der Strom treibt','Der Druck, der Strom treibt','Der Gradient, der Strom treibt','Die Arbeit, die Strom treibt','Keine der Antworten'], correct:1, level:'mittel' },
-                { q:'Schallgeschwindigkeit v=300 m/s. Echo nach t=5 s. Entfernung der Felswand?', opts:['16,5 km','165 km','0,165 km','0,75 km','1650 m'], correct:3, level:'mittel' },
-                { q:'Radfahrer: v₀=0, v=30 km/h in t=8 s. Beschleunigung?', opts:['1 m/s²','2 m/s²','4 m/s²','8 m/s²','10 m/s²'], correct:0, level:'mittel' },
-                { q:'Wirkungsgrad 33%, Arbeit W=8100 J zugeführt. Abgegebene Arbeit?', opts:['2,673 kJ','2673 kJ','267300 J','267,3 kJ','26,73 J'], correct:0, level:'mittel' },
-                { q:'Pinguin springt von 5 m Klippe. Geschwindigkeit beim Eintauchen (Luftwiderstand vernachlässigt)?', opts:['9,9 m/s','9,9 km/m','99 m/s','49 m/s','Keine der Antworten'], correct:0, level:'mittel' },
-                { q:'Welche Systeme führen harmonische Schwingungen aus? 1) Elektrische Schwingkreise 2) Federpendel 3) Fadenpendel 4) Frequenzfreies Pendel 5) Doppler-Pendel', opts:['1, 3 und 5','1, 2 und 3 sind richtig','2 und 3','Nur 5','Alle'], correct:1, level:'mittel' },
-                { q:'Was ist die Einheit der Leistung?', opts:['Joule','Newton','Watt','Pascal','Keine der Antworten'], correct:2 },
-                { q:'Wie lautet die Formel für kinetische Energie?', opts:['E = m·g·h','E = ½·m·v²','E = F·s','E = p·V','E = m·c²'], correct:1 },
-                { q:'Was ist die Formel für den hydrostatischen Druck?', opts:['p = F/A','p = ρ·g·h','p = m/V','p = n·R·T/V','p = F·s'], correct:1 },
-                { q:'Was besagt der Energieerhaltungssatz?', opts:['Energie kann erzeugt, aber nicht vernichtet werden','Energie wird in jedem Prozess verbraucht','Die Gesamtenergie eines abgeschlossenen Systems ist konstant','Kinetische Energie ist immer größer als potenzielle','Keine der Antworten'], correct:2 },
-                { q:'Wie ändert sich die Gravitationskraft wenn der Abstand zwischen zwei Körpern verdoppelt wird?', opts:['Sie halbiert sich','Sie verdoppelt sich','Sie wird viermal kleiner','Sie bleibt gleich','Sie wird viermal größer'], correct:2 },
-                { q:'Was ist der Unterschied zwischen Masse und Gewicht?', opts:['Kein Unterschied','Masse ist eine Kraft, Gewicht ist Materie','Masse ist ein Maß für Trägheit (kg), Gewicht ist die Gravitationskraft (N)','Gewicht ist immer größer als Masse','Keine der Antworten'], correct:2 },
-                { q:'Was beschreibt das Trägheitsmoment?', opts:['Den Widerstand eines Körpers gegen Translation','Den Widerstand eines Körpers gegen Rotation','Die Geschwindigkeit einer Rotation','Den Drehimpuls eines Körpers','Keine der Antworten'], correct:1 },
-                { q:'Was ist die Einheit des Drehmoments?', opts:['Newton','Joule','Nm (Newton-Meter)','Watt','Pascal'], correct:2 },
-                { q:'Was ist Bernoulli-Effekt anschaulich?', opts:['Erhöhter Druck bei langsamer Strömung','Verringerter Druck bei schnellerer Strömung','Auftrieb in Flüssigkeiten','Reibung in Gasen','Keine der Antworten'], correct:1 },
-                { q:'Welcher Zusammenhang gilt für gleichförmige Kreisbewegung?', opts:['Die Geschwindigkeit ändert sich','Die Richtung der Geschwindigkeit ändert sich, der Betrag nicht','Beide ändern sich','Keine Kraft wirkt','Keine der Antworten'], correct:1 },
-                { q:'Was ist der Dopplereffekt?', opts:['Änderung der Wellenamplitude durch Bewegung','Wahrgenommene Frequenzänderung durch Relativbewegung von Quelle und Empfänger','Überlagerung zweier Wellen','Reflexion von Schallwellen','Keine der Antworten'], correct:1 },
-                { q:'Was ist konstruktive Interferenz?', opts:['Auslöschung zweier Wellen','Verstärkung durch Überlagerung gleichphasiger Wellen','Dämpfung einer Welle','Reflexion an einer Grenzfläche','Keine der Antworten'], correct:1 },
-                { q:'Welche Eigenschaft hat Licht, die Interferenz erklärt?', opts:['Teilchennatur','Wellennatur','Beide – Welle-Teilchen-Dualismus','Elektrische Ladung','Keine der Antworten'], correct:2 },
-                { q:'Was ist Beugung (Diffraktion)?', opts:['Reflexion an einer glatten Fläche','Ablenkung von Wellen an Hindernissen oder Spaltöffnungen','Brechung an Grenzflächen','Absorption von Licht','Keine der Antworten'], correct:1 },
-                { q:'Welche Strahlungsart hat die längste Wellenlänge?', opts:['Gammastrahlung','Röntgenstrahlung','Sichtbares Licht','Infrarotstrahlung','Radiowellen'], correct:4 },
-                { q:'Was ist die Kapazität eines Kondensators?', opts:['C = U/Q','C = Q/U','C = R·I','C = P/U','C = U·I'], correct:1 },
-                { q:'Was ist elektrische Arbeit?', opts:['W = U/I','W = U·I·t','W = R/I','W = I²·R','Beide b und d sind richtig'], correct:4 },
-                { q:'Was ist spezifischer Widerstand ρ?', opts:['Widerstand pro Länge','Materialabhängige Konstante: R = ρ·l/A','Widerstand pro Fläche','Leitfähigkeit','Keine der Antworten'], correct:1 },
-                { q:'Was besagt der Zweite Hauptsatz der Thermodynamik in Bezug auf Entropie?', opts:['Entropie nimmt in abgeschlossenen Systemen ab','Entropie bleibt in allen Systemen konstant','Entropie in abgeschlossenen Systemen nimmt nie ab (ΔS ≥ 0)','Entropie kann beliebig verändert werden','Keine der Antworten'], correct:2 },
-                { q:'Was ist der Wirkungsgrad einer Wärmekraftmaschine (Carnot)?', opts:['η = W_nutz / Q_ein','η = T_kalt / T_warm','η = 1 - (T_kalt / T_warm)','η = Q_ab / Q_ein','Keine der Antworten'], correct:2 },
-                { q:'Was ist osmotischer Druck abhängig von?', opts:['Nur von der Temperatur','Nur von der Konzentration','Konzentration, Temperatur und Teilchenanzahl','Nur von der Teilchengröße','Keine der Antworten'], correct:2 },
-            ],
-            mathematik: [
-                // ── Zehnerpotenzen & Präfixe ───────────────────────────────
-                { q:'Was ist 10⁻³ als Präfix?', opts:['Mikro (μ)','Milli (m)','Nano (n)','Zenti (c)'], correct:1 },
-                { q:'Was ist 10⁶ als Präfix?', opts:['Kilo (k)','Mega (M)','Giga (G)','Tera (T)'], correct:1 },
-                { q:'Was ist 10⁻⁶ als Präfix?', opts:['Milli (m)','Nano (n)','Mikro (μ)','Piko (p)'], correct:2 },
-                { q:'Was ist 10⁹ als Präfix?', opts:['Mega (M)','Giga (G)','Tera (T)','Peta (P)'], correct:1 },
-                { q:'Wie viel ist 1 km in Metern?', opts:['100 m','1000 m','10 000 m','0,001 m'], correct:1 },
-                // ── Algebra ───────────────────────────────────────────────
-                { q:'Was ist 30% von 200?', opts:['30','60','90','6'], correct:1 },
-                { q:'Wie lautet der Binomische Lehrsatz für (a+b)²?', opts:['a²+b²','a²+ab+b²','a²+2ab+b²','a²−2ab+b²'], correct:2 },
-                { q:'Wie lautet (a−b)²?', opts:['a²−b²','a²−2ab+b²','a²+2ab+b²','a²+b²'], correct:1 },
-                { q:'Wie lautet (a+b)(a−b)?', opts:['a²+b²','a²−b²','a²+2ab−b²','2a²'], correct:1 },
-                { q:'Was ist log₁₀(1000)?', opts:['2','3','4','10'], correct:1 },
-                { q:'Was ist ln(e²)?', opts:['e','2','e²','2e'], correct:1 },
-                { q:'Was ist die Umkehrfunktion von eˣ?', opts:['xᵉ','ln(x)','log₁₀(x)','1/eˣ'], correct:1 },
-                { q:'Welche Lösungsmenge hat x² = −4 in ℝ?', opts:['x = ±2','x = ±2i','∅','x = 4'], correct:2 },
-                { q:'Was ist 0! (Null-Fakultät)?', opts:['0','1','Nicht definiert','∞'], correct:1 },
-                { q:'Was ist 5! (5 Fakultät)?', opts:['25','60','120','720'], correct:2 },
-                { q:'Was ist das Ergebnis von 2³ × 2⁴?', opts:['2⁷','2¹²','4⁷','8⁷'], correct:0 },
-                { q:'Was ist (2³)²?', opts:['2⁵','2⁶','2⁸','4⁶'], correct:1 },
-                { q:'Wie lautet die Lösungsformel für ax² + bx + c = 0?', opts:['x = −b ± √(b²−4ac)','x = (−b ± √(b²−4ac)) / (2a)','x = b / (2a)','x = ±√(−b/a)'], correct:1 },
-                // ── Geometrie ─────────────────────────────────────────────
-                { q:'Wie lautet der Satz des Pythagoras?', opts:['a² + b² = c','a + b = c','a² + b² = c²','a² · b² = c²'], correct:2 },
-                { q:'Was ist der Flächeninhalt eines Kreises mit Radius r?', opts:['2πr','πr²','πd','4πr²'], correct:1 },
-                { q:'Was ist der Umfang eines Kreises mit Radius r?', opts:['πr²','2πr','πr','4πr'], correct:1 },
-                { q:'Was ist das Volumen einer Kugel mit Radius r?', opts:['4πr²','2πr³','4/3·πr³','πr³'], correct:2 },
-                { q:'Was ist die Oberfläche einer Kugel mit Radius r?', opts:['4/3·πr³','πr²','4πr²','2πr²'], correct:2 },
-                { q:'Was ist das Volumen eines Zylinders (Radius r, Höhe h)?', opts:['πr²','2πrh','πr²h','2πr²h'], correct:2 },
-                { q:'Was ist das Volumen eines Quaders (l, b, h)?', opts:['2(lb+lh+bh)','l+b+h','l·b·h','(l+b+h)²'], correct:2 },
-                { q:'Wie groß ist die Winkelsumme in einem Dreieck?', opts:['90°','180°','270°','360°'], correct:1 },
-                { q:'Was ist sin(90°)?', opts:['0','0,5','√2/2','1'], correct:3 },
-                { q:'Was ist cos(0°)?', opts:['0','1','−1','√2/2'], correct:1 },
-                { q:'Was ist tan(45°)?', opts:['0','0,5','1','√3'], correct:2 },
-                { q:'Was ist der Sinus-Satz in einem Dreieck?', opts:['a/sin A = b/sin B = c/sin C','a² = b² + c² − 2bc·cos A','sin A = Gegenkathete/Hypotenuse','a + b > c'], correct:0 },
-                // ── Funktionen & Analysis ─────────────────────────────────
-                { q:'Was ist die Ableitung von f(x) = x³?', opts:['x²','3x','3x²','x⁴/4'], correct:2 },
-                { q:'Was ist die Ableitung von f(x) = eˣ?', opts:['xeˣ⁻¹','eˣ','x·eˣ','1/eˣ'], correct:1 },
-                { q:'Was ist die Ableitung von f(x) = ln(x)?', opts:['ln(x)/x','1/x','x·ln(x)','eˣ'], correct:1 },
-                { q:'Was ist ∫x dx?', opts:['x²','x²/2 + C','2x + C','1/x + C'], correct:1 },
-                { q:'Was ist ∫eˣ dx?', opts:['x·eˣ + C','eˣ + C','eˣ/x + C','ln(x) + C'], correct:1 },
-                { q:'Was beschreibt ein lokales Maximum?', opts:["f'(x) = 0 und f''(x) > 0","f'(x) = 0 und f''(x) < 0","f'(x) > 0","f(x) > 0"], correct:1 },
-                { q:'Was ist die Kettenregel für f(g(x))?', opts:["f'(x)·g'(x)","f'(g(x))·g'(x)","f(x)·g'(x)","f'(g(x)) + g'(x)"], correct:1 },
-                { q:'Was ist die Produktregel für (f·g)?', opts:["f'·g'","f'·g + f·g'","f·g' − g·f'","(f·g)'/(f'+g')"], correct:1 },
-                { q:'Was ist der Grenzwert von (1 + 1/n)ⁿ für n → ∞?', opts:['1','2','e ≈ 2,718','π'], correct:2 },
-                // ── Vektorrechnung ────────────────────────────────────────
-                { q:'Was ist der Betrag des Vektors v = (3, 4)?', opts:['7','5','12','1'], correct:1 },
-                { q:'Was ist das Skalarprodukt a⃗ · b⃗?', opts:['Ein Vektor senkrecht zu a⃗ und b⃗','|a⃗| · |b⃗| · cos(θ)','|a⃗| × |b⃗|','Ein Vektor in Richtung a⃗'], correct:1 },
-                { q:'Wann sind zwei Vektoren senkrecht zueinander?', opts:['Wenn ihr Skalarprodukt = 1','Wenn ihr Skalarprodukt = 0','Wenn sie gleich lang sind','Wenn einer ein Vielfaches des anderen ist'], correct:1 },
-                { q:'Was ist ein Einheitsvektor?', opts:['Ein Vektor der Länge 0','Ein Vektor der Länge 1','Ein Vektor mit ganzzahligen Komponenten','Der x-Achsenvektor'], correct:1 },
-                { q:'Was ist die Addition zweier Vektoren a⃗ = (a₁,a₂) und b⃗ = (b₁,b₂)?', opts:['(a₁·b₁, a₂·b₂)','(a₁+b₂, a₂+b₁)','(a₁+b₁, a₂+b₂)','(a₁−b₁, a₂−b₂)'], correct:2 },
-                // ── Einheiten ─────────────────────────────────────────────
-                { q:'Wie viele Sekunden hat eine Stunde?', opts:['60','600','3600','36000'], correct:2 },
-                { q:'Was ist 1 m² in cm²?', opts:['100 cm²','1000 cm²','10 000 cm²','100 000 cm²'], correct:2 },
-                { q:'Was ist 1 Liter in m³?', opts:['0,001 m³','0,01 m³','0,1 m³','1 m³'], correct:0 },
-                { q:'Wie viel ist 1 km/h in m/s?', opts:['1/3,6 m/s','3,6 m/s','1/36 m/s','36 m/s'], correct:0 },
-                { q:'Wie viel ist 1 µm (Mikrometer) in Meter?', opts:['10⁻³ m','10⁻⁶ m','10⁻⁹ m','10⁻¹² m','10⁻² m'], correct:1 },
-                { q:'Wie viel ist 1 nm (Nanometer) in Meter?', opts:['10⁻⁶ m','10⁻⁸ m','10⁻⁹ m','10⁻¹² m','10⁻³ m'], correct:2 },
-                { q:'Was ist 2⁻³?', opts:['−8','8','1/8','1/6','Keine der Antworten'], correct:2 },
-                { q:'Ein Medikament kostet 40 € und wird um 15% teurer. Neuer Preis?', opts:['46 €','55 €','48 €','44 €','42 €'], correct:0 },
-                { q:'Von 200 Patienten haben 30 eine bestimmte Erkrankung. Wie viel Prozent sind das?', opts:['10%','15%','20%','25%','30%'], correct:1 },
-                { q:'Löse für x: 3x + 7 = 22', opts:['x = 3','x = 4','x = 5','x = 6','x = 7'], correct:2 },
-                { q:'Löse für x: x/4 - 2 = 3', opts:['x = 16','x = 20','x = 12','x = 28','x = 8'], correct:1 },
-                { q:'Was ist der Kehrwert von 3/5?', opts:['5/3','3/5','-3/5','0,6','Keine der Antworten'], correct:0 },
-                { q:'Was ist die Oberfläche eines Zylinders (Radius r, Höhe h)?', opts:['πr²h','2πr² + 2πrh','2πrh','πr² + 2πrh','Keine der Antworten'], correct:1 },
-                { q:'Was ist das Volumen einer Pyramide (Grundfläche A, Höhe h)?', opts:['A·h','A·h/2','A·h/3','2·A·h/3','Keine der Antworten'], correct:2 },
-                { q:'In einem rechtwinkligen Dreieck sind die Katheten 3 und 4. Wie lang ist die Hypotenuse?', opts:['5','6','7','√7','Keine der Antworten'], correct:0 },
-                { q:'Wie groß ist der Mittelpunktswinkel eines gleichseitigen Dreiecks, das einem Kreis einbeschrieben ist?', opts:['60°','90°','120°','180°','Keine der Antworten'], correct:2 },
-                { q:'Was ist cos(180°)?', opts:['0','1','-1','√2/2','Keine der Antworten'], correct:2 },
-                { q:'Was ist sin(30°)?', opts:['√3/2','1','0,5','√2/2','Keine der Antworten'], correct:2 },
-                { q:'Was ist die Ableitung von f(x) = sin(x)?', opts:['−sin(x)','-cos(x)','cos(x)','tan(x)','Keine der Antworten'], correct:2 },
-                { q:'Was ist die Ableitung von f(x) = x² · eˣ? (Produktregel)', opts:['2x + eˣ','2x · eˣ','x² · eˣ + 2x · eˣ','2eˣ','Keine der Antworten'], correct:2 },
-                { q:'Was ist ∫ sin(x) dx?', opts:['cos(x) + C','-cos(x) + C','sin(x) + C','-sin(x) + C','Keine der Antworten'], correct:1 },
-                { q:'Wann hat eine Funktion einen Wendepunkt?', opts:['f\'(x) = 0','f\'(x) = 0 und f\'\'(x) = 0 und Vorzeichenwechsel von f\'\'','f\'\'(x) = 0 und Vorzeichenwechsel von f\'\'','f(x) = 0','Keine der Antworten'], correct:2 },
-                { q:'Was ist die Ableitung von f(x) = 1/x?', opts:['ln(x)','x⁻²','−x⁻²','1/x²','Keine der Antworten'], correct:2 },
-                { q:'Wie berechnet man den Winkel zwischen zwei Vektoren a⃗ und b⃗?', opts:['cos(α) = |a⃗| · |b⃗|','cos(α) = (a⃗ · b⃗) / (|a⃗| · |b⃗|)','sin(α) = a⃗ · b⃗','cos(α) = a⃗ + b⃗','Keine der Antworten'], correct:1 },
-                { q:'Was ist das Kreuzprodukt a⃗ × b⃗ geometrisch?', opts:['Ein Skalar proportional zum Cosinus','Ein Vektor senkrecht zu a⃗ und b⃗','Der Betrag beider Vektoren','Ein Skalar gleich dem Flächeninhalt','Keine der Antworten'], correct:1 },
-                { q:'Welcher Vektor ist zu a⃗ = (1, 0) linear unabhängig?', opts:['(2, 0)','(−3, 0)','(0, 1)','(0,5, 0)','Keine der Antworten'], correct:2 },
-                { q:'Wie groß ist die Wahrscheinlichkeit, bei 2 Münzwürfen zweimal Kopf zu bekommen?', opts:['1/2','1/3','1/4','1/8','Keine der Antworten'], correct:2 },
-                { q:'Was ist 1 kPa in Pa?', opts:['100 Pa','1000 Pa','10 000 Pa','0,001 Pa','Keine der Antworten'], correct:1 },
-                { q:'Wie viele Minuten hat eine Woche?', opts:['1440','5040','10080','60480','Keine der Antworten'], correct:2 },
-            ]
-        };
+        
 
         // ============================================================
         // GLOBALER ZUSTAND
@@ -1950,8 +1158,13 @@
             wissenCurrent = pool[idx];
             wissenSelected = null;
 
-            document.getElementById('wissen-subject-badge').textContent =
-                subjectIcons[wissenCurrent.subj] + ' ' + subjectNames[wissenCurrent.subj];
+            const _isOrig = wissenCurrent.level === 'leicht' || wissenCurrent.level === 'mittel' || wissenCurrent.level === 'schwer';
+            const _levelLabel = wissenCurrent.level ? { leicht:'🟢 Leicht', mittel:'🟡 Mittel', schwer:'🔴 Schwer' }[wissenCurrent.level] || '' : '✏️ Eigene';
+            const _badgeEl = document.getElementById('wissen-subject-badge');
+            _badgeEl.textContent = subjectIcons[wissenCurrent.subj] + ' ' + subjectNames[wissenCurrent.subj] + ' · ' + _levelLabel;
+            _badgeEl.style.background = wissenCurrent.level
+                ? { leicht:'#16a34a', mittel:'#d97706', schwer:'#dc2626' }[wissenCurrent.level] || 'var(--accent-emerald)'
+                : 'var(--accent-emerald)';
             document.getElementById('wissen-question').textContent = wissenCurrent.q;
 
             const numOpts = wissenCurrent.opts.length;
@@ -1963,9 +1176,12 @@
 
             // Mische nur so viele Optionen wie vorhanden
             const indices = Array.from({length: numOpts}, (_, i) => i);
-            const shuffled = [...indices].sort(() => Math.random() - 0.5);
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
             let newCorrect = 0;
-            shuffled.forEach((origIdx, newPos) => {
+            indices.forEach((origIdx, newPos) => {
                 const el = document.getElementById('wissen-option-' + optEls[newPos]);
                 if (el) el.textContent = wissenCurrent.opts[origIdx];
                 if (origIdx === wissenCurrent.correct) newCorrect = newPos;
@@ -1995,7 +1211,7 @@
                 return;
             }
             wissenTotal++;
-            const correctOpt = ['A','B','C','D'][wissenCurrent._shuffledCorrect];
+            const correctOpt = ['A','B','C','D','E'][wissenCurrent._shuffledCorrect];
             const isCorrect = wissenSelected === correctOpt;
             if (isCorrect) wissenCorrect++;
 
@@ -2004,13 +1220,18 @@
                 else if (o.dataset.option === wissenSelected && !isCorrect) o.classList.add('incorrect');
             });
 
-            const correctText = document.getElementById('wissen-option-' + correctOpt.toLowerCase()).textContent;
+            const _optEl = document.getElementById('wissen-option-' + correctOpt.toLowerCase());
+            const correctText = _optEl ? _optEl.textContent : '(Option ' + correctOpt + ')';
             const fb = document.getElementById('wissen-feedback');
             fb.textContent = isCorrect ? '✓ Richtig!' : '✗ Falsch. Richtige Antwort: ' + correctText;
             fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
 
             updateWissenStats();
-            setTimeout(generateNewWissenFrage, 2500);
+
+            // SRS: Bewertungsbuttons einblenden
+            document.getElementById('srs-rating').style.display = 'block';
+            document.getElementById('wissen-check-btn').disabled = true;
+            document.getElementById('wissen-new-btn').disabled = true;
         }
 
         function setWissenSubject(s) {
@@ -2043,6 +1264,327 @@
             if (name === 'wortfluessigkeit' && !currentWordData) generateNewWord();
             if (name === 'zahlenfolgen' && !zfCurrent) generateNewZahlenfolge();
             if (name === 'wissen' && !wissenCurrent) generateNewWissenFrage();
+        }
+
+
+        // =============================================
+        // SPACED REPETITION (SM-2 Algorithmus)
+        // =============================================
+        const SRS_KEY = 'medat_srs_v2';
+        let srsData = {};
+        let srsMode = false;
+        let srsDueQueue = [];
+
+        function srsLoad() {
+            try { srsData = JSON.parse(localStorage.getItem(SRS_KEY) || '{}'); } catch(e) { srsData = {}; }
+        }
+        function srsSave() {
+            try { localStorage.setItem(SRS_KEY, JSON.stringify(srsData)); } catch(e) {}
+        }
+        function srsKey(subj, idx) { return subj + '_' + idx; }
+        function srsGetCard(key) {
+            return srsData[key] || { interval: 0, repetitions: 0, ef: 2.5, nextReview: 0 };
+        }
+
+        // SM-2 Update: rating 0-5
+        function srsUpdate(key, rating) {
+            const card = srsGetCard(key);
+            const dayMs = 86400000;
+            let { interval, repetitions, ef } = card;
+            if (rating >= 3) {
+                if (repetitions === 0) interval = 1;
+                else if (repetitions === 1) interval = 6;
+                else interval = Math.round(interval * ef);
+                repetitions++;
+            } else {
+                interval = 1;
+                repetitions = 0;
+            }
+            ef = Math.max(1.3, Math.min(2.5, ef + 0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02)));
+            srsData[key] = { interval, repetitions, ef, nextReview: Date.now() + interval * dayMs, lastRating: rating };
+            srsSave();
+        }
+
+        function srsIsDue(key) { return srsGetCard(key).nextReview <= Date.now(); }
+
+        function getAllWissenPool() {
+            return Object.entries(wissenFragen).flatMap(([s, qs]) => qs.map(q => ({...q, subj: s})));
+        }
+
+        function srsCounts() {
+            const now = Date.now();
+            let due = 0, learning = 0, known = 0, unseen = 0;
+            getAllWissenPool().forEach((q, i) => {
+                const card = srsData[srsKey(q.subj, i)];
+                if (!card) { unseen++; return; }
+                if (card.nextReview <= now) { due++; return; }
+                if (card.repetitions < 3) learning++; else known++;
+            });
+            return { due, learning, known, unseen };
+        }
+
+        function getNextDueTime() {
+            const now = Date.now();
+            let next = Infinity;
+            getAllWissenPool().forEach((q, i) => {
+                const c = srsData[srsKey(q.subj, i)];
+                if (c && c.nextReview > now) next = Math.min(next, c.nextReview);
+            });
+            if (next === Infinity) return null;
+            const diff = next - now;
+            const h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000);
+            if (h >= 24) return 'in ' + Math.floor(h/24) + ' Tag(en)';
+            if (h > 0) return 'in ' + h + 'h ' + m + 'min';
+            return 'in ' + m + ' Min.';
+        }
+
+        function srsUpdateDisplay() {
+            const { due, learning, known, unseen } = srsCounts();
+            document.getElementById('srs-due-count').textContent = due;
+            document.getElementById('srs-learning-count').textContent = learning;
+            document.getElementById('srs-known-count').textContent = known;
+            document.getElementById('srs-new-count').textContent = unseen;
+            const btn = document.getElementById('srs-due-btn');
+            const info = document.getElementById('srs-next-info');
+            if (due > 0) {
+                btn.textContent = '📚 ' + due + ' fällige Karte' + (due !== 1 ? 'n' : '') + ' üben';
+                btn.style.opacity = '1';
+                info.textContent = '';
+            } else {
+                btn.textContent = '✅ Alle erledigt!';
+                btn.style.opacity = '0.6';
+                const nxt = getNextDueTime();
+                info.textContent = nxt ? 'Nächste Wiederholung: ' + nxt : 'Alle Karten bekannt 🎓';
+            }
+        }
+
+        function srsBuildDueQueue() {
+            srsDueQueue = getAllWissenPool()
+                .map((q, i) => ({ q, key: srsKey(q.subj, i) }))
+                .filter(item => srsIsDue(item.key))
+                .sort(() => Math.random() - 0.5);
+        }
+
+        function srsStartDueSession() {
+            srsBuildDueQueue();
+            if (srsDueQueue.length === 0) {
+                alert('Keine fälligen Karten! ' + (getNextDueTime() || 'Alle bekannt.'));
+                return;
+            }
+            srsMode = true;
+            if (currentModule !== 'wissen') switchModule('wissen');
+            generateNextSrsCard();
+        }
+
+        function generateNextSrsCard() {
+            if (srsDueQueue.length === 0) {
+                srsMode = false;
+                srsUpdateDisplay();
+                const fb = document.getElementById('wissen-feedback');
+                fb.textContent = '🎉 Alle fälligen Karten erledigt!';
+                fb.className = 'feedback correct';
+                return;
+            }
+            const item = srsDueQueue.shift();
+            // Frage vorbereiten wie normale Wissenfrage, aber mit SRS-Key
+            wissenCurrent = { ...item.q, _srsKey: item.key };
+            wissenSelected = null;
+
+            const numOpts = wissenCurrent.opts.length;
+            const optEls = ['a','b','c','d','e'];
+            const eRow = document.getElementById('wissen-option-e-row');
+            if (eRow) eRow.style.display = numOpts >= 5 ? '' : 'none';
+
+            const badge = document.getElementById('wissen-subject-badge');
+            const _srsLevel = wissenCurrent.level ? { leicht:'🟢', mittel:'🟡', schwer:'🔴' }[wissenCurrent.level] || '✏️' : '✏️';
+            badge.textContent = subjectIcons[wissenCurrent.subj] + ' ' + subjectNames[wissenCurrent.subj]
+                + ' · ' + _srsLevel + ' 🗓 noch ' + srsDueQueue.length;
+
+            document.getElementById('wissen-question').textContent = wissenCurrent.q;
+
+            const indices = Array.from({length: numOpts}, (_, i) => i);
+            // Fisher-Yates shuffle
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            let newCorrect = 0;
+            indices.forEach((origIdx, newPos) => {
+                const el = document.getElementById('wissen-option-' + optEls[newPos]);
+                if (el) el.textContent = wissenCurrent.opts[origIdx];
+                if (origIdx === wissenCurrent.correct) newCorrect = newPos;
+            });
+            wissenCurrent._shuffledCorrect = newCorrect;
+
+            document.querySelectorAll('#wissen-options .letter-option').forEach(o => o.classList.remove('selected','correct','incorrect'));
+            document.getElementById('srs-rating').style.display = 'none';
+            document.getElementById('wissen-check-btn').disabled = false;
+            document.getElementById('wissen-new-btn').disabled = false;
+            const fb = document.getElementById('wissen-feedback');
+            fb.className = 'feedback hidden';
+            fb.textContent = '';
+        }
+
+        function handleSrsRating(rating) {
+            if (!wissenCurrent) return;
+            let key = wissenCurrent._srsKey;
+            if (!key) {
+                const pool = getAllWissenPool();
+                const idx = pool.findIndex(q => q.q === wissenCurrent.q && q.subj === wissenCurrent.subj);
+                if (idx !== -1) key = srsKey(wissenCurrent.subj, idx);
+            }
+            if (key) srsUpdate(key, rating);
+            srsUpdateDisplay();
+            document.getElementById('srs-rating').style.display = 'none';
+            document.getElementById('wissen-check-btn').disabled = false;
+            document.getElementById('wissen-new-btn').disabled = false;
+            setTimeout(srsMode ? generateNextSrsCard : generateNewWissenFrage, 400);
+        }
+
+        // ============================================================
+        // ============================================================
+        // FIGUREN ZUSAMMENSETZEN
+        // ============================================================
+        let fzCurrent = null, fzSelected = null;
+        let fzCorrectCount = 0, fzTotalCount = 0;
+        const fzUsed = new Set();
+
+        const FZ_F = '#dce8f5'; // Füllfarbe
+        const FZ_S = '#1a365d'; // Strichfarbe
+
+        function fzPoly(ctx, pts, fill, stroke) {
+            ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+            ctx.closePath();
+            if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+            ctx.strokeStyle = stroke || FZ_S; ctx.lineWidth = 1.8; ctx.stroke();
+        }
+        function fzCircle(ctx, x, y, r, fill, stroke) {
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+            if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+            ctx.strokeStyle = stroke || FZ_S; ctx.lineWidth = 1.8; ctx.stroke();
+        }
+        function fzArc(ctx, x, y, r, a1, a2, fill, stroke) {
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.arc(x, y, r, a1, a2); ctx.closePath();
+            if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+            ctx.strokeStyle = stroke || FZ_S; ctx.lineWidth = 1.8; ctx.stroke();
+        }
+        function fzRect(ctx, x, y, w, h, fill, stroke) {
+            if (fill) { ctx.fillStyle = fill; ctx.fillRect(x, y, w, h); }
+            ctx.strokeStyle = stroke || FZ_S; ctx.lineWidth = 1.8; ctx.strokeRect(x, y, w, h);
+        }
+        function fzPath(ctx, pts, fill, stroke) { // offener Pfad (kein closePath)
+            ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+            ctx.closePath();
+            if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+            ctx.strokeStyle = stroke || FZ_S; ctx.lineWidth = 1.8; ctx.stroke();
+        }
+
+        
+
+        // ── Render ────────────────────────────────────────────────────────
+        function fzRenderParts(puzzle) {
+            const cv = document.getElementById('fz-parts-canvas');
+            if (!cv) return;
+            const ctx = cv.getContext('2d');
+            ctx.clearRect(0, 0, cv.width, cv.height);
+            puzzle.parts(ctx, cv.width, cv.height);
+        }
+
+        function fzRenderOptions(puzzle) {
+            ['A','B','C','D'].forEach(lbl => {
+                const cv = document.querySelector('.fz-opt-canvas[data-opt="' + lbl + '"]');
+                if (!cv) return;
+                const ctx = cv.getContext('2d');
+                ctx.clearRect(0, 0, cv.width, cv.height);
+                puzzle.opts[lbl](ctx, cv.width, cv.height);
+            });
+        }
+
+        function fzGenerateNew() {
+            let avail = figurenAufgaben.map((_,i) => i).filter(i => !fzUsed.has(i));
+            if (avail.length === 0) { fzUsed.clear(); avail = figurenAufgaben.map((_,i) => i); }
+            const idx = avail[Math.floor(Math.random() * avail.length)];
+            fzUsed.add(idx);
+            fzCurrent = figurenAufgaben[idx];
+            fzSelected = null;
+
+            fzRenderParts(fzCurrent);
+            fzRenderOptions(fzCurrent);
+
+            // Reset Styles
+            document.querySelectorAll('.fz-opt-canvas').forEach(el => {
+                el.style.borderColor = 'var(--border-light)';
+                el.style.boxShadow = '';
+            });
+            // Option E div
+            const eDiv = document.querySelector('[data-opt="E"].fz-opt-canvas');
+            if (eDiv) { eDiv.style.borderColor = 'var(--border-light)'; eDiv.style.boxShadow = ''; }
+
+            const fb = document.getElementById('fz-feedback');
+            if (fb) { fb.className = 'feedback hidden'; fb.textContent = ''; }
+            const btn = document.getElementById('fz-check-btn');
+            if (btn) btn.disabled = false;
+        }
+
+        function fzSelectOpt(opt) {
+            fzSelected = opt;
+            document.querySelectorAll('.fz-opt-canvas').forEach(el => {
+                const sel = el.dataset && el.dataset.opt === opt;
+                el.style.borderColor = sel ? 'var(--accent-emerald)' : 'var(--border-light)';
+                el.style.boxShadow = sel ? '0 0 0 3px rgba(45,90,61,0.25)' : '';
+            });
+            const eDiv = document.querySelector('[data-opt="E"].fz-opt-canvas');
+            if (eDiv) {
+                const sel = opt === 'E';
+                eDiv.style.borderColor = sel ? 'var(--accent-emerald)' : 'var(--border-light)';
+                eDiv.style.boxShadow = sel ? '0 0 0 3px rgba(45,90,61,0.25)' : '';
+            }
+        }
+
+        function fzMarkResult() {
+            const correct = fzCurrent.correct;
+            document.querySelectorAll('.fz-opt-canvas').forEach(el => {
+                if (!el.dataset) return;
+                const opt = el.dataset.opt;
+                if (opt === correct) { el.style.borderColor = '#16a34a'; el.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.3)'; }
+                else if (opt === fzSelected && opt !== correct) { el.style.borderColor = '#dc2626'; el.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.3)'; }
+            });
+            const eDiv = document.querySelector('[data-opt="E"].fz-opt-canvas');
+            if (eDiv) {
+                if (correct === 'E') { eDiv.style.borderColor = '#16a34a'; eDiv.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.3)'; }
+                else if (fzSelected === 'E') { eDiv.style.borderColor = '#dc2626'; eDiv.style.boxShadow = '0 0 0 3px rgba(220,38,38,0.3)'; }
+            }
+        }
+
+        function fzCheckAnswer() {
+            if (!fzSelected) {
+                const fb = document.getElementById('fz-feedback');
+                fb.textContent = 'Bitte wähle eine Antwort!'; fb.className = 'feedback incorrect'; return;
+            }
+            fzTotalCount++;
+            const isCorrect = fzSelected === fzCurrent.correct;
+            if (isCorrect) fzCorrectCount++;
+            fzMarkResult();
+            const fb = document.getElementById('fz-feedback');
+            fb.textContent = isCorrect ? '✓ Richtig!' : '✗ Falsch. Richtige Antwort: ' + fzCurrent.correct;
+            fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+            document.getElementById('fz-correct-count').textContent = fzCorrectCount;
+            document.getElementById('fz-total-count').textContent = fzTotalCount;
+            document.getElementById('fz-success-rate').textContent = Math.round(fzCorrectCount / fzTotalCount * 100) + '%';
+            document.getElementById('fz-check-btn').disabled = true;
+            setTimeout(fzGenerateNew, 2500);
+        }
+
+        function fzShowSolution() {
+            fzMarkResult();
+            const fb = document.getElementById('fz-feedback');
+            fb.textContent = 'Lösung: ' + fzCurrent.correct; fb.className = 'feedback correct';
+            fzTotalCount++;
+            document.getElementById('fz-total-count').textContent = fzTotalCount;
+            document.getElementById('fz-success-rate').textContent = fzTotalCount > 0 ? Math.round(fzCorrectCount / fzTotalCount * 100) + '%' : '0%';
+            setTimeout(fzGenerateNew, 2800);
         }
 
         // ============================================================
@@ -2081,7 +1623,34 @@
                 o.addEventListener('click', () => selectWissenAnswer(o.dataset.option));
             });
             document.getElementById('wissen-check-btn').addEventListener('click', checkWissenAnswer);
-            document.getElementById('wissen-new-btn').addEventListener('click', generateNewWissenFrage);
+            document.getElementById('wissen-new-btn').addEventListener('click', () => {
+                srsMode = false;
+                generateNewWissenFrage();
+            });
+
+            // SRS-Buttons
+            document.querySelectorAll('.srs-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleSrsRating(parseInt(btn.dataset.rating)));
+            });
+            document.getElementById('srs-due-btn').addEventListener('click', srsStartDueSession);
+            document.getElementById('srs-reset-btn').addEventListener('click', () => {
+                if (confirm('SRS-Fortschritt für alle Wissen-Fragen zurücksetzen?')) {
+                    srsData = {};
+                    srsSave();
+                    srsUpdateDisplay();
+                    alert('SRS zurückgesetzt.');
+                }
+            });
+
+            // Figuren
+            document.querySelectorAll('.fz-opt-canvas[data-opt]').forEach(el => {
+                el.addEventListener('click', () => fzSelectOpt(el.dataset.opt));
+            });
+            const eDiv = document.querySelector('[data-opt="E"].fz-opt-canvas');
+            if (eDiv) eDiv.addEventListener('click', () => fzSelectOpt('E'));
+            document.getElementById('fz-check-btn').addEventListener('click', fzCheckAnswer);
+            document.getElementById('fz-show-btn').addEventListener('click', fzShowSolution);
+            document.getElementById('fz-new-btn').addEventListener('click', fzGenerateNew);
 
             // Tastatur
             document.addEventListener('keydown', e => {
@@ -2098,16 +1667,27 @@
                     if (e.key === 'Escape') generateNewWissenFrage();
                     else if (e.key === 'Enter') { e.preventDefault(); checkWissenAnswer(); }
                     else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) selectWissenAnswer(e.key.toUpperCase());
+                } else if (currentModule === 'figuren') {
+                    if (e.key === 'Escape') fzGenerateNew();
+                    else if (e.key === 'Enter') { e.preventDefault(); fzCheckAnswer(); }
+                    else if (['a','b','c','d','e'].includes(e.key.toLowerCase())) fzSelectOpt(e.key.toUpperCase());
                 }
             });
+
+            // switchModule Figuren-Hook
+            const origSwitch = switchModule;
 
             // Erste Aufgaben generieren
             generateNewWord();
             generateNewZahlenfolge();
             generateNewWissenFrage();
+            fzGenerateNew();
             updateStats();
             updateZfStats();
             updateWissenStats();
+            // SRS laden und anzeigen
+            srsLoad();
+            srsUpdateDisplay();
         });
     </script>
 </body>
