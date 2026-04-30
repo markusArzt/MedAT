@@ -1,7 +1,7 @@
 // MedAT Trainer – Service Worker
 // Cached alle App-Dateien für Offline-Nutzung
 
-const CACHE = 'medat-v1';
+const CACHE = 'medat-v2';
 const FILES = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const FILES = [
   './data_zahlenfolgen.js',
   './data_wissen.js',
   './data_figuren.js',
+  './data_flashcards.js',
   './manifest.json',
 ];
 
