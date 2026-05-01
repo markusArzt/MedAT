@@ -29,14 +29,14 @@ Zwei fehlende Zahlen in einer Folge bestimmen (5 Antwortmöglichkeiten A–E, E 
 
 ---
 
-### 🧬 Wissen — 564 Fragen
+### 🧬 Wissen — 657 Fragen
 
 | Fach | Fragen | Quelle |
 |---|---|---|
 | Biologie | 222 | ÖH Bio-Skript 2022 (191 Original + 31 eigene) |
 | Chemie | 121 | ÖH Chemie-Skript 2020 (101 Original + 20 eigene) |
 | Physik | 148 | ÖH Physik-Skript 2021 (127 Original + 21 eigene) |
-| Mathematik | 73 | Stichwortliste 2026 (eigene) |
+| Mathematik | 166 | ÖH Mathe-Skript Vol.1 2021 (93 Original + 73 eigene) |
 
 Originalfragen aus den ÖH-Skripten sind mit Schwierigkeitsgrad markiert (🟢 Leicht · 🟡 Mittel · 🔴 Schwer). Eigene Ergänzungsfragen erscheinen mit ✏️.
 
@@ -98,7 +98,7 @@ medat-trainer/
 ├── index.html                  ← App (HTML + CSS + gesamte Logik)
 ├── data_wortfluessigkeit.js    ← 184 Anagramme
 ├── data_zahlenfolgen.js        ← 60 Zahlenfolgen-Aufgaben
-├── data_wissen.js              ← 564 Wissensfragen
+├── data_wissen.js              ← 657 Wissensfragen
 ├── data_figuren.js             ← 21 Figuren-Aufgaben (Canvas)
 ├── data_flashcards.js          ← 120 Flashcards
 ├── sw.js                       ← Service Worker (Offline-Cache)
