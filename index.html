@@ -1020,9 +1020,24 @@
             return shuffled;
         }
 
+        // Wortflüssigkeit – Tracking: je Schwierigkeit eigener Set
+        const wfUsed = { all: new Set(), short: new Set(), medium: new Set(), long: new Set() };
+
         function generateNewWord() {
             const words = getWordsByDifficulty();
-            currentWordData = words[Math.floor(Math.random() * words.length)];
+            const key = currentDifficulty;
+
+            // Alle durch? → Set zurücksetzen
+            if (wfUsed[key].size >= words.length) wfUsed[key].clear();
+
+            // Noch nicht gezeigte Wörter
+            const available = words.filter((_, i) => !wfUsed[key].has(i));
+            const idx = Math.floor(Math.random() * available.length);
+            const globalIdx = words.indexOf(available[idx]);
+            wfUsed[key].add(globalIdx);
+            currentWordData = words[globalIdx];
+
+            // Buchstaben anzeigen (geshuffled)
             const shuffled = shuffleArray([...currentWordData.letters]);
             const container = document.getElementById('letters-container');
             container.innerHTML = '';
@@ -1033,24 +1048,41 @@
                 el.style.animationDelay = (i * 0.1) + 's';
                 container.appendChild(el);
             });
-            // Antwortoptionen generieren
-            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            // Antwortoptionen: correctLetter + 3 andere Buchstaben AUS DEM ANAGRAMM
             const correctLetter = currentWordData.startLetter;
-            const options = [correctLetter];
-            while (options.length < 4) {
-                const r = alphabet[Math.floor(Math.random() * alphabet.length)];
-                if (!options.includes(r)) options.push(r);
+            // Alle einzigartigen Buchstaben des Wortes außer dem korrekten
+            const otherLetters = [...new Set(currentWordData.letters.filter(l => l !== correctLetter))];
+            // Fülle auf mit anderen Buchstaben des Wortes (shuffled)
+            shuffleArray(otherLetters);
+            const distractors = otherLetters.slice(0, 3);
+            // Falls das Wort zu wenige verschiedene Buchstaben hat, ergänze mit Nachbarn im Alphabet
+            if (distractors.length < 3) {
+                const code = correctLetter.charCodeAt(0);
+                for (let offset = 1; distractors.length < 3; offset++) {
+                    const c1 = String.fromCharCode(code + offset);
+                    const c2 = String.fromCharCode(code - offset);
+                    if (c1 >= 'A' && c1 <= 'Z' && c1 !== correctLetter && !distractors.includes(c1)) distractors.push(c1);
+                    if (distractors.length < 3 && c2 >= 'A' && c2 <= 'Z' && c2 !== correctLetter && !distractors.includes(c2)) distractors.push(c2);
+                }
             }
-            for (let i = options.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [options[i], options[j]] = [options[j], options[i]];
-            }
+
+            // Mische korrekte + 3 Distraktoren
+            const options = shuffleArray([correctLetter, ...distractors.slice(0, 3)]);
             currentAnswerOptions = options;
             document.getElementById('option-a-letter').textContent = 'Anfangsbuchstabe: ' + options[0];
             document.getElementById('option-b-letter').textContent = 'Anfangsbuchstabe: ' + options[1];
             document.getElementById('option-c-letter').textContent = 'Anfangsbuchstabe: ' + options[2];
             document.getElementById('option-d-letter').textContent = 'Anfangsbuchstabe: ' + options[3];
-            // Reset
+
+            // Fortschrittsanzeige
+            const total = words.length;
+            const done = wfUsed[key].size;
+            const diffEl = document.getElementById('current-difficulty');
+            const names = { all:'Alle', short:'Kurz', medium:'Mittel', long:'Lang' };
+            diffEl.textContent = names[key] + ' · ' + done + '/' + total;
+
+            // Reset UI
             selectedAnswer = null;
             document.querySelectorAll('#letter-options .letter-option').forEach(o => {
                 o.classList.remove('selected', 'correct', 'incorrect');
@@ -1141,8 +1173,6 @@
             document.querySelectorAll('.difficulty-btn[data-difficulty]').forEach(b => {
                 b.classList.toggle('active', b.dataset.difficulty === d);
             });
-            const names = { all:'Alle', short:'Kurz', medium:'Mittel', long:'Lang' };
-            document.getElementById('current-difficulty').textContent = names[d];
             generateNewWord();
         }
 
