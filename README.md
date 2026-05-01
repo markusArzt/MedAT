@@ -1,189 +1,138 @@
-# medAT Anagramm Trainer
+# MedAT Trainer
 
-Eine elegante Web-App zum Training von Anagramm-Aufgaben für den österreichischen Medizin-Aufnahmetest (medAT).
-
-## Features
-
-🧩 **Anagramm-Training:**
-- Wörter werden durcheinandergewürfelt
-- Errate das ursprüngliche Wort
-- Über 100 medizinrelevante und allgemeine Begriffe
-- Automatische Validierung
-
-💡 **Hilfestellungen:**
-- Tipp-Funktion zeigt ersten Buchstaben
-- Überspringen-Option für schwierige Wörter
-- Automatische Erkennung bei vollständiger Eingabe
-
-📊 **Fortschrittsverfolgung:**
-- Live-Statistiken (Richtig/Gesamt/Erfolgsrate)
-- Sammlung gelöster Wörter
-- Endlose Herausforderung
-
-🎨 **Elegantes Design:**
-- Sophisticated Academic Theme mit Navy & Gold
-- Responsive für alle Geräte
-- Smooth Animationen und visuelles Feedback
-- Hochwertige Typografie (Playfair Display + Source Code Pro)
-
-## Screenshots
-
-Die App zeigt durcheinandergewürfelte Buchstaben in eleganten Kacheln:
-```
-M  A  G  E  N  →  Input: MAGEN  ✓
-```
-
-## Wie es funktioniert
-
-1. **Buchstaben betrachten:** Das Wort wird zufällig durchgemischt angezeigt
-2. **Lösung eingeben:** Tippe das ursprüngliche Wort
-3. **Tipp nutzen:** Button zeigt den ersten Buchstaben
-4. **Fortschritt verfolgen:** Statistiken und gelöste Wörter werden angezeigt
-
-## Wortlisten
-
-### Medizinische Begriffe
-- Körperteile: HERZ, LUNGE, LEBER, NIERE, GEHIRN...
-- Medizin: ARZT, PATIENT, DIAGNOSE, THERAPIE...
-- Gesundheit: FIEBER, SCHMERZ, HEILUNG, VIRUS...
-
-### Allgemeine Begriffe  
-- Natur: BAUM, WASSER, SONNE, BERG, MEER...
-- Konzepte: ZEIT, LEBEN, LIEBE, HOFFNUNG...
-- Jahreszeiten: WINTER, SOMMER, HERBST...
-
-### Wissenschaft
-- Physik: ATOM, ENERGIE, KRAFT, BEWEGUNG...
-- Forschung: EXPERIMENT, THEORIE, BEWEIS...
-
-## GitHub Pages Setup
-
-### 1. Repository erstellen
-```bash
-git clone https://github.com/DEIN-USERNAME/medat-anagramm-trainer.git
-cd medat-anagramm-trainer
-
-# Hauptdatei umbenennen
-mv anagramm-trainer.html index.html
-
-git add .
-git commit -m "medAT Anagramm Trainer"
-git push origin main
-```
-
-### 2. GitHub Pages aktivieren
-1. Repository Settings → Pages
-2. Source: Deploy from branch → main
-3. Folder: / (root)
-4. Save
-
-### 3. Fertig!
-```
-https://DEIN-USERNAME.github.io/medat-anagramm-trainer/
-```
-
-## Lokale Entwicklung
-
-Einfach die HTML-Datei im Browser öffnen - keine Installation nötig!
-
-## Tastatur-Shortcuts
-
-- **ESC:** Neues Wort generieren
-- **F1:** Tipp anzeigen
-- **Ctrl+S:** Wort überspringen
-- **Enter:** Antwort überprüfen
-
-## Technische Details
-
-- **Reine Frontend-App** (HTML/CSS/JavaScript)
-- **Responsive Design** für Desktop und Mobile
-- **Elegante Animationen** mit CSS-only
-- **Fisher-Yates Shuffle** für echte Zufälligkeit
-- **Offline-fähig** nach dem ersten Laden
-
-## Anpassungen
-
-### Neue Wörter hinzufügen
-Editiere die `wordCategories` in der JavaScript-Sektion:
-
-```javascript
-const wordCategories = {
-    medical: [
-        'HERZ', 'LUNGE', 'DEIN_WORT'
-    ],
-    // ...
-};
-```
-
-### Design anpassen
-Alle Farben sind als CSS-Custom-Properties definiert:
-
-```css
-:root {
-    --primary-navy: #0f1b3c;
-    --accent-gold: #d4af37;
-    --accent-emerald: #2d5a3d;
-    /* etc. */
-}
-```
-
-### Schwierigkeitsgrad
-- **Wortlänge begrenzen:** Filtere `allWords` nach Länge
-- **Kategorien wählen:** Nutze nur bestimmte `wordCategories`
-- **Timer hinzufügen:** Implementiere Zeitbegrenzung
-
-## Algorithmus
-
-**Shuffle-Algorithmus (Fisher-Yates):**
-```javascript
-function shuffleWord(word) {
-    const letters = word.split('');
-    // Zufällige Vertauschung bis Wort != Original
-    // Verhindert endlose Schleifen bei kurzen Wörtern
-}
-```
-
-## Browser-Support
-
-- Chrome/Chromium 60+
-- Firefox 55+  
-- Safari 12+
-- Edge 79+
-
-## Performance
-
-- **Bundle-Größe:** < 30KB
-- **Ladezeit:** < 0.5s
-- **Animationen:** 60fps
-- **Memory:** < 5MB
-
-## Für den medAT
-
-Diese App trainiert speziell die **Wortflüssigkeit** und **Anagramm-Fähigkeiten**, die im medAT getestet werden. Durch die medizinischen Begriffe bereitest du dich optimal auf medizinrelevanten Wortschatz vor.
-
-## Erweiterte Features (Roadmap)
-
-- [ ] Kategoriefilter
-- [ ] Timer-Modus
-- [ ] Schwierigkeitsgrade
-- [ ] Mehrspieler-Modus
-- [ ] Export von Statistiken
-- [ ] Dunkler Modus
-- [ ] Audio-Feedback
-
-## Lizenz
-
-MIT License - Siehe LICENSE für Details.
-
-## Beitragen
-
-Pull Requests willkommen für:
-- Neue Wortlisten (besonders medizinisch)
-- Performance-Optimierungen  
-- Barrierefreiheit
-- Mobile UX-Verbesserungen
+Persönlicher Übungstrainer für den österreichischen Medizin-Aufnahmetest (MedAT / BMS).
+Läuft als Progressive Web App – im Browser, offline-fähig, ohne Installation.
 
 ---
 
-**Viel Erfolg beim medAT! 🏥🧩**
+## Inhalte
 
+### 📝 Wortflüssigkeit — 184 Anagramme
+Buchstaben werden gemischt angezeigt. Ziel: den Anfangsbuchstaben des versteckten deutschen Substantivs bestimmen.
+
+| Kategorie | Wörter |
+|---|---|
+| Kurz (≤ 5 Buchstaben) | 40 |
+| Mittel (6–8 Buchstaben) | 42 |
+| Lang (9+ Buchstaben) | 102 |
+
+**Quellen:** Offizielles IB_WF_26.pdf · ÖH Med Wien Skript 2014 · ÖH Med Wien Skript 2021 · eigene Ergänzungen
+
+**Qualitätssicherung:** Alle Anagramme wurden gegen 118.000+ deutsche Substantive (ngerman) geprüft. Wörter mit mehr als einer gültigen Lösung wurden entfernt. Letters-Arrays werden direkt aus dem Lösungswort abgeleitet — keine manuellen Tippfehler möglich.
+
+---
+
+### 🔢 Zahlenfolgen — 60 Aufgaben
+Zwei fehlende Zahlen in einer Folge bestimmen (5 Antwortmöglichkeiten A–E, E = „Keine der Antwortmöglichkeiten").
+
+**Quellen:** Offizielles IB_ZF_26.pdf · ÖH Med Wien Skript 2014
+
+---
+
+### 🧬 Wissen — 564 Fragen
+
+| Fach | Fragen | Quelle |
+|---|---|---|
+| Biologie | 222 | ÖH Bio-Skript 2022 (191 Original + 31 eigene) |
+| Chemie | 121 | ÖH Chemie-Skript 2020 (101 Original + 20 eigene) |
+| Physik | 148 | ÖH Physik-Skript 2021 (127 Original + 21 eigene) |
+| Mathematik | 73 | Stichwortliste 2026 (eigene) |
+
+Originalfragen aus den ÖH-Skripten sind mit Schwierigkeitsgrad markiert (🟢 Leicht · 🟡 Mittel · 🔴 Schwer). Eigene Ergänzungsfragen erscheinen mit ✏️.
+
+Fragen haben 4 oder 5 Antwortoptionen (bei 5 Optionen: E = „Keine der Antwortmöglichkeiten"). Optionen werden bei jeder Anzeige neu gemischt (Fisher-Yates).
+
+**Spaced Repetition (SM-2):** Nach jeder Antwort Selbstbewertung 0–5. Intervalle wachsen bei korrekter Antwort (1 → 6 → ×Ease-Faktor Tage). Fortschritt wird in `localStorage` gespeichert. Separater SRS-Modus für fällige Karten.
+
+---
+
+### 🔷 Figuren zusammensetzen — 21 Aufgaben
+Einzelteile (Canvas-Zeichnungen) müssen zur richtigen Gesamtfigur (A–D) zugeordnet werden. Option E = „Keine der Lösungsmöglichkeiten". Figuren sind vollständig in JavaScript als Canvas-Zeichnungen implementiert.
+
+---
+
+### 🃏 Flashcards — 120 Karten
+
+| Fach | Topics | Karten |
+|---|---|---|
+| Chemie | Periodensystem, Bindungen, Formeln, Reaktionen, Gleichgewicht, Besondere Elemente | 35 |
+| Biologie | Zellbiologie, Embryologie, Mikro-/Makroanatomie, Nerven, Sinnesorgane, Haut, Hormone, Immunsystem, Niere, Geschlechtsorgane, Genetik, Meiose, Mutationen, Mol. Genetik, Evolution, Ökologie, Immunbiologie | 85 |
+
+**Quelle:** Handschriftliche Mitschriften (Chemie + Biologie)
+
+Karten können nach Topic gefiltert werden. **Spaced Repetition (SM-2)** identisch zum Wissen-Modul, eigener Speicher-Key (`medat_fc_srs_v1`).
+
+Bedienung: Tippen → umdrehen · 1–6 → bewerten · Leertaste/Enter → umdrehen · Escape → nächste Karte
+
+---
+
+## Deployment
+
+### GitHub Pages (empfohlen — überall erreichbar, iPhone-tauglich)
+
+1. [github.com](https://github.com) → **New repository** → Name z.B. `medat-trainer` → Public → Create
+2. **Add file → Upload files** → alle Dateien aus diesem Ordner hochladen (inkl. `.github/workflows/deploy.yml`)
+3. **Settings → Pages → Source: GitHub Actions** → Save
+4. App läuft unter `https://DEIN-USERNAME.github.io/medat-trainer/`
+
+**iPhone:** URL in Safari öffnen → Teilen → Zum Home-Bildschirm → die App funktioniert danach **vollständig offline** (Service Worker cached alle Dateien).
+
+### Lokal (ohne Internet)
+
+```bash
+# Mac/Linux
+python3 start.py
+
+# Windows
+start.bat
+```
+
+Dann im Browser: [http://localhost:8080](http://localhost:8080)
+
+---
+
+## Dateien
+
+```
+medat-trainer/
+├── index.html                  ← App (HTML + CSS + gesamte Logik)
+├── data_wortfluessigkeit.js    ← 184 Anagramme
+├── data_zahlenfolgen.js        ← 60 Zahlenfolgen-Aufgaben
+├── data_wissen.js              ← 564 Wissensfragen
+├── data_figuren.js             ← 21 Figuren-Aufgaben (Canvas)
+├── data_flashcards.js          ← 120 Flashcards
+├── sw.js                       ← Service Worker (Offline-Cache)
+├── manifest.json               ← PWA-Manifest
+├── icon-192.png / icon-512.png ← App-Icons
+├── start.py                    ← Lokaler Server (Mac/Linux)
+├── start.bat                   ← Lokaler Server (Windows)
+├── .github/workflows/
+│   └── deploy.yml              ← GitHub Actions (Auto-Deploy)
+├── README.md                   ← Diese Datei
+└── ERWEITERUNG.md              ← Anleitung zum Erweitern
+```
+
+---
+
+## Tastaturkürzel
+
+| Modul | Taste | Aktion |
+|---|---|---|
+| Alle | A / B / C / D / E | Antwort auswählen |
+| Alle | Enter | Antwort prüfen |
+| Alle | Escape | Neue Aufgabe |
+| Wortflüssigkeit | F1 | Wort anzeigen |
+| Flashcards | Leertaste | Karte umdrehen |
+| Flashcards | 1–6 | SRS-Bewertung |
+
+---
+
+## Daten erweitern
+
+Alle Datendateien sind plain JavaScript — einfach am Ende des jeweiligen Arrays neue Einträge anhängen und auf GitHub pushen. Das Schema ist in `ERWEITERUNG.md` dokumentiert.
+
+**Neue Flashcard-Mitschrift hinzufügen:**
+1. `data_flashcards.js` öffnen
+2. Neuen Eintrag ans Array anhängen: `{ id: 121, topic: "Neues Thema", q: "Frage?", a: "Antwort." }`
+3. In `index.html` den Topic-Filter-Button ergänzen (Suche nach `fc-topic-btn`)
+4. Commit + Push → automatisch live
