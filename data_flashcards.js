@@ -509,4 +509,82 @@ const flashcardsData = [
     { id: 119, topic: "Crossing Over",
       q: "Was ist Crossing Over und warum ist es wichtig?",
       a: "Austausch von Gensegmenten zwischen homologen Chromosomen während Prophase I der Meiose (Pachytän-Stadium). Erhöht genetische Vielfalt. Erzeugt neue Allel-Kombinationen → wichtig für Evolution." },
+
+
+    // ── Chemie Teil 2: Säuren, Basen, Redox, Organik, Naturstoffe ──────
+    { id: 120, topic: "Säuren und Basen",
+      q: 'Was ist die Autoprotoloyse des Wassers und was folgt daraus für pH + pOH?',
+      a: 'H₂O + H₂O → H₃O⁺ + OH⁻. Da H₂O in großer Menge konstant: K = [H₃O⁺] × [OH⁻]. Je 10⁻⁷ mol/L H₃O⁺ und OH⁻ → pK = pH + pOH = 14.' },
+
+    { id: 121, topic: "Säuren und Basen",
+      q: 'Was ist der Unterschied zwischen Brønsted- und Lewis-Definition von Säure/Base?',
+      a: 'Brønsted: Säure = Protonendonator, Base = Protonenakzeptor. Lewis: Säure = e⁻-Paar-Akzeptor, Base = e⁻-Paar-Donator.' },
+
+    { id: 122, topic: "Säuren und Basen",
+      q: 'Was bestimmt die Stärke einer Säure strukturell?',
+      a: 'Je höher die Elektronegativität des Atoms in der Mitte und mehr O → desto stärker die Säure. z.B. Phosphorsäure H₃PO₄, Salzsäure HCl. Stoffe, bei denen Wasser sowohl H₃O⁺ als auch OH⁻ bildet = Ampholyte.' },
+
+    { id: 123, topic: "Säuren und Basen",
+      q: 'Wie berechnet man den pH starker vs. schwacher Säuren?',
+      a: 'Starke Säure: pH = −log₁₀[Säure]. Schwache Säure: pH = ½(pKs − log₁₀[Säure]). pKs = Säurekonstante: <4 = stark, >4 = schwach. pKb analog für Basen.' },
+
+    { id: 124, topic: "Säuren und Basen",
+      q: 'Was ist Neutralisation und was sind Mineralsäuren?',
+      a: 'Neutralisation: Säure + Base → H₂O + Salz (z.B. HCl + NaOH → NaCl + H₂O). Mineralsäuren: Salz-, Schwefel- und Salpetersäure (→ Magenp>sauer/Regen, Löslichkeit).' },
+
+    { id: 125, topic: "Säuren und Basen",
+      q: 'Was sind Salze und wie werden sie benannt?',
+      a: 'Salze = Ionenbindung zwischen Kationen und Anionen (L = Kationen·Anionen). Nitrate/Nitrite (NO₃⁻/NO₂⁻) → Basis N → Salpetersäure. Sulfate/Sulfite/Sulfid (SO₄²⁻/SO₃²⁻/S²⁻) → Basis S → Schwefelsäure.' },
+
+    { id: 126, topic: "Redox-Reaktionen",
+      q: 'Was bedeutet Oxidation und Reduktion?',
+      a: 'Reduktion = e⁻-Aufnahme. Oxidation = e⁻-Abgabe (Oxidationszahl ↑). Achtung bei Molekülen: bei e⁻-Sharing wird e⁻ dem elektronegativeren zugeordnet. ΣOxidationszahlen = Ladung Molekül.' },
+
+    { id: 127, topic: "Redox-Reaktionen",
+      q: 'Was ist die elektrochemische Spannungsreihe?',
+      a: 'Sortierung nach Reduktionsfreudigkeit. (Edle) Alkalimetalle = gute Reduktionsmittel (werden leicht oxidiert). Halogene = gute Oxidationsmittel (werden leicht reduziert). Vice versa.' },
+
+    { id: 128, topic: "Redox-Reaktionen",
+      q: 'Was ist eine galvanische Zelle und wo ist Anode/Kathode?',
+      a: 'Redox-Reaktion + Salzbrücke = galvanische Zelle (Stromzelle). Ort der Oxidation = Anode = −Pol. (Bei Elektrolyse ist es umgekehrt!)' },
+
+    { id: 129, topic: "Organische Chemie",
+      q: 'Was sind Alkane, Alkene und Alkine und ihre Formeln?',
+      a: 'Kohlenwasserstoffe bestehen nur aus C und H → geringe e⁻-Negativität. Alkane: 1-fach Bindung, CₙH₂ₙ₊₂ (Methan, Ethan, Propan, Butan…), Siedepunkt ↑ mit Kettenlänge. Cycloalkane: CₙHₙ. Alkene: 2-fach Bindung, CₙH₂ₙ₋₂ (C=C), kumuliert/konjugiert/isoliert. Alkine: 3-fach Bindung (C≡C), CₙH₂ₙ₋₂, ungesättigt.' },
+
+    { id: 130, topic: "Organische Chemie",
+      q: 'Was sind funktionelle Gruppen mit O und was machen sie?',
+      a: '−OH: Alkohole (primär/sekundär/tertiär; ein-/zwei-/dreiwertig; amphoter). C−O−C: Ether (aus −OH + −OH → H₂O + Ether). C=O: Carbonylgruppe (Aldehyd −al, Keton −on). COOH: Carboxylgruppe (Säuren → Alkanname + -säure, enthält Hydroxy-).' },
+
+    { id: 131, topic: "Organische Chemie",
+      q: 'Was sind Thiol-Gruppen und Disulfidbrücken?',
+      a: 'Gruppen mit S: wie O, aber weniger e⁻-negativ → Siedepunkt ↓, viel Energie gespeichert. Thiole analog Alkohole; Thioether, Thioester. 2× Thiol → Disulfidbrücke (kovalent, sehr stark, wichtig für Mensch z.B. Proteinstruktur).' },
+
+    { id: 132, topic: "Organische Chemie",
+      q: 'Was sind Amine und wie unterscheiden sie sich von Alkoholen?',
+      a: 'Gruppen mit N leiten sich von Ammoniak ab → Amine. Primär = N + 1×C, Sekundär = N + 2×C. Achtung: anders als bei −OH! (Primär/Sekundär bezieht sich auf die Anzahl der C-Substituenten am N, nicht am Kohlenstoff.)' },
+
+    { id: 133, topic: "Substanzen der Natur",
+      q: 'Wie sind Kohlenhydrate aufgebaut und welche Disaccharide sind wichtig?',
+      a: 'Formel: Cₙ(H₂O)ₙ. Als Mono-, Di- und Polysaccharide (Zucker). Unterscheidung durch Kettenlänge → wichtig: Ribose (5C) und Glucose (6C). Wichtige Disaccharide: Lactose (Gala+Gluc), Maltose (Gluc+Gluc), Saccharose (Gluc+Fruct).' },
+
+    { id: 134, topic: "Substanzen der Natur",
+      q: 'Wie sind Aminosäuren und Proteine aufgebaut?',
+      a: 'Aminosäuren bestehen aus Carboxylgruppe (COOH) und Aminogruppe (NH₂). 8 essentielle AS → Aufnahme durch Nahrung nötig. Bindung über Amid-/Peptidbindung → Peptide → Proteine. Proteine haben Primär- (Sequenz), Sekundär- (α-Helix, β-Faltblatt), Tertiär- (3D-Struktur) und Quartärstruktur (Domänen).' },
+
+    { id: 135, topic: "Substanzen der Natur",
+      q: 'Was sind Lipide und Fettsäuren?',
+      a: 'Lipide sind hydrophob, vom Organismus hergestellt, 7 Gruppen u.a. Fettsäuren. Fettsäuren sind amphiphil → COOH polar, CH-Kette unpolar. Gesättigt = keine Doppelbindung, sonst ungesättigt. ω3-Fettsäure = Doppelbindung am 3. und 4. C vom Kettenende. Fettsäuren nicht frei im Körper → in Glycerin gespeichert.' },
+
+    { id: 136, topic: "Substanzen der Natur",
+      q: 'Wie sind Nukleinsäuren aufgebaut (Nukleotid → DNA)?',
+      a: 'Nukleinbase → Nukleosin → Nukleotid → Nukleinsäure. Pyrimidin-Basen: C, T, U. Purin-Basen: A, G. Base + Zucker (Ribose) = Nukleosin. RNA vs. DNA → 2-Desoxyribose. Nukleosin + Phosphorsäure = Nukleotid (Esterbindung mit Zucker). Mehrere Nukleotide = Strang; mittels H-Brücken zum Doppelstrang (→ 2 A-T, 3 C-G).' },
+
+    { id: 137, topic: "Substanzen der Natur",
+      q: 'Welche fettlöslichen Vitamine gibt es und was machen sie?',
+      a: 'Fettlöslich: A, D, E, K. A = Retinol → Sehen. D = Cholecalciferol → Knochen, aktiv als D₃, Knochenbildung über Haut. E = Tocopherol → gegen freie Radikale, Antioxidans. K = Phyllochinon → Blutgerinnung.' },
+
+    { id: 138, topic: "Substanzen der Natur",
+      q: 'Welche wasserlöslichen Vitamine gibt es und was machen sie?',
+      a: 'C = Ascorbinsäure → Skorbut, Antioxidans. B₁ = Thiamin → Enzym. B₂ = Riboflavin → Stoffwechsel. B₃ = Niacin → Cofaktor. B₅ = Pantothensäure → Coenzym. B₆ = Pyridoxalphosphat (PALP) → wichtiger Cofaktor. B₇/H = Biotin → Stoffwechsel, Epigenetik. B₉ = Folsäure → Methylierung (Nukleinsäuren!). B₁₂ = Cobalamin → Blut, Nerven; in tierischen Produkten.' },
 ];

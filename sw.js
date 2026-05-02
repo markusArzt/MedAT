@@ -1,6 +1,6 @@
 // MedAT Trainer – Service Worker
 // WICHTIG: CACHE-Version hochzählen bei jedem Deployment mit Änderungen!
-const CACHE = 'medat-v3';
+const CACHE = 'medat-v4';
 
 const STATIC = [
   './',
