@@ -12,7 +12,30 @@ medat-trainer/
 └── ERWEITERUNG.md          ← Diese Anleitung
 ```
 
-## Nutzung
+## Deployment & Cache-Verwaltung
+
+### Nach jedem Update: Cache-Version hochzählen
+
+Wenn du neue Fragen oder andere Daten pushst, **muss** die Cache-Version in `sw.js` erhöht werden — sonst sehen Nutzer auf dem iPhone noch die alte Version.
+
+In `sw.js`, erste Zeile ändern:
+```js
+const CACHE = 'medat-v3';  // → 'medat-v4', 'medat-v5', ...
+```
+
+Dann committen und pushen — GitHub Actions deployt automatisch, und beim nächsten Öffnen der App wird der alte Cache verworfen.
+
+### Fetch-Strategie
+
+- **Datendateien** (`data_*.js`): Network-first — beim Öffnen wird immer die neueste Version vom Server geholt, Fallback auf Cache wenn offline
+- **App-Shell** (`index.html`, Icons): Cache-first — bleibt schnell und offline-fähig
+
+### Manueller Cache-Reset (iPhone)
+
+Falls eine Aktualisierung trotzdem nicht ankommt:
+Einstellungen → Safari → Erweitert → Websitedaten → Deine GitHub-Pages-URL suchen → Löschen
+
+
 
 Alle Dateien in **einem Ordner** behalten und `index.html` im Browser öffnen.
 Bei `file://`-Protokoll muss der Browser lokale Scripts erlauben (Chrome: `--allow-file-access-from-files`).
