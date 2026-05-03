@@ -620,7 +620,7 @@ const wissenFragen = {
                 { q:'Ein Quadrat besitzt wie viele Symmetrieachsen?', opts:['1','2','4','6','8'], correct:2, level:'mittel' },
                 { q:'Gibt man einer Zahl 2/3 ihrer Selbst hinzu und dividiert die Summe durch 3, so ergibt es 5. Die Zahl lautet…', opts:['6','7','8','9','10'], correct:3, level:'mittel' },
                 { q:'Mit welcher Bedingung berechnet man den Wendepunkt einer Funktion?', opts:['f\'(x) = 0','f\'(x) = 1','f\'\'\'(x) = 0','f\'\'(x) = 0','f(x) = 0'], correct:3, level:'mittel' },
-                { q:'Ein Wasserhahn lässt 30 L/min durch. Wie viele ml strömen in einer halben Stunde bei 30% Öffnung?', opts:['2,7·10⁵','2,7·10⁴','270','4,5·10⁵','4,5·10⁴'], correct:1, level:'mittel' },
+                { q:'Ein Wasserhahn lässt 30 L/min durch. Wie viele ml strömen in einer halben Stunde bei 30% Öffnung?', opts:['2,7·10⁵','2,7·10⁴','270','4,5·10⁵','4,5·10⁴'], correct:0, level:'mittel' },
                 { q:'Was ergibt ½ + ¾ − ⅓ + ½ (auf 2 Dezimalstellen gerundet)?', opts:['1,42','1,52','1,82','2,08','2,18'], correct:0, level:'mittel' },
                 { q:'Welchen Exponenten hat das Präfix „Tera"?', opts:['6','9','12','15','18'], correct:2, level:'mittel' },
                 { q:'Ein Kreis hat eine Fläche von 48 mm². Wie groß ist ungefähr der Umfang eines Viertelkreises mit gleichem Radius?', opts:['4 mm','5 mm','6 mm','7 mm','8 mm'], correct:2, level:'mittel' },
