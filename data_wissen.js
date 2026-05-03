@@ -678,6 +678,6 @@ const wissenFragen = {
                 { q:'Einem Patienten sollen 80 mg verabreicht werden. Er hat bereits 10% davon erhalten, davon sind 25% verloren gegangen. Wieviel muss noch verabreicht werden?', opts:['78 mg','76 mg','74 mg','72 mg','68 mg'], correct:2, level:'schwer' },
                 { q:'x + 1 = (y+3)/5 und x < 3. Welchen Wert darf y nicht annehmen?', opts:['y = 16','y = −5','y = 0','y = 10','y = 21'], correct:4, level:'schwer' },
                 { q:'Welche Zahl findet sich in der Menge der rationalen Zahlen wieder?', opts:['1/3','2π/4','30/180','21/126','π/(8π)'], correct:4, level:'schwer' },
-                { q:'Das Volumen des Rotationskörpers f(x) = 2x² zwischen 1 und 2 beträgt:', opts:['ca. 20π','ca. 40π','ca. 80π','ca. 160π','ca. 320π'], correct:2, level:'schwer' },
+                { q:'Das Volumen des Rotationskörpers f(x) = 2x² zwischen 1 und 2 beträgt:', opts:['ca. 20E³','ca. 40E³','ca. 80E³','ca. 160E³','ca. 320E³'], correct:2, level:'schwer' },
             ]
         };;
