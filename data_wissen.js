@@ -641,7 +641,7 @@ const wissenFragen = {
                 { q:'2 m³ entsprechen wie vielen ml?', opts:['20.000.000 ml','2.000.000 ml','200.000 ml','20.000 ml','2.000 ml'], correct:1, level:'mittel' },
                 { q:'100 mm² ergeben wie viele km²?', opts:['10⁻⁸','10⁻⁹','10⁻¹⁰','10⁻¹²','10⁻¹³'], correct:2, level:'mittel' },
                 { q:'Berechne: √(10¹² · 10⁻⁴ / (10⁻⁸ · √10⁴))', opts:['10⁹','10¹²','10¹⁰','10⁷','10¹⁴'], correct:3, level:'schwer' },
-                { q:'Ein zylinderförmiger Muskel verkürzt sich um 30% bei gleichbleibendem Volumen. Was passiert mit dem Durchmesser?', opts:['Steigt um ca. 50%','Steigt um ca. 39%','Steigt um ca. 19,5%','Steigt um ca. 30%','Steigt um ca. 70%'], correct:1, level:'schwer' },
+                { q:'Ein zylinderförmiger Muskel verkürzt sich um 30% bei gleichbleibendem Volumen. Was passiert mit dem Durchmesser?', opts:['Steigt um ca. 50%','Steigt um ca. 39%','Steigt um ca. 19,5%','Steigt um ca. 30%','Steigt um ca. 70%'], correct:2, level:'schwer' },
                 { q:'Wie lässt sich die Mischung von 10 g in 250 mL noch darstellen?', opts:['40 g/L','20 g/L','60 g/L','4·10⁻⁶ g/μL','6·10⁻⁶ g/μL'], correct:0, level:'schwer' },
                 { q:'Das Volumen eines Prismas beträgt 72 cm³. Es hat eine Grundfläche von 9 cm². Wie groß ist die Höhe?', opts:['6','7','8','9','Aus diesen Angaben nicht errechenbar'], correct:2, level:'schwer' },
                 { q:'Welche Formel gibt die Raumdiagonale eines Würfels mit Kantenlänge l an?', opts:['l · √3','l² · √3','l² · √3','l · √2','l² · √2'], correct:0, level:'schwer' },
