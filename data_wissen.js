@@ -659,7 +659,7 @@ const wissenFragen = {
                 { q:'200 ml einer Lösung enthalten Natriumlauge in der Konzentration 40 mg/L. Welche Aussage ist richtig?', opts:['8% bestehen aus Natriumlauge','8 Promille bestehen aus Natriumlauge','5% bestehen aus Natriumlauge','Enthält 50 mg Natriumlauge','Enthält 8 mg Natriumlauge'], correct:4, level:'schwer' },
                 { q:'Eine Kugel hat die Oberfläche von 20 m². Welches Volumen hat sie (in m³)?', opts:['2,52','25,2','12,6','84,1','8,41'], correct:4, level:'schwer' },
                 { q:'75% von 80% ergeben:', opts:['75%','70%','65%','60%','32%'], correct:3, level:'schwer' },
-                { q:'Eine Funktion schneidet die y-Achse bei (0|2) und verläuft durch (1|1). Um welche Funktion könnte es sich handeln?', opts:['f(x) = x² + 2','f(x) = x³','f(x) = −x³ + 2','f(x) = −x² − 2','f(x) = −2x² + 2'], correct:4, level:'schwer' },
+                { q:'Eine Funktion schneidet die y-Achse bei (0|2) und verläuft durch (1|1). Um welche Funktion könnte es sich handeln?', opts:['f(x) = x² + 2','f(x) = x³','f(x) = −x³ + 2','f(x) = −x² − 2','f(x) = −2x² + 2'], correct:2, level:'schwer' },
                 { q:'1000 km/h entsprechen…', opts:['6000 m/s','6.000.000 m/s','277,8 m/s','277,8 km/s','1000 m/s'], correct:2, level:'schwer' },
                 { q:'Welche Aussage ist falsch?', opts:['log(0) ist undefiniert','log(1) = 0','e⁰ = 1','log(u·v) = log u + log v','u = eˡᵒᵍ ᵘ'], correct:4, level:'schwer' },
                 { q:'Zwei positive Zahlen a und b: 3/4 von a gleich 2/5 von b. Daraus folgt:', opts:['15a = 8b','7a = 8b','3a = 2b','5a = 12b','8a = 15b'], correct:0, level:'schwer' },
