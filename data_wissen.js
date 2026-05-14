@@ -499,7 +499,7 @@ const wissenFragen = {
                 { q:'Was ist Beugung (Diffraktion)?', opts:['Reflexion an einer glatten Fläche','Ablenkung von Wellen an Hindernissen oder Spaltöffnungen','Brechung an Grenzflächen','Absorption von Licht','Keine der Antworten'], correct:1 },
                 { q:'Welche Strahlungsart hat die längste Wellenlänge?', opts:['Gammastrahlung','Röntgenstrahlung','Sichtbares Licht','Infrarotstrahlung','Radiowellen'], correct:4 },
                 { q:'Was ist die Kapazität eines Kondensators?', opts:['C = U/Q','C = Q/U','C = R·I','C = P/U','C = U·I'], correct:1 },
-                { q:'Was ist elektrische Arbeit?', opts:['W = U/I','W = U·I·t','W = R/I','W = I²·R','Beide b und d sind richtig'], correct:4 },
+                { q:'Was ist elektrische Arbeit?', opts:['W = U/I','W = U·I·t','W = R/I','W = I²·R·t','W = U·I·t and W = I²·R·t'], correct:4 },
                 { q:'Was ist spezifischer Widerstand ρ?', opts:['Widerstand pro Länge','Materialabhängige Konstante: R = ρ·l/A','Widerstand pro Fläche','Leitfähigkeit','Keine der Antworten'], correct:1 },
                 { q:'Was besagt der Zweite Hauptsatz der Thermodynamik in Bezug auf Entropie?', opts:['Entropie nimmt in abgeschlossenen Systemen ab','Entropie bleibt in allen Systemen konstant','Entropie in abgeschlossenen Systemen nimmt nie ab (ΔS ≥ 0)','Entropie kann beliebig verändert werden','Keine der Antworten'], correct:2 },
                 { q:'Was ist der Wirkungsgrad einer Wärmekraftmaschine (Carnot)?', opts:['η = W_nutz / Q_ein','η = T_kalt / T_warm','η = 1 - (T_kalt / T_warm)','η = Q_ab / Q_ein','Keine der Antworten'], correct:2 },
