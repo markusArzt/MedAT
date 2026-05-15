@@ -587,7 +587,7 @@ const wissenFragen = {
                 { q:'Wie viele Minuten hat eine Woche?', opts:['1440','5040','10080','60480','Keine der Antworten'], correct:2 },
                 { q:'Das Präfix „femto" steht für welchen Wert?', opts:['10⁻⁹','10⁻¹⁵','10⁻¹²','10¹⁵','10¹²'], correct:1, level:'leicht' },
                 { q:'246 × 38 ergibt?', opts:['9328','9338','9348','9358','9368'], correct:2, level:'leicht' },
-                { q:'(aˣ)ʸ = ?', opts:['aˣ + aʸ','aˣʸ','(aˣ)×y','axʸ','aˣ⁺ʸ'], correct:3, level:'leicht' },
+                { q:'(aˣ)ʸ = ?', opts:['aˣ + aʸ','aˣʸ','(aˣ)×y','axʸ','aˣ⁺ʸ'], correct:1, level:'leicht' },
                 { q:'Wieviel Liter sind 1 dm³?', opts:['10⁻²','10⁻¹','1','10','10²'], correct:2, level:'leicht' },
                 { q:'Was ergibt 10³ × 10⁻⁹?', opts:['10¹²','10¹⁸','10⁻¹⁸','10⁶','10⁻⁶'], correct:4, level:'leicht' },
                 { q:'Das Präfix „nano" steht für welchen Wert?', opts:['10⁻⁶','10⁻¹⁵','10⁻¹²','10⁻⁹','10⁻³'], correct:3, level:'leicht' },
